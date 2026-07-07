@@ -18,7 +18,8 @@ minimum_handson/
 ├── README.md              ← 進め方・章一覧
 ├── part1_基礎/
 │   ├── README.md
-│   └── 1_board_list/      ← Step 1 のコード一式（実装済み）
+│   ├── 1_board_list/      ← Step 1 のコード一式（実装済み）
+│   └── 2_board_detail/    ← Step 2 のコード一式（実装済み）
 └── part2_応用/
     └── README.md          ← 以降の章（順次追加）
 ```
