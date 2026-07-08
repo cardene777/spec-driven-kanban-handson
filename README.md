@@ -7,22 +7,27 @@ Next.js（App Router）+ Prisma + SQLite でカンバンアプリを段階的に
 
 ## 全体構成
 
-教材の章ごとにトップレベルのハンズオン用ディレクトリを分けています。
+ハンズオン（＝稼働アプリを直下に持つ末端ディレクトリ）を、目的ごとに配置しています。
+関連するものは親ディレクトリでまとめています。
 
-- [`minimum_handson/`](./minimum_handson/) … 教材 **第2章**
-- [`main_handson/`](./main_handson/) … 教材 **第5章**
+- [`minimum_handson/`](./minimum_handson/) … 進め方別のハンズオンを束ねる親
+  - [`simple_prompt/`](./minimum_handson/simple_prompt/) … プロンプトで進める版
+  - [`simple_skill/`](./minimum_handson/simple_skill/) … スキルで進める版
+- [`main_handson/`](./main_handson/) … ハンズオン（末端）
 
-**各ハンズオンのディレクトリ直下が「常に最新の稼働アプリ」**で、作業はここで行います。
+**各ハンズオン（末端ディレクトリ）の直下が「常に最新の稼働アプリ」**で、作業はここで行います。
 各ステップの成果は、その時点のソースを `1_...` / `2_...` にコピーしたスナップショットとして残します。
 
 ```
 <repo>/
 ├── README.md
-├── minimum_handson/       ← 教材 第2章
-│   ├── app/ prisma/ ...   ← ★ 直下 = 常に最新の稼働アプリ（ここで作業・データ保持）
-│   ├── 1_xxx/             ← 各ステップのスナップショット（コピー）
-│   └── 2_xxx/
-└── main_handson/          ← 教材 第5章（同じ構成）
+├── minimum_handson/
+│   ├── simple_prompt/        ← ハンズオン（末端）
+│   │   ├── app/ prisma/ ...  ← ★ 直下 = 常に最新の稼働アプリ（ここで作業・データ保持）
+│   │   ├── 1_xxx/            ← 各ステップのスナップショット（コピー）
+│   │   └── 2_xxx/
+│   └── simple_skill/         ← ハンズオン（末端・同じ構成）
+└── main_handson/             ← ハンズオン（末端・同じ構成）
 ```
 
 詳細は各ディレクトリの README を参照してください。
@@ -35,10 +40,10 @@ Next.js（App Router）+ Prisma + SQLite でカンバンアプリを段階的に
 
 ## 動かし方
 
-対象ハンズオンのディレクトリ直下で起動します:
+対象ハンズオン（末端ディレクトリ）直下で起動します:
 
 ```bash
-cd minimum_handson   # または main_handson
+cd minimum_handson/simple_prompt   # 対象のハンズオンへ
 # 初回のみ
 npm install
 cp .env.example .env
