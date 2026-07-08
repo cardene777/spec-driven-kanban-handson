@@ -4,26 +4,23 @@ Next.js（App Router）+ Prisma + SQLite でカンバンアプリを段階的に
 
 > **このリポジトリのルートには実装コードを置きません。**
 > ルートは説明（このファイル）のみで、実際のコードはすべて
-> [`minimum_handson/`](./minimum_handson/) 配下に、**ステップ（step）→ 章（chapter）** の
+> [`minimum_handson/`](./minimum_handson/) 配下に、**章（chapter）→ ステップ** の
 > ディレクトリ構成で置いています。
 
-## 全体構成（2ステップ・5章）
+## 全体構成
 
-ハンズオンは大きく **2ステップ・5章** に分かれます。
-各章のディレクトリには、**その章まで進めた時点のコード全体**（累積スナップショット）が入っており、
-そのディレクトリだけをコピーすれば単体で動作します。
+教材の章ごとに `chapter_2/` `chapter_5/` を用意し、その中を段階的なステップ（`1_...`, `2_...` …）に分けています。
+各ステップのディレクトリには、**そのステップまで進めた時点のコード全体**（累積スナップショット）が入っています。
 
 ```
 minimum_handson/
-├── README.md              ← 進め方・章一覧
-├── step1_基礎/
-│   ├── README.md
-│   ├── 1_board_list/      ← 第1章 のコード一式（実装済み）
-│   ├── 2_board_detail/    ← 第2章 のコード一式（実装済み）
-│   └── 3_card_create/     ← 第3章 のコード一式（実装済み）
-└── step2_応用/
-    ├── README.md          ← 以降の章（順次追加）
-    └── 4_card_edit/       ← 第4章 のコード一式（実装済み）
+├── README.md              ← 進め方・一覧
+├── chapter_2/             ← 教材 第2章
+│   ├── 1_board_list/      ← ボード一覧・作成（実装済み）
+│   ├── 2_board_detail/    ← ボード詳細・リスト（実装済み）
+│   ├── 3_card_create/     ← カード追加（実装済み）
+│   └── 4_card_edit/       ← カードのインライン編集（実装済み）
+└── chapter_5/             ← 教材 第5章（今後追加）
 ```
 
 詳細は [`minimum_handson/README.md`](./minimum_handson/README.md) を参照してください。
@@ -34,16 +31,16 @@ minimum_handson/
 - Tailwind CSS v4
 - Prisma + SQLite（Node.js v20.12 互換のため Prisma は `6.5.0`）
 
-## 章の動かし方
+## 動かし方
 
-各章のディレクトリに移動して、**`npm run dev` だけ**で起動します:
+対象のステップのディレクトリに移動して、**`npm run dev` だけ**で起動します:
 
 ```bash
-cd minimum_handson/step1_基礎/1_board_list
+cd minimum_handson/chapter_2/1_board_list
 npm run dev   # 初回は依存インストール〜.env作成〜DBマイグレーションまで自動実行して起動
 ```
 
-http://localhost:3000 を開くと、その章の画面が表示されます。
+http://localhost:3000 を開くと、その回の画面が表示されます。
 
-DB は全章で共有（`minimum_handson/dev.db`）なので、ある章で追加したデータは別の章にも引き継がれます。
+DB は全体で共有（`minimum_handson/dev.db`）なので、あるステップで追加したデータは別のステップにも引き継がれます。
 詳細は [`minimum_handson/README.md`](./minimum_handson/README.md) を参照してください。
