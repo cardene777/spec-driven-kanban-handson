@@ -61,6 +61,10 @@ npx prisma migrate dev
 npm run dev
 ```
 
+> `npm run dev` は `.env` が無ければ `.env.example` から自動生成します
+> （`"dev": "cp -n .env.example .env && next dev"`）。ただし `npx prisma migrate dev`
+> の前には `.env` が必要なので、上記の手順どおり先に `cp .env.example .env` を実行してください。
+
 ## 新しい章を追加するとき
 
 直前の章ディレクトリを丸ごと複製してから、その章の変更を加えます（累積スナップショットを維持）。
