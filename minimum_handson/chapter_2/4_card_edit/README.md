@@ -18,11 +18,11 @@
 ## セットアップ手順
 
 ```bash
-npm run dev   # 初回は依存インストール〜.env作成〜DBマイグレーションまで自動実行して起動
+npm install
+cp .env.example .env
+npx prisma migrate dev
+npm run dev
 ```
-
-`npm run dev` だけでOKです（初回のみ依存インストールに時間がかかります）。
-DB は全章共有の `minimum_handson/dev.db` に保存されます（データは章をまたいで引き継がれます）。
 
 ボード → リスト → カードを用意し、カードのタイトルをクリック → 書き換え → 枠外をクリック（フォーカスアウト）で保存されます。
 
