@@ -53,17 +53,19 @@ minimum_handson/
 
 ## 章の動かし方（共通）
 
-対象の章ディレクトリに移動して、**2コマンドだけ**で起動します:
+対象の章ディレクトリに移動して、**`npm run dev` だけ**で起動します:
 
 ```bash
-npm install
 npm run dev
 ```
 
-- `npm install` 時に `postinstall` で Prisma Client を生成します。
-- `npm run dev` 時に `predev` で `.env` の作成（`.env.example` から）と DB のマイグレーション適用
-  （`prisma migrate deploy`）を自動実行してから起動します。
-- つまり手動での `cp .env.example .env` や `npx prisma migrate dev` は不要です。
+`npm run dev` 実行時に `predev` が次を自動で行います（初回のみ時間がかかります）:
+
+1. `node_modules` が無ければ `npm install`（`postinstall` で Prisma Client も生成）
+2. `.env` が無ければ `.env.example` からコピー
+3. `prisma migrate deploy` で DB にマイグレーションを適用
+
+つまり手動での `npm install` / `cp .env.example .env` / `npx prisma migrate dev` は不要です。
 
 ### データは章をまたいで共有されます
 
