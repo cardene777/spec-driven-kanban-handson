@@ -39,8 +39,12 @@ minimum_handson/
 
 ```bash
 cd minimum_handson/chapter_2
-npm run setup   # 初回のみ（依存インストール + DB 作成）
-npm run dev     # 2回目以降
+# 初回のみ
+npm install
+cp .env.example .env
+npx prisma migrate dev
+# 起動（2回目以降はこれだけ）
+npm run dev
 ```
 
 http://localhost:3000 を開くと最新アプリが表示されます。

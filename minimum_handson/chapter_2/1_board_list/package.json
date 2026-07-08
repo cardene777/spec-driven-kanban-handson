@@ -3,12 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "( [ -d node_modules ] || npm install ) && cp -n .env.example .env && prisma migrate deploy",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "postinstall": "prisma generate"
+    "lint": "eslint"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",

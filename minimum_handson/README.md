@@ -40,10 +40,12 @@ minimum_handson/
 稼働アプリのある章ディレクトリ（例 `chapter_2/`）直下で:
 
 ```bash
-# 初回のみ（依存インストール + DB 作成）
-npm run setup
+# 初回のみ（依存インストール + .env 作成 + DB 作成）
+npm install
+cp .env.example .env
+npx prisma migrate dev
 
-# 2回目以降
+# 起動（2回目以降はこれだけ）
 npm run dev
 ```
 

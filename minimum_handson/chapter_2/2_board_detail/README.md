@@ -20,11 +20,11 @@ URL のボード ID からボード情報とリスト一覧を取得して表示
 ## セットアップ手順
 
 ```bash
-npm run dev   # 初回は依存インストール〜.env作成〜DBマイグレーションまで自動実行して起動
+npm install
+cp .env.example .env
+npx prisma migrate dev
+npm run dev
 ```
-
-`npm run dev` だけでOKです（初回のみ依存インストールに時間がかかります）。
-DB は全章共有の `minimum_handson/dev.db` に保存されます（データは章をまたいで引き継がれます）。
 
 http://localhost:3000 を開き、ボードをクリックすると詳細ページが表示されます。
 「リスト作成」からタイトルを入力して送信すると、リストが `order` の末尾に追加されます。
