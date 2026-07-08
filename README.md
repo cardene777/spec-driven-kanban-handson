@@ -22,7 +22,8 @@ minimum_handson/
 │   ├── 2_board_detail/    ← 第2章 のコード一式（実装済み）
 │   └── 3_card_create/     ← 第3章 のコード一式（実装済み）
 └── step2_応用/
-    └── README.md          ← 以降の章（順次追加）
+    ├── README.md          ← 以降の章（順次追加）
+    └── 4_card_edit/       ← 第4章 のコード一式（実装済み）
 ```
 
 詳細は [`minimum_handson/README.md`](./minimum_handson/README.md) を参照してください。
