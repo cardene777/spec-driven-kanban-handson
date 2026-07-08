@@ -48,23 +48,31 @@ minimum_handson/
 | --- | --- |
 | `app/` `lib/` `prisma/schema.prisma` `prisma/migrations/` | `node_modules/`（`npm install`） |
 | `package.json` `package-lock.json` 各種設定ファイル | `.next/`（ビルド時に生成） |
-| `.env.example` | `.env`（`cp .env.example .env`） |
-| `README.md`（手順書） | `prisma/dev.db`（`npx prisma migrate dev` で生成） |
+| `.env.example` | `.env`（`npm run dev` の predev で自動生成） |
+| `README.md`（手順書） | `dev.db`（共有 DB `minimum_handson/dev.db`、自動生成） |
 
 ## 章の動かし方（共通）
 
-対象の章ディレクトリに移動して:
+対象の章ディレクトリに移動して、**2コマンドだけ**で起動します:
 
 ```bash
 npm install
-cp .env.example .env
-npx prisma migrate dev
 npm run dev
 ```
 
-> `npm run dev` は `.env` が無ければ `.env.example` から自動生成します
-> （`"dev": "cp -n .env.example .env && next dev"`）。ただし `npx prisma migrate dev`
-> の前には `.env` が必要なので、上記の手順どおり先に `cp .env.example .env` を実行してください。
+- `npm install` 時に `postinstall` で Prisma Client を生成します。
+- `npm run dev` 時に `predev` で `.env` の作成（`.env.example` から）と DB のマイグレーション適用
+  （`prisma migrate deploy`）を自動実行してから起動します。
+- つまり手動での `cp .env.example .env` や `npx prisma migrate dev` は不要です。
+
+### データは章をまたいで共有されます
+
+DB は各章ではなく **`minimum_handson/dev.db`（全章で共有）** に保存されます
+（各章の `.env.example` で `DATABASE_URL="file:../../../dev.db"` を指定）。
+そのため、ある章で追加したボード/リスト/カードは、別の章に移っても引き継がれます。
+
+> 章を単体で切り離して使いたい場合は、その章の `.env`（または `.env.example`）の
+> `DATABASE_URL` を `file:./dev.db` に変更すると、その章専用の DB になります。
 
 ## 新しい章を追加するとき
 

@@ -18,11 +18,12 @@
 ## セットアップ手順
 
 ```bash
-npm install
-cp .env.example .env
-npx prisma migrate dev
-npm run dev
+npm install   # postinstall で Prisma Client を生成
+npm run dev   # predev で .env 生成 + DB マイグレーションを自動実行して起動
 ```
+
+`npm install` 後は `npm run dev` だけで、`.env` の作成と DB のマイグレーションまで自動で行われます。
+DB は全章共有の `minimum_handson/dev.db` に保存されます（データは章をまたいで引き継がれます）。
 
 http://localhost:3000 を開き、ボード → リストの順に用意してから、
 リスト内の「+ カード追加」でカードを追加できます。
