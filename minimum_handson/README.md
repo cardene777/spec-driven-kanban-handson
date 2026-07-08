@@ -16,7 +16,8 @@ minimum_handson/
 ├── README.md
 ├── app/ lib/ prisma/ package.json ...  ← ★ 直下 = 常に最新の稼働アプリ（ここで作業）
 ├── 1_board_list/                        ← 各ステップのスナップショット（コピー）
-└── 2_xxx/
+├── 2_board_detail/
+└── 3_xxx/
 ```
 
 （教材 第5章分は別ディレクトリ [`../main_handson/`](../main_handson/) にあります。）
@@ -26,6 +27,7 @@ minimum_handson/
 | ステップ | ディレクトリ | 内容 | 状態 |
 | --- | --- | --- | --- |
 | 1 | [`1_board_list/`](./1_board_list/) | ボード一覧画面 + ボード作成（Next.js App Router + Prisma/SQLite、`GET`/`POST /api/boards`） | 完了 |
+| 2 | [`2_board_detail/`](./2_board_detail/) | ボード詳細ページ + リスト作成（`List` モデル追加、`order` 昇順、`GET`/`POST /api/boards/[id]/lists`） | 完了 |
 
 ## 技術スタック
 
@@ -68,5 +70,9 @@ rsync -a \
   --exclude 'prisma/dev.db' --exclude 'prisma/dev.db-journal' \
   --exclude next-env.d.ts \
   --exclude '[0-9]*_*/' \
-  ./ 2_xxx/
+  ./ 3_xxx/
+
+# 注意: 上の '[0-9]*_*/' 除外は Prisma のタイムスタンプ付き migration フォルダも
+# 巻き込むため、スナップショット後に migrations を明示コピーで補完する:
+rsync -a prisma/migrations/ 3_xxx/prisma/migrations/
 ```
