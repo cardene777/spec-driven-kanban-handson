@@ -9,17 +9,19 @@ Next.js（App Router）+ Prisma + SQLite でカンバンアプリを段階的に
 
 ## 全体構成
 
-教材の章ごとに `chapter_2/` `chapter_5/` を用意し、その中を段階的なステップ（`1_...`, `2_...` …）に分けています。
-各ステップのディレクトリには、**そのステップまで進めた時点のコード全体**（累積スナップショット）が入っています。
+教材の章ごとに `chapter_2/` `chapter_5/` を用意しています。
+**各章ディレクトリの直下が「常に最新の稼働アプリ」**で、作業はここで行います。
+各ステップの成果は、その時点のソースを `1_...` / `2_...` にコピーしたスナップショットとして残します。
 
 ```
 minimum_handson/
-├── README.md              ← 進め方・一覧
+├── README.md
 ├── chapter_2/             ← 教材 第2章
-│   ├── 1_board_list/      ← ボード一覧・作成（実装済み）
-│   ├── 2_board_detail/    ← ボード詳細・リスト（実装済み）
-│   ├── 3_card_create/     ← カード追加（実装済み）
-│   └── 4_card_edit/       ← カードのインライン編集（実装済み）
+│   ├── app/ prisma/ ...   ← ★ 直下 = 常に最新の稼働アプリ（ここで作業・データ保持）
+│   ├── 1_board_list/      ← 各ステップのスナップショット（コピー）
+│   ├── 2_board_detail/
+│   ├── 3_card_create/
+│   └── 4_card_edit/
 └── chapter_5/             ← 教材 第5章（今後追加）
 ```
 
@@ -33,14 +35,14 @@ minimum_handson/
 
 ## 動かし方
 
-対象のステップのディレクトリに移動して、**`npm run dev` だけ**で起動します:
+稼働アプリのある章ディレクトリ直下で起動します:
 
 ```bash
-cd minimum_handson/chapter_2/1_board_list
-npm run dev   # 初回は依存インストール〜.env作成〜DBマイグレーションまで自動実行して起動
+cd minimum_handson/chapter_2
+npm run setup   # 初回のみ（依存インストール + DB 作成）
+npm run dev     # 2回目以降
 ```
 
-http://localhost:3000 を開くと、その回の画面が表示されます。
-
-DB は全体で共有（`minimum_handson/dev.db`）なので、あるステップで追加したデータは別のステップにも引き継がれます。
+http://localhost:3000 を開くと最新アプリが表示されます。
+DB は直下の `prisma/dev.db` に保持されるので、追加したデータは消えません。
 詳細は [`minimum_handson/README.md`](./minimum_handson/README.md) を参照してください。
