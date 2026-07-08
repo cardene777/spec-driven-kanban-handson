@@ -3,29 +3,29 @@
 Next.js（App Router）+ Prisma + SQLite でカンバンアプリを段階的に作るハンズオンです。
 
 > **このリポジトリのルートには実装コードを置きません。**
-> ルートは説明（このファイル）のみで、実際のコードはすべて
-> [`minimum_handson/`](./minimum_handson/) 配下に、**章（chapter）→ ステップ** の
-> ディレクトリ構成で置いています。
+> ルートは説明（このファイル）のみで、実際のコードは各ハンズオンのディレクトリ配下に置いています。
 
 ## 全体構成
 
-教材の章ごとに `chapter_2/` `chapter_5/` を用意しています。
-**各章ディレクトリの直下が「常に最新の稼働アプリ」**で、作業はここで行います。
+教材の章ごとにトップレベルのハンズオン用ディレクトリを分けています。
+
+- [`minimum_handson/`](./minimum_handson/) … 教材 **第2章**
+- [`main_handson/`](./main_handson/) … 教材 **第5章**
+
+**各ハンズオンのディレクトリ直下が「常に最新の稼働アプリ」**で、作業はここで行います。
 各ステップの成果は、その時点のソースを `1_...` / `2_...` にコピーしたスナップショットとして残します。
 
 ```
-minimum_handson/
+<repo>/
 ├── README.md
-├── chapter_2/             ← 教材 第2章
+├── minimum_handson/       ← 教材 第2章
 │   ├── app/ prisma/ ...   ← ★ 直下 = 常に最新の稼働アプリ（ここで作業・データ保持）
-│   ├── 1_board_list/      ← 各ステップのスナップショット（コピー）
-│   ├── 2_board_detail/
-│   ├── 3_card_create/
-│   └── 4_card_edit/
-└── chapter_5/             ← 教材 第5章（今後追加）
+│   ├── 1_xxx/             ← 各ステップのスナップショット（コピー）
+│   └── 2_xxx/
+└── main_handson/          ← 教材 第5章（同じ構成）
 ```
 
-詳細は [`minimum_handson/README.md`](./minimum_handson/README.md) を参照してください。
+詳細は各ディレクトリの README を参照してください。
 
 ## 技術スタック
 
@@ -35,10 +35,10 @@ minimum_handson/
 
 ## 動かし方
 
-稼働アプリのある章ディレクトリ直下で起動します:
+対象ハンズオンのディレクトリ直下で起動します:
 
 ```bash
-cd minimum_handson/chapter_2
+cd minimum_handson   # または main_handson
 # 初回のみ
 npm install
 cp .env.example .env
@@ -49,4 +49,3 @@ npm run dev
 
 http://localhost:3000 を開くと最新アプリが表示されます。
 DB は直下の `prisma/dev.db` に保持されるので、追加したデータは消えません。
-詳細は [`minimum_handson/README.md`](./minimum_handson/README.md) を参照してください。
