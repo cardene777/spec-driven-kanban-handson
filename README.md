@@ -35,14 +35,15 @@ minimum_handson/
 
 ## 章の動かし方
 
-各章のディレクトリに移動して、次を実行します（章共通）:
+各章のディレクトリに移動して、**2コマンド**で起動します:
 
 ```bash
 cd minimum_handson/step1_基礎/1_board_list
-npm install
-cp .env.example .env
-npx prisma migrate dev
-npm run dev
+npm install   # postinstall で Prisma Client を生成
+npm run dev   # predev で .env 生成 + DB マイグレーションを自動実行して起動
 ```
 
 http://localhost:3000 を開くと、その章の画面が表示されます。
+
+DB は全章で共有（`minimum_handson/dev.db`）なので、ある章で追加したデータは別の章にも引き継がれます。
+詳細は [`minimum_handson/README.md`](./minimum_handson/README.md) を参照してください。

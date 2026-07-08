@@ -17,18 +17,12 @@ Prisma + SQLite でボードを永続化し、一覧表示と新規作成がで�
 ## セットアップ手順
 
 ```bash
-# 1. 依存関係をインストール
-npm install
-
-# 2. 環境変数ファイルを用意
-cp .env.example .env
-
-# 3. DB を作成（マイグレーション適用 + Prisma Client 生成）
-npx prisma migrate dev
-
-# 4. 開発サーバーを起動
-npm run dev
+npm install   # postinstall で Prisma Client を生成
+npm run dev   # predev で .env 生成 + DB マイグレーションを自動実行して起動
 ```
+
+`npm install` 後は `npm run dev` だけで、`.env` の作成と DB のマイグレーションまで自動で行われます。
+DB は全章共有の `minimum_handson/dev.db` に保存されます（データは章をまたいで引き継がれます）。
 
 ブラウザで http://localhost:3000 を開くと、ボード一覧画面が表示されます。
 「新規ボード作成」ボタンからタイトルを入力して送信すると、ボードが作成されて一覧に追加されます。

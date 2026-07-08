@@ -20,11 +20,12 @@ URL のボード ID からボード情報とリスト一覧を取得して表示
 ## セットアップ手順
 
 ```bash
-npm install
-cp .env.example .env
-npx prisma migrate dev
-npm run dev
+npm install   # postinstall で Prisma Client を生成
+npm run dev   # predev で .env 生成 + DB マイグレーションを自動実行して起動
 ```
+
+`npm install` 後は `npm run dev` だけで、`.env` の作成と DB のマイグレーションまで自動で行われます。
+DB は全章共有の `minimum_handson/dev.db` に保存されます（データは章をまたいで引き継がれます）。
 
 http://localhost:3000 を開き、ボードをクリックすると詳細ページが表示されます。
 「リスト作成」からタイトルを入力して送信すると、リストが `order` の末尾に追加されます。
