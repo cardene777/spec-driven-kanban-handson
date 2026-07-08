@@ -35,12 +35,11 @@ minimum_handson/
 
 ## 章の動かし方
 
-各章のディレクトリに移動して、**2コマンド**で起動します:
+各章のディレクトリに移動して、**`npm run dev` だけ**で起動します:
 
 ```bash
 cd minimum_handson/step1_基礎/1_board_list
-npm install   # postinstall で Prisma Client を生成
-npm run dev   # predev で .env 生成 + DB マイグレーションを自動実行して起動
+npm run dev   # 初回は依存インストール〜.env作成〜DBマイグレーションまで自動実行して起動
 ```
 
 http://localhost:3000 を開くと、その章の画面が表示されます。
