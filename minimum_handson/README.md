@@ -15,7 +15,7 @@
 minimum_handson/
 ├── README.md
 ├── app/ lib/ prisma/ package.json ...  ← ★ 直下 = 常に最新の稼働アプリ（ここで作業）
-├── 1_xxx/                               ← 各ステップのスナップショット（コピー）
+├── 1_board_list/                        ← 各ステップのスナップショット（コピー）
 └── 2_xxx/
 ```
 
@@ -25,7 +25,13 @@ minimum_handson/
 
 | ステップ | ディレクトリ | 内容 | 状態 |
 | --- | --- | --- | --- |
-| - | （今後追加） | - | 予定 |
+| 1 | [`1_board_list/`](./1_board_list/) | ボード一覧画面 + ボード作成（Next.js App Router + Prisma/SQLite、`GET`/`POST /api/boards`） | 完了 |
+
+## 技術スタック
+
+- Next.js 16（App Router）/ React 19 / TypeScript
+- Tailwind CSS v4
+- Prisma + SQLite（Node.js v20.12 互換のため Prisma は `6.5.0`）
 
 ## 動かし方
 
@@ -62,5 +68,5 @@ rsync -a \
   --exclude 'prisma/dev.db' --exclude 'prisma/dev.db-journal' \
   --exclude next-env.d.ts \
   --exclude '[0-9]*_*/' \
-  ./ 1_xxx/
+  ./ 2_xxx/
 ```
