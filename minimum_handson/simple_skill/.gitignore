@@ -1,0 +1,16 @@
+/node_modules
+/.next
+/out
+/build
+*.tsbuildinfo
+next-env.d.ts.bak
+
+# env
+.env
+
+# database
+/prisma/*.db
+/prisma/*.db-journal
+
+# misc
+.DS_Store
