@@ -1,0 +1,17 @@
+{
+  "name": "spec-driven-kanban-handson",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "handson",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [3000],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "Prisma.prisma"
+      ]
+    }
+  }
+}
