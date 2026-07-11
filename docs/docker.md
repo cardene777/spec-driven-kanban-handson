@@ -13,6 +13,15 @@
 
 Claude Codeはホスト側のターミナルで実行する前提です。Docker内でClaude Codeを使う場合は、認証や設定ファイルの扱いが環境ごとに変わるため、各自の運用に合わせて設定してください。
 
+## ファイル配置
+
+Docker関連ファイルは以下にあります。
+
+- `Dockerfile`
+- `docker-compose.yml`
+- `.devcontainer/devcontainer.json`
+- `docs/docker.md`
+
 ## 起動
 
 ```bash
@@ -43,9 +52,16 @@ npm run dev -- --hostname 0.0.0.0
 ```
 
 ブラウザでは以下を開きます。
+ホスト側の公開ポートは、既存の開発サーバーと衝突しにくいようにデフォルトで3001にしています。
 
 ```text
-http://localhost:3000
+http://localhost:3001
+```
+
+別のポートで開きたい場合は、起動時に `KANBAN_HANDSON_PORT` を指定します。
+
+```bash
+KANBAN_HANDSON_PORT=3010 docker compose up -d --build
 ```
 
 ## 停止
