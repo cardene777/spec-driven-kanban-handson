@@ -1,0 +1,18 @@
+services:
+  handson:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - handson-node-modules:/workspace/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      NEXT_TELEMETRY_DISABLED: "1"
+    command: sleep infinity
+
+volumes:
+  handson-node-modules:
