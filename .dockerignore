@@ -1,0 +1,9 @@
+.git
+.next
+node_modules
+**/node_modules
+**/.next
+**/prisma/dev.db
+**/.env
+Dockerfile
+docker-compose.yml

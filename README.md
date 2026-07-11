@@ -21,6 +21,10 @@ Next.js（App Router）+ Prisma + SQLite でカンバンアプリを段階的に
 ```
 <repo>/
 ├── README.md
+├── Dockerfile                ← Docker補助環境
+├── docker-compose.yml        ← Docker補助環境
+├── docs/
+│   └── docker.md
 ├── minimum_handson/
 │   ├── simple_prompt/        ← ハンズオン（末端）
 │   │   ├── app/ prisma/ ...  ← ★ 直下 = 常に最新の稼働アプリ（ここで作業・データ保持）
@@ -54,3 +58,10 @@ npm run dev
 
 http://localhost:3000 を開くと最新アプリが表示されます。
 DB は直下の `prisma/dev.db` に保持されるので、追加したデータは消えません。
+
+## Dockerで実行環境を揃える場合
+
+Node.js、npm、Git、SQLiteの実行環境をDockerで揃えたい場合は、以下を参照してください。
+Claude CodeはDockerに含めず、ホスト側のターミナルに通常どおりインストールして使います。
+
+- [Docker環境](./docs/docker.md)

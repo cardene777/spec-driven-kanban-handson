@@ -1,0 +1,17 @@
+services:
+  handson:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - handson-node-modules:/workspace/node_modules
+    ports:
+      - "${KANBAN_HANDSON_PORT:-32100}:3000"
+    environment:
+      NODE_ENV: development
+      NEXT_TELEMETRY_DISABLED: "1"
+
+volumes:
+  handson-node-modules:
