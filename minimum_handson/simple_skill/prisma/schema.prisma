@@ -1,0 +1,42 @@
+// FR-005 (spec/005_shared_rules.md) データモデル
+// Board 1:N List 1:N Card、親削除で cascade。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  title     String
+  createdAt DateTime @default(now())
+  lists     List[]
+}
+
+model List {
+  id        String   @id @default(cuid())
+  title     String
+  order     Int
+  boardId   String
+  createdAt DateTime @default(now())
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards     Card[]
+
+  @@index([boardId])
+}
+
+model Card {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  order       Int
+  listId      String
+  createdAt   DateTime @default(now())
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@index([listId])
+}
