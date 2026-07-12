@@ -1,0 +1,144 @@
+// design/001_boards.md § データモデル > Prisma スキーマ (全体) SSOT
+// design/011_auth.md § データモデル > User モデル拡張 / Session モデル (新設)
+// design/012_member_invite.md § データモデル > Invite モデル (新設)
+// design/013_permissions.md § データモデル > BoardMembership モデル (index 追加)
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  owner
+  member
+  viewer
+}
+
+enum InviteStatus {
+  pending
+  accepted
+  revoked
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships   BoardMembership[]
+  comments      Comment[]         @relation("CommentAuthor")
+  sessions      Session[]         @relation("UserSessions")
+  invitesSent   Invite[]          @relation("InviterUser")
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation("UserSessions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  title     String
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships BoardMembership[]
+  lists       List[]
+  invites     Invite[]
+
+  @@unique([order])
+}
+
+model BoardMembership {
+  boardId   String
+  userId    String
+  role      Role
+  createdAt DateTime @default(now())
+
+  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([boardId, userId])
+  @@index([userId])
+  @@index([boardId, role])
+}
+
+model Invite {
+  id         String       @id @default(cuid())
+  boardId    String
+  email      String
+  role       Role
+  tokenHash  String       @unique
+  status     InviteStatus @default(pending)
+  expiresAt  DateTime
+  invitedBy  String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  board   Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  inviter User  @relation("InviterUser", fields: [invitedBy], references: [id], onDelete: Cascade)
+
+  @@index([boardId, status])
+  @@index([email])
+}
+
+model List {
+  id        String   @id @default(cuid())
+  boardId   String
+  title     String
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  board Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards Card[]
+
+  @@unique([boardId, order])
+  @@index([boardId])
+}
+
+model Card {
+  id          String   @id @default(cuid())
+  listId      String
+  title       String
+  description String   @default("")
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  list     List      @relation(fields: [listId], references: [id], onDelete: Cascade)
+  comments Comment[]
+
+  @@unique([listId, order])
+  @@index([listId])
+}
+
+// design/010_comment.md § データモデル > Comment モデル (新設) SSOT
+model Comment {
+  id        String   @id @default(cuid())
+  cardId    String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  card   Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  author User @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@index([authorId])
+}
