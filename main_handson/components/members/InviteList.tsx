@@ -65,39 +65,43 @@ export default function InviteList({
 
   if (invites.length === 0) {
     return (
-      <p className="text-xs text-gray-500">
-        pending の招待はありません。
-      </p>
+      <div className="rounded-xl border border-dashed border-neutral-200 bg-neutral-50 px-4 py-6 text-center text-sm text-neutral-400">
+        pending の招待はありません
+      </div>
     );
   }
   return (
-    <div className="rounded border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-0 shadow-sm">
       {message ? (
-        <div className="border-b border-blue-200 bg-blue-50 px-4 py-2 text-xs text-blue-800 break-all">
+        <div className="break-all border-b border-primary-200 bg-primary-50 px-4 py-2.5 text-xs text-primary-800">
           {message}
         </div>
       ) : null}
       <table className="w-full text-sm">
-        <thead className="text-left text-xs text-gray-500">
+        <thead className="bg-neutral-50 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
           <tr>
-            <th className="px-4 py-2">メール</th>
-            <th className="px-4 py-2">ロール</th>
-            <th className="px-4 py-2">有効期限</th>
-            <th className="px-4 py-2">操作</th>
+            <th className="px-4 py-3">メール</th>
+            <th className="px-4 py-3">ロール</th>
+            <th className="px-4 py-3">有効期限</th>
+            <th className="px-4 py-3 text-right">操作</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-neutral-200">
           {invites.map((inv) => (
-            <tr key={inv.id}>
-              <td className="px-4 py-2">{inv.email}</td>
-              <td className="px-4 py-2">{inv.role}</td>
-              <td className="px-4 py-2 text-xs text-gray-600">
-                {inv.expiresAt}
+            <tr key={inv.id} className="transition-colors hover:bg-neutral-50">
+              <td className="px-4 py-3 text-neutral-800">{inv.email}</td>
+              <td className="px-4 py-3">
+                <span className="inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700 ring-1 ring-inset ring-neutral-200">
+                  {inv.role}
+                </span>
               </td>
-              <td className="px-4 py-2 space-x-2">
+              <td className="px-4 py-3 text-xs text-neutral-500">
+                {new Date(inv.expiresAt).toLocaleString("ja-JP")}
+              </td>
+              <td className="space-x-2 px-4 py-3 text-right">
                 <button
                   type="button"
-                  className="rounded border border-gray-300 px-2 py-0.5 text-xs hover:bg-gray-50 disabled:opacity-50"
+                  className="inline-flex items-center rounded-lg border border-neutral-300 bg-neutral-0 px-2.5 py-1 text-xs font-medium text-neutral-700 shadow-sm transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={busy === inv.id}
                   onClick={() => resend(inv.id)}
                 >
@@ -105,7 +109,7 @@ export default function InviteList({
                 </button>
                 <button
                   type="button"
-                  className="rounded border border-red-300 px-2 py-0.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-50"
+                  className="inline-flex items-center rounded-lg border border-danger-border bg-neutral-0 px-2.5 py-1 text-xs font-medium text-danger shadow-sm transition-colors hover:bg-danger-soft disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={busy === inv.id}
                   onClick={() => revoke(inv.id)}
                 >

@@ -22,10 +22,9 @@ export default function CardRow({
   return (
     <button
       onClick={openModal}
-      className="w-full rounded border border-gray-200 bg-white px-3 py-2 text-left text-sm hover:bg-gray-50"
+      className="w-full rounded-lg border border-neutral-200 bg-neutral-0 px-3 py-2.5 text-left text-sm text-neutral-800 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
     >
       <div className="font-medium">{card.title}</div>
-      <div className="text-xs text-gray-400">order={card.order}</div>
     </button>
   );
 }

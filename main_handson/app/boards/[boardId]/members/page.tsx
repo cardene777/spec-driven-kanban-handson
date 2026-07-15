@@ -57,41 +57,71 @@ export default async function BoardMembersPage({ params }: Props) {
     : [];
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-6">
-      <nav className="mb-4 text-sm">
-        <Link
-          href={`/boards/${boardId}`}
-          className="text-blue-600 hover:underline"
-        >
-          ← ボードへ戻る
-        </Link>
-      </nav>
-      <h1 className="text-2xl font-semibold">
-        {board.title} — メンバー管理
-      </h1>
+    <div className="min-h-screen bg-neutral-50">
+      <header className="border-b border-neutral-200 bg-neutral-0">
+        <div className="mx-auto max-w-4xl px-6 py-4">
+          <nav className="mb-3 flex items-center gap-2 text-xs text-neutral-500">
+            <Link
+              href="/"
+              className="rounded-md px-1.5 py-0.5 font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+            >
+              ボード一覧
+            </Link>
+            <span className="text-neutral-300">/</span>
+            <Link
+              href={`/boards/${boardId}`}
+              className="rounded-md px-1.5 py-0.5 font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+            >
+              {board.title}
+            </Link>
+            <span className="text-neutral-300">/</span>
+            <span className="font-medium text-neutral-700">メンバー管理</span>
+          </nav>
+          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+            メンバー管理
+          </h1>
+          <p className="mt-1 text-sm text-neutral-500">
+            {board.title} のメンバーと招待を管理します。
+          </p>
+        </div>
+      </header>
 
-      <section className="mt-6">
-        <h2 className="mb-2 text-lg font-medium">メンバー一覧</h2>
-        <BoardMemberList
-          boardId={boardId}
-          members={members}
-          currentUserId={user.id}
-          currentRole={myMembership.role}
-        />
-      </section>
+      <main className="mx-auto max-w-4xl space-y-8 px-6 py-8">
+        <section>
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-500">
+              メンバー一覧 ({members.length})
+            </h2>
+          </div>
+          <BoardMemberList
+            boardId={boardId}
+            members={members}
+            currentUserId={user.id}
+            currentRole={myMembership.role}
+          />
+        </section>
 
-      {isOwner ? (
-        <>
-          <section className="mt-8">
-            <h2 className="mb-2 text-lg font-medium">招待</h2>
-            <InviteCreateForm boardId={boardId} />
-          </section>
-          <section className="mt-6">
-            <h2 className="mb-2 text-lg font-medium">Pending の招待</h2>
-            <InviteList boardId={boardId} invites={invites} />
-          </section>
-        </>
-      ) : null}
-    </main>
+        {isOwner ? (
+          <>
+            <section>
+              <div className="mb-3 flex items-baseline justify-between">
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-500">
+                  招待
+                </h2>
+              </div>
+              <InviteCreateForm boardId={boardId} />
+            </section>
+            <section>
+              <div className="mb-3 flex items-baseline justify-between">
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-500">
+                  Pending の招待 ({invites.length})
+                </h2>
+              </div>
+              <InviteList boardId={boardId} invites={invites} />
+            </section>
+          </>
+        ) : null}
+      </main>
+    </div>
   );
 }

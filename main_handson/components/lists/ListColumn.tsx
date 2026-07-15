@@ -70,8 +70,8 @@ export default function ListColumn({
   }
 
   return (
-    <div className="w-72 shrink-0 rounded border border-gray-200 bg-gray-50 p-3">
-      <div className="mb-2 flex items-center justify-between gap-2">
+    <div className="flex w-80 shrink-0 flex-col rounded-xl border border-neutral-200 bg-neutral-0 shadow-sm">
+      <div className="flex items-center justify-between gap-2 border-b border-neutral-200 bg-neutral-50 px-4 py-3">
         {editing ? (
           <input
             type="text"
@@ -85,49 +85,63 @@ export default function ListColumn({
                 setTitle(list.title);
               }
             }}
-            className="flex-1 rounded border border-gray-300 px-2 py-1"
+            className="flex-1 rounded-lg border border-neutral-300 bg-neutral-0 px-2 py-1 text-sm font-medium text-neutral-900 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-500/10"
             autoFocus
           />
         ) : (
-          <h2
-            className="flex-1 cursor-pointer font-medium"
-            onClick={() => canWrite && setEditing(true)}
-          >
-            {list.title}
-            <span className="ml-2 text-xs text-gray-400">
-              (order={list.order})
+          <div className="flex flex-1 items-center gap-2">
+            <h2
+              className="cursor-pointer text-sm font-semibold text-neutral-800"
+              onClick={() => canWrite && setEditing(true)}
+            >
+              {list.title}
+            </h2>
+            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-neutral-200 px-1.5 text-xs font-medium text-neutral-600">
+              {cards.length}
             </span>
-          </h2>
+          </div>
         )}
         {canWrite && !editing ? (
           <button
             onClick={remove}
-            className="text-xs text-red-600 hover:underline"
+            className="rounded-md p-1 text-neutral-400 transition-colors hover:bg-danger-soft hover:text-danger"
+            aria-label={`リスト ${list.title} を削除`}
+            title="削除"
           >
-            削除
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+            </svg>
           </button>
         ) : null}
       </div>
 
-      {error ? (
-        <div className="mb-2 text-xs text-red-600">{error}</div>
-      ) : null}
+      <div className="flex flex-col gap-2 p-3">
+        {error ? (
+          <div className="rounded-lg border border-danger-border bg-danger-soft px-2 py-1.5 text-xs text-danger">
+            {error}
+          </div>
+        ) : null}
 
-      <ul className="mb-2 space-y-2">
         {cards.length === 0 ? (
-          <li className="rounded border border-dashed border-gray-300 px-3 py-2 text-center text-xs text-gray-500">
+          <div className="rounded-lg border border-dashed border-neutral-200 bg-neutral-50 px-3 py-6 text-center text-xs text-neutral-400">
             カードなし
-          </li>
+          </div>
         ) : (
-          cards.map((card) => (
-            <li key={card.id}>
-              <CardRow card={card} boardId={list.boardId} />
-            </li>
-          ))
+          <ul className="flex flex-col gap-2">
+            {cards.map((card) => (
+              <li key={card.id}>
+                <CardRow card={card} boardId={list.boardId} />
+              </li>
+            ))}
+          </ul>
         )}
-      </ul>
 
-      {canWrite ? <CardCreateForm listId={list.id} /> : null}
+        {canWrite ? (
+          <div className="mt-1">
+            <CardCreateForm listId={list.id} />
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

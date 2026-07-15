@@ -39,59 +39,82 @@ export default async function BoardDetailPage({ params, searchParams }: PageProp
     },
   });
 
+  const canWrite =
+    membership.role === "owner" || membership.role === "member";
+
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6">
-      <nav className="mb-4 text-sm">
-        <Link href="/" className="text-blue-600 hover:underline">
-          ← ボード一覧
-        </Link>
-      </nav>
-
-      <BoardHeader board={board} canEdit={membership.role === "owner"} />
-
-      <div className="mt-4">
-        <Link
-          href={`/boards/${boardId}/members`}
-          className="text-sm text-blue-600 hover:underline"
-        >
-          メンバー / 招待の管理へ →
-        </Link>
-      </div>
-
-      <div className="mt-6">
-        <ListCreateForm boardId={boardId} />
-      </div>
-
-      <section className="mt-6 flex gap-4 overflow-x-auto pb-4">
-        {lists.length === 0 ? (
-          <div className="w-full rounded border border-dashed border-gray-300 p-8 text-center text-gray-500">
-            まだリストがありません。 上のフォームから新規作成してください。
+    <div className="min-h-screen bg-neutral-50">
+      <header className="border-b border-neutral-200 bg-neutral-0">
+        <div className="mx-auto max-w-6xl px-6 py-4">
+          <nav className="mb-3 flex items-center gap-2 text-xs text-neutral-500">
+            <Link href="/" className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900">
+              <span aria-hidden>←</span>
+              ボード一覧
+            </Link>
+            <span className="text-neutral-300">/</span>
+            <span className="font-medium text-neutral-700">{board.title}</span>
+          </nav>
+          <BoardHeader board={board} canEdit={membership.role === "owner"} />
+          <div className="mt-4 flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary-500" />
+              {membership.role}
+            </span>
+            <Link
+              href={`/boards/${boardId}/members`}
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary-600 transition-colors hover:text-primary-700"
+            >
+              メンバー / 招待の管理
+              <span aria-hidden>→</span>
+            </Link>
           </div>
-        ) : (
-          lists.map((list) => (
-            <ListColumn
-              key={list.id}
-              list={{
-                id: list.id,
-                boardId: list.boardId,
-                title: list.title,
-                order: list.order,
-              }}
-              cards={list.cards.map((c) => ({
-                id: c.id,
-                listId: c.listId,
-                title: c.title,
-                order: c.order,
-              }))}
-              canWrite={
-                membership.role === "owner" || membership.role === "member"
-              }
-            />
-          ))
-        )}
-      </section>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-6 py-8">
+        {canWrite ? (
+          <div className="mb-6 rounded-2xl border border-neutral-200 bg-neutral-0 p-4 shadow-sm">
+            <ListCreateForm boardId={boardId} />
+          </div>
+        ) : null}
+
+        <section className="flex gap-4 overflow-x-auto pb-4">
+          {lists.length === 0 ? (
+            <div className="w-full rounded-2xl border border-dashed border-neutral-300 bg-neutral-0 p-12 text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-400">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M4 6h16M4 12h16M4 18h10" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-neutral-700">まだリストがありません</p>
+              <p className="mt-1 text-xs text-neutral-500">
+                上のフォームから最初のリストを作成しましょう。
+              </p>
+            </div>
+          ) : (
+            lists.map((list) => (
+              <ListColumn
+                key={list.id}
+                list={{
+                  id: list.id,
+                  boardId: list.boardId,
+                  title: list.title,
+                  order: list.order,
+                }}
+                cards={list.cards.map((c) => ({
+                  id: c.id,
+                  listId: c.listId,
+                  title: c.title,
+                  order: c.order,
+                }))}
+                canWrite={canWrite}
+              />
+            ))
+          )}
+        </section>
+      </main>
 
       {cardParam ? <CardDetailModal cardId={cardParam} /> : null}
-    </main>
+    </div>
   );
 }

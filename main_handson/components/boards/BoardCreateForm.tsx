@@ -36,26 +36,26 @@ export default function BoardCreateForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex gap-2">
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="ボード名 (1〜100 文字)"
-        className="flex-1 rounded border border-gray-300 px-3 py-2"
-        disabled={submitting}
-      />
-      <button
-        type="submit"
-        disabled={submitting}
-        className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-      >
-        {submitting ? "作成中..." : "作成"}
-      </button>
+    <form onSubmit={onSubmit} className="space-y-2">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="ボード名 (1〜100 文字)"
+          className="flex-1 rounded-lg border border-neutral-300 bg-neutral-0 px-3.5 py-2.5 text-sm text-neutral-900 shadow-sm transition-colors placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-500/10 disabled:bg-neutral-50"
+          disabled={submitting}
+        />
+        <button
+          type="submit"
+          disabled={submitting || !title.trim()}
+          className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-medium text-neutral-0 shadow-sm transition-all hover:bg-primary-700 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {submitting ? "作成中..." : "作成"}
+        </button>
+      </div>
       {fieldError ? (
-        <span className="ml-2 self-center text-sm text-red-600">
-          {fieldError}
-        </span>
+        <p className="text-xs text-danger">{fieldError}</p>
       ) : null}
     </form>
   );

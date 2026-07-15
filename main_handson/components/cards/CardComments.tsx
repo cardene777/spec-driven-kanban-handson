@@ -90,63 +90,89 @@ export default function CardComments({ cardId }: { cardId: string }) {
   }
 
   return (
-    <div className="border-t border-gray-200 pt-4">
-      <h3 className="mb-2 text-sm font-medium text-gray-700">コメント</h3>
-      <div className="mb-3 space-y-2">
+    <div className="border-t border-neutral-200 pt-5">
+      <div className="mb-3 flex items-center gap-2">
+        <h3 className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+          コメント
+        </h3>
+        {items ? (
+          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-neutral-100 px-1.5 text-xs font-medium text-neutral-600">
+            {items.length}
+          </span>
+        ) : null}
+      </div>
+
+      <div className="mb-4 space-y-2">
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="コメントを入力"
-          className="h-20 w-full whitespace-pre-wrap rounded border border-gray-300 px-3 py-2 text-sm"
+          className="h-20 w-full whitespace-pre-wrap rounded-lg border border-neutral-300 bg-neutral-0 px-3.5 py-2 text-sm text-neutral-900 shadow-sm transition-colors placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-500/10"
         />
         <div className="flex items-center justify-between">
           {postError ? (
-            <p className="text-xs text-red-600">{postError}</p>
+            <p className="text-xs text-danger">{postError}</p>
           ) : (
             <span />
           )}
           <button
             type="button"
             onClick={submit}
-            disabled={submitting}
-            className="rounded bg-black px-3 py-1.5 text-sm text-white disabled:opacity-50"
+            disabled={submitting || !body.trim()}
+            className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-1.5 text-sm font-medium text-neutral-0 shadow-sm transition-all hover:bg-primary-700 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            投稿
+            {submitting ? "投稿中..." : "投稿"}
           </button>
         </div>
       </div>
+
       {loadError ? (
-        <p className="text-sm text-red-600">
+        <div className="rounded-lg border border-danger-border bg-danger-soft px-3 py-2 text-sm text-danger">
           コメントの取得に失敗しました ({loadError})
-        </p>
+        </div>
       ) : items === null ? (
-        <p className="text-sm text-gray-500">読み込み中...</p>
+        <p className="text-sm text-neutral-500">読み込み中...</p>
       ) : items.length === 0 ? (
-        <p className="text-sm text-gray-500">まだコメントはありません</p>
+        <div className="rounded-lg border border-dashed border-neutral-200 bg-neutral-50 px-3 py-6 text-center text-sm text-neutral-400">
+          まだコメントはありません
+        </div>
       ) : (
         <ul className="space-y-2">
-          {items.map((c) => (
-            <li
-              key={c.id}
-              className="rounded border border-gray-200 p-2 text-sm"
-            >
-              <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
-                <span>
-                  {c.authorId} / {c.createdAt}
-                </span>
-                {c.authorId === CURRENT_USER_ID ? (
-                  <button
-                    type="button"
-                    onClick={() => remove(c.id)}
-                    className="text-red-600 hover:underline"
-                  >
-                    削除
-                  </button>
-                ) : null}
-              </div>
-              <p className="whitespace-pre-wrap">{c.body}</p>
-            </li>
-          ))}
+          {items.map((c) => {
+            const initial = c.authorId.slice(0, 1).toUpperCase();
+            return (
+              <li
+                key={c.id}
+                className="rounded-lg border border-neutral-200 bg-neutral-0 p-3"
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-700">
+                      {initial}
+                    </div>
+                    <span className="text-xs font-medium text-neutral-700">
+                      {c.authorId}
+                    </span>
+                    <span className="text-xs text-neutral-400">
+                      {new Date(c.createdAt).toLocaleString("ja-JP")}
+                    </span>
+                  </div>
+                  {c.authorId === CURRENT_USER_ID ? (
+                    <button
+                      type="button"
+                      onClick={() => remove(c.id)}
+                      className="text-xs text-danger hover:underline"
+                    >
+                      削除
+                    </button>
+                  ) : null}
+                </div>
+                <p className="whitespace-pre-wrap text-sm text-neutral-800">
+                  {c.body}
+                </p>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

@@ -1,0 +1,60 @@
+/* brand.json から書き出したデザイントークン。 手で編集せず brand.json を更新して再生成する。
+   変数名は --brand-* prefix を付け、 globals.css の @theme inline から Tailwind utility へ写す。 */
+
+:root {
+  --brand-primary-50: #eef2ff;
+  --brand-primary-100: #e0e7ff;
+  --brand-primary-200: #c7d2fe;
+  --brand-primary-300: #a5b4fc;
+  --brand-primary-400: #818cf8;
+  --brand-primary-500: #6366f1;
+  --brand-primary-600: #4f46e5;
+  --brand-primary-700: #4338ca;
+  --brand-primary-800: #3730a3;
+  --brand-primary-900: #312e81;
+
+  --brand-neutral-0: #ffffff;
+  --brand-neutral-50: #f9fafb;
+  --brand-neutral-100: #f3f4f6;
+  --brand-neutral-200: #e5e7eb;
+  --brand-neutral-300: #d1d5db;
+  --brand-neutral-400: #9ca3af;
+  --brand-neutral-500: #6b7280;
+  --brand-neutral-600: #4b5563;
+  --brand-neutral-700: #374151;
+  --brand-neutral-800: #1f2937;
+  --brand-neutral-900: #111827;
+
+  --brand-success: #10b981;
+  --brand-warning: #f59e0b;
+  --brand-danger: #ef4444;
+  --brand-danger-soft: #fee2e2;
+  --brand-danger-border: #fecaca;
+
+  --brand-font-sans: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", "Segoe UI", sans-serif;
+  --brand-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --brand-radius-sm: 4px;
+  --brand-radius-md: 8px;
+  --brand-radius-lg: 12px;
+  --brand-radius-full: 9999px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brand-neutral-0: #0b0f19;
+    --brand-neutral-50: #111827;
+    --brand-neutral-100: #1f2937;
+    --brand-neutral-200: #374151;
+    --brand-neutral-300: #4b5563;
+    --brand-neutral-400: #6b7280;
+    --brand-neutral-500: #9ca3af;
+    --brand-neutral-600: #d1d5db;
+    --brand-neutral-700: #e5e7eb;
+    --brand-neutral-800: #f3f4f6;
+    --brand-neutral-900: #f9fafb;
+
+    --brand-danger-soft: #431a1a;
+    --brand-danger-border: #7f1d1d;
+  }
+}

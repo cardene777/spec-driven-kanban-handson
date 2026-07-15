@@ -36,23 +36,24 @@ export default function CardCreateForm({ listId }: { listId: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-1">
+    <form onSubmit={onSubmit} className="space-y-2">
       <input
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="カード名 (1〜200 文字)"
-        className="rounded border border-gray-300 px-2 py-1 text-sm"
+        className="w-full rounded-lg border border-neutral-200 bg-neutral-0 px-3 py-2 text-sm text-neutral-900 shadow-sm transition-colors placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-500/10 disabled:bg-neutral-50"
         disabled={submitting}
       />
       <button
         type="submit"
-        disabled={submitting || !title}
-        className="rounded bg-gray-800 px-2 py-1 text-xs text-white disabled:opacity-50"
+        disabled={submitting || !title.trim()}
+        className="inline-flex w-full items-center justify-center gap-1 rounded-lg border border-dashed border-neutral-300 bg-neutral-0 px-3 py-2 text-xs font-medium text-neutral-600 transition-all hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {submitting ? "追加中..." : "＋ カード追加"}
+        <span aria-hidden>＋</span>
+        {submitting ? "追加中..." : "カード追加"}
       </button>
-      {error ? <span className="text-xs text-red-600">{error}</span> : null}
+      {error ? <p className="text-xs text-danger">{error}</p> : null}
     </form>
   );
 }

@@ -11,7 +11,7 @@ export default function LogoutButton() {
   return (
     <button
       type="button"
-      className="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50"
+      className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-neutral-0 px-3 py-1.5 text-xs font-medium text-neutral-700 shadow-sm transition-colors hover:bg-neutral-50 hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-60"
       disabled={busy}
       onClick={async () => {
         setBusy(true);

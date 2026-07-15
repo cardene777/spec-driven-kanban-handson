@@ -19,7 +19,7 @@ export default function LoginForm() {
 
   return (
     <form
-      className="space-y-3"
+      className="space-y-5"
       onSubmit={async (e) => {
         e.preventDefault();
         setBusy(true);
@@ -49,40 +49,50 @@ export default function LoginForm() {
       }}
     >
       <div>
-        <label className="block text-sm">メールアドレス</label>
+        <label htmlFor="login-email" className="block text-sm font-medium text-neutral-700">
+          メールアドレス
+        </label>
         <input
+          id="login-email"
           type="email"
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+          className="mt-1.5 w-full rounded-lg border border-neutral-300 bg-neutral-0 px-3.5 py-2.5 text-sm text-neutral-900 shadow-sm transition-colors placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+          placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         {fieldErrors.email ? (
-          <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
+          <p className="mt-1.5 text-xs text-danger">{fieldErrors.email}</p>
         ) : null}
       </div>
       <div>
-        <label className="block text-sm">パスワード</label>
+        <label htmlFor="login-password" className="block text-sm font-medium text-neutral-700">
+          パスワード
+        </label>
         <input
+          id="login-password"
           type="password"
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+          className="mt-1.5 w-full rounded-lg border border-neutral-300 bg-neutral-0 px-3.5 py-2.5 text-sm text-neutral-900 shadow-sm transition-colors placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+          placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
         {fieldErrors.password ? (
-          <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>
+          <p className="mt-1.5 text-xs text-danger">{fieldErrors.password}</p>
         ) : null}
       </div>
       {topError ? (
-        <p className="text-sm text-red-600">{topError}</p>
+        <div className="rounded-lg border border-danger-border bg-danger-soft px-3 py-2 text-sm text-danger">
+          {topError}
+        </div>
       ) : null}
       <button
         type="submit"
-        className="w-full rounded bg-blue-600 px-3 py-2 text-white disabled:opacity-50"
+        className="inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-medium text-neutral-0 shadow-sm transition-all hover:bg-primary-700 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-60"
         disabled={busy}
       >
-        {busy ? "ログイン中..." : "ログインする"}
+        {busy ? "ログイン中..." : "ログイン"}
       </button>
     </form>
   );

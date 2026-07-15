@@ -1,26 +1,44 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "./tokens.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-primary-50: var(--brand-primary-50);
+  --color-primary-100: var(--brand-primary-100);
+  --color-primary-200: var(--brand-primary-200);
+  --color-primary-300: var(--brand-primary-300);
+  --color-primary-400: var(--brand-primary-400);
+  --color-primary-500: var(--brand-primary-500);
+  --color-primary-600: var(--brand-primary-600);
+  --color-primary-700: var(--brand-primary-700);
+  --color-primary-800: var(--brand-primary-800);
+  --color-primary-900: var(--brand-primary-900);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-neutral-0: var(--brand-neutral-0);
+  --color-neutral-50: var(--brand-neutral-50);
+  --color-neutral-100: var(--brand-neutral-100);
+  --color-neutral-200: var(--brand-neutral-200);
+  --color-neutral-300: var(--brand-neutral-300);
+  --color-neutral-400: var(--brand-neutral-400);
+  --color-neutral-500: var(--brand-neutral-500);
+  --color-neutral-600: var(--brand-neutral-600);
+  --color-neutral-700: var(--brand-neutral-700);
+  --color-neutral-800: var(--brand-neutral-800);
+  --color-neutral-900: var(--brand-neutral-900);
+
+  --color-success: var(--brand-success);
+  --color-warning: var(--brand-warning);
+  --color-danger: var(--brand-danger);
+  --color-danger-soft: var(--brand-danger-soft);
+  --color-danger-border: var(--brand-danger-border);
+
+  --font-sans: var(--brand-font-sans);
+  --font-mono: var(--brand-font-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--brand-neutral-0);
+  color: var(--brand-neutral-900);
+  font-family: var(--brand-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
