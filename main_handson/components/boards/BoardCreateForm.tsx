@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiFetch } from "@/lib/client/apiFetch";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function BoardCreateForm() {
   const router = useRouter();
@@ -36,27 +38,24 @@ export default function BoardCreateForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex gap-2">
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="ボード名 (1〜100 文字)"
-        className="flex-1 rounded border border-gray-300 px-3 py-2"
-        disabled={submitting}
-      />
-      <button
-        type="submit"
-        disabled={submitting}
-        className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-      >
+    <form onSubmit={onSubmit} className="flex items-start gap-2">
+      <div className="flex-1">
+        <Input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="ボード名 (1〜100 文字)"
+          disabled={submitting}
+        />
+        {fieldError ? (
+          <span className="mt-1 block text-sm text-destructive">
+            {fieldError}
+          </span>
+        ) : null}
+      </div>
+      <Button type="submit" disabled={submitting}>
         {submitting ? "作成中..." : "作成"}
-      </button>
-      {fieldError ? (
-        <span className="ml-2 self-center text-sm text-red-600">
-          {fieldError}
-        </span>
-      ) : null}
+      </Button>
     </form>
   );
 }

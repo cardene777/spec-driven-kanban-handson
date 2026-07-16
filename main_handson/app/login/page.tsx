@@ -4,6 +4,12 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getCurrentUserFromCookies } from "@/lib/auth/currentUserFromCookies";
 import LoginForm from "@/components/auth/LoginForm";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
@@ -12,17 +18,23 @@ export default async function LoginPage() {
   if (user) redirect("/");
 
   return (
-    <main className="mx-auto max-w-md px-4 py-8">
-      <h1 className="mb-6 text-2xl font-semibold">ログイン</h1>
-      <Suspense fallback={null}>
-        <LoginForm />
-      </Suspense>
-      <p className="mt-4 text-sm">
-        アカウントがない場合は{" "}
-        <Link href="/signup" className="text-blue-600 hover:underline">
-          サインアップ
-        </Link>
-      </p>
+    <main className="flex min-h-full flex-1 items-center justify-center bg-muted/40 px-4 py-12">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl">ログイン</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Suspense fallback={null}>
+            <LoginForm />
+          </Suspense>
+          <p className="mt-4 text-sm text-muted-foreground">
+            アカウントがない場合は{" "}
+            <Link href="/signup" className="text-primary hover:underline">
+              サインアップ
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
     </main>
   );
 }

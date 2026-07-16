@@ -1,0 +1,109 @@
+/* brand.json を SSOT として書き出したデザイントークン。
+   色コード (hex) はこのファイルと brand.json にのみ置き、app/**・components/** では
+   var(--brand-*) か shadcn semantic token 経由でのみ参照する。 */
+
+:root {
+  --brand-primary-50: #fdf3ef;
+  --brand-primary-100: #f9e1d8;
+  --brand-primary-200: #f0c2b1;
+  --brand-primary-300: #e59d84;
+  --brand-primary-400: #d67a5c;
+  --brand-primary-500: #c85a3c;
+  --brand-primary-600: #ad4830;
+  --brand-primary-700: #8f3a27;
+  --brand-primary-800: #6b2b1d;
+  --brand-primary-900: #4a1e15;
+
+  --brand-neutral-0: #ffffff;
+  --brand-neutral-50: #f9f6f1;
+  --brand-neutral-100: #f0ebe3;
+  --brand-neutral-200: #e3ddd2;
+  --brand-neutral-300: #cfc7b8;
+  --brand-neutral-400: #a89f8d;
+  --brand-neutral-500: #837b6b;
+  --brand-neutral-600: #5f5849;
+  --brand-neutral-700: #453f33;
+  --brand-neutral-800: #2b2822;
+  --brand-neutral-900: #1b1a17;
+
+  --brand-success: #3f8f5b;
+  --brand-warning: #d08b2c;
+  --brand-danger: #c0432f;
+
+  --brand-font-sans: system-ui, -apple-system, "Hiragino Sans", "Yu Gothic UI",
+    "Segoe UI", Meiryo, sans-serif;
+  --brand-font-serif: Charter, "Iowan Old Style", "Hiragino Mincho ProN",
+    "Yu Mincho", Georgia, serif;
+  --brand-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    monospace;
+
+  --brand-radius-sm: 6px;
+  --brand-radius-md: 10px;
+  --brand-radius-lg: 14px;
+  --brand-radius-full: 9999px;
+
+  --brand-shadow-sm: 0 1px 2px 0 rgb(74 30 21 / 0.06);
+  --brand-shadow-md: 0 4px 12px -2px rgb(74 30 21 / 0.1);
+  --brand-shadow-lg: 0 12px 32px -6px rgb(74 30 21 / 0.16);
+
+  /* ラベル 8 色パレット (spec/006_label.md § 事前定義された色パレット)。
+     色コード (hex) はここに集約し、tsx からは label.color を使って
+     var(--label-{color}-bg/-fg) をデータ参照で当てる (生 hex / 生 Tailwind 色禁止)。 */
+  --label-red-bg: #fbe4e0;
+  --label-red-fg: #9b2c1e;
+  --label-orange-bg: #fbe8d4;
+  --label-orange-fg: #9a5a12;
+  --label-yellow-bg: #f8efcf;
+  --label-yellow-fg: #7d5e09;
+  --label-green-bg: #dcefe0;
+  --label-green-fg: #2f6b41;
+  --label-blue-bg: #dbe7f5;
+  --label-blue-fg: #2a4d78;
+  --label-purple-bg: #e8e0f3;
+  --label-purple-fg: #573b86;
+  --label-pink-bg: #f7dfec;
+  --label-pink-fg: #8f3567;
+  --label-gray-bg: #e6e2d9;
+  --label-gray-fg: #4f4a3d;
+}
+
+/* 明暗の反転はこの 1 ブロックに一本化する。
+   globals.css の semantic token は var(--brand-*) を遅延解決するので、
+   ここで brand 変数を上書きするだけで --background / --card / --border 等が追従する。 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brand-neutral-0: #1b1a17;
+    --brand-neutral-50: #232019;
+    --brand-neutral-100: #2b2822;
+    --brand-neutral-200: #3a362d;
+    --brand-neutral-300: #4a453a;
+    --brand-neutral-400: #6b6456;
+    --brand-neutral-500: #928a79;
+    --brand-neutral-600: #b3ab99;
+    --brand-neutral-700: #d4cdbd;
+    --brand-neutral-800: #e8e2d6;
+    --brand-neutral-900: #f9f6f1;
+
+    /* terracotta は暗背景で沈むため 1 段明るい 500 を primary に使う */
+    --brand-primary-600: #c85a3c;
+    --brand-primary-700: #d67a5c;
+
+    /* ラベル 8 色の暗背景版 (背景を暗く、文字を明るく) */
+    --label-red-bg: #4a231c;
+    --label-red-fg: #f0b7ab;
+    --label-orange-bg: #4a3418;
+    --label-orange-fg: #f0c896;
+    --label-yellow-bg: #453c15;
+    --label-yellow-fg: #e8d48a;
+    --label-green-bg: #1f3a28;
+    --label-green-fg: #a6d4b4;
+    --label-blue-bg: #22344a;
+    --label-blue-fg: #a9c4e6;
+    --label-purple-bg: #322a47;
+    --label-purple-fg: #c6b3e6;
+    --label-pink-bg: #43223a;
+    --label-pink-fg: #e6a9cf;
+    --label-gray-bg: #35322a;
+    --label-gray-fg: #cfc7b8;
+  }
+}

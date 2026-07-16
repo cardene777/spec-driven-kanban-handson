@@ -4,6 +4,17 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiFetch } from "@/lib/client/apiFetch";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 type Member = {
   userId: string;
@@ -19,6 +30,15 @@ type Props = {
   currentUserId: string;
   currentRole: "owner" | "member" | "viewer";
 };
+
+// 置換対象 15 component に <select> は含まれないため、native のまま token 由来 class で見た目だけ統一する。
+const selectClass =
+  "rounded-md border border-input bg-transparent px-2 py-1 text-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50";
+
+function initials(name: string): string {
+  const t = name.trim();
+  return t ? t.slice(0, 2).toUpperCase() : "?";
+}
 
 export default function BoardMemberList({
   boardId,
@@ -58,7 +78,7 @@ export default function BoardMemberList({
   };
 
   const remove = async (userId: string) => {
-    if (!confirm("削除しますか?")) return;
+    if (!window.confirm("削除しますか?")) return;
     setBusy(userId);
     setError(null);
     try {
@@ -90,32 +110,41 @@ export default function BoardMemberList({
   };
 
   return (
-    <div className="rounded border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
       {error ? (
-        <div className="border-b border-red-200 bg-red-50 px-4 py-2 text-xs text-red-700">
+        <div className="border-b border-destructive/30 bg-destructive/10 px-4 py-2 text-xs text-destructive">
           {error}
         </div>
       ) : null}
-      <table className="w-full text-sm">
-        <thead className="text-left text-xs text-gray-500">
-          <tr>
-            <th className="px-4 py-2">名前</th>
-            <th className="px-4 py-2">メール</th>
-            <th className="px-4 py-2">ロール</th>
-            <th className="px-4 py-2">操作</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>メンバー</TableHead>
+            <TableHead>メール</TableHead>
+            <TableHead>ロール</TableHead>
+            <TableHead>操作</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {members.map((m) => {
             const isSelf = m.userId === currentUserId;
             return (
-              <tr key={m.userId}>
-                <td className="px-4 py-2">{m.name}</td>
-                <td className="px-4 py-2 text-gray-600">{m.email}</td>
-                <td className="px-4 py-2">
+              <TableRow key={m.userId}>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Avatar size="sm">
+                      <AvatarFallback>{initials(m.name)}</AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium">{m.name}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {m.email}
+                </TableCell>
+                <TableCell>
                   {isOwner ? (
                     <select
-                      className="rounded border border-gray-300 px-1 py-0.5 text-xs"
+                      className={selectClass}
                       value={m.role}
                       disabled={busy === m.userId}
                       onChange={(e) => changeRole(m.userId, e.target.value)}
@@ -125,26 +154,27 @@ export default function BoardMemberList({
                       <option value="viewer">viewer</option>
                     </select>
                   ) : (
-                    <span>{m.role}</span>
+                    <Badge variant="secondary">{m.role}</Badge>
                   )}
-                </td>
-                <td className="px-4 py-2">
+                </TableCell>
+                <TableCell>
                   {isOwner || isSelf ? (
-                    <button
+                    <Button
                       type="button"
-                      className="rounded border border-red-300 px-2 py-0.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-50"
+                      variant="destructive"
+                      size="xs"
                       disabled={busy === m.userId}
                       onClick={() => remove(m.userId)}
                     >
                       {isSelf ? "脱退" : "削除"}
-                    </button>
+                    </Button>
                   ) : null}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             );
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }

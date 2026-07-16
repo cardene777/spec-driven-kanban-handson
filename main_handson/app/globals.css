@@ -1,26 +1,106 @@
 @import "tailwindcss";
+@import "./tokens.css";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* init が生成した class 方式の dark 定義 (`&:is(.dark *)` + `.dark {}`) は、
+   OS のダーク設定に追従する方針と衝突する。custom-variant を media query に再定義し、
+   明暗の反転は tokens.css の @media ブロックに一本化する。 */
+@custom-variant dark (@media (prefers-color-scheme: dark));
 
 @theme inline {
+  --font-sans: var(--brand-font-sans);
+  --font-heading: var(--brand-font-serif);
+  --font-mono: var(--brand-font-mono);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: var(--brand-radius-sm);
+  --radius-md: var(--brand-radius-md);
+  --radius-lg: var(--brand-radius-lg);
+  --radius-xl: calc(var(--brand-radius-lg) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: var(--brand-radius-md);
+
+  --background: var(--brand-neutral-0);
+  --foreground: var(--brand-neutral-900);
+  --card: var(--brand-neutral-0);
+  --card-foreground: var(--brand-neutral-900);
+  --popover: var(--brand-neutral-0);
+  --popover-foreground: var(--brand-neutral-900);
+  --primary: var(--brand-primary-600);
+  --primary-foreground: var(--brand-neutral-0);
+  --secondary: var(--brand-neutral-100);
+  --secondary-foreground: var(--brand-neutral-800);
+  --muted: var(--brand-neutral-100);
+  --muted-foreground: var(--brand-neutral-500);
+  --accent: var(--brand-primary-50);
+  --accent-foreground: var(--brand-primary-700);
+  --destructive: var(--brand-danger);
+  --success: var(--brand-success);
+  --warning: var(--brand-warning);
+  --border: var(--brand-neutral-200);
+  --input: var(--brand-neutral-300);
+  --ring: var(--brand-primary-500);
+
+  --chart-1: var(--brand-primary-500);
+  --chart-2: var(--brand-primary-300);
+  --chart-3: var(--brand-neutral-400);
+  --chart-4: var(--brand-neutral-600);
+  --chart-5: var(--brand-primary-700);
+
+  --sidebar: var(--brand-neutral-50);
+  --sidebar-foreground: var(--brand-neutral-900);
+  --sidebar-primary: var(--brand-primary-600);
+  --sidebar-primary-foreground: var(--brand-neutral-0);
+  --sidebar-accent: var(--brand-primary-50);
+  --sidebar-accent-foreground: var(--brand-primary-700);
+  --sidebar-border: var(--brand-neutral-200);
+  --sidebar-ring: var(--brand-primary-500);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }

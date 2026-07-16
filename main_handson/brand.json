@@ -1,0 +1,48 @@
+{
+  "name": "Simple Kanban",
+  "tone": "height",
+  "palette": {
+    "primary": {
+      "50": "#fdf3ef",
+      "100": "#f9e1d8",
+      "200": "#f0c2b1",
+      "300": "#e59d84",
+      "400": "#d67a5c",
+      "500": "#c85a3c",
+      "600": "#ad4830",
+      "700": "#8f3a27",
+      "800": "#6b2b1d",
+      "900": "#4a1e15"
+    },
+    "neutral": {
+      "0": "#ffffff",
+      "50": "#f9f6f1",
+      "100": "#f0ebe3",
+      "200": "#e3ddd2",
+      "300": "#cfc7b8",
+      "400": "#a89f8d",
+      "500": "#837b6b",
+      "600": "#5f5849",
+      "700": "#453f33",
+      "800": "#2b2822",
+      "900": "#1b1a17"
+    },
+    "semantic": {
+      "success": "#3f8f5b",
+      "warning": "#d08b2c",
+      "danger": "#c0432f"
+    }
+  },
+  "typography": {
+    "font-sans": "system-ui, -apple-system, \"Hiragino Sans\", \"Yu Gothic UI\", \"Segoe UI\", Meiryo, sans-serif",
+    "font-serif": "Charter, \"Iowan Old Style\", \"Hiragino Mincho ProN\", \"Yu Mincho\", Georgia, serif",
+    "font-mono": "ui-monospace, SFMono-Regular, \"SF Mono\", Menlo, Consolas, monospace"
+  },
+  "spacing": { "unit": 4, "scale": [0, 4, 8, 12, 16, 24, 32, 48, 64] },
+  "radius": { "sm": "6px", "md": "10px", "lg": "14px", "full": "9999px" },
+  "shadow": {
+    "sm": "0 1px 2px 0 rgb(74 30 21 / 0.06)",
+    "md": "0 4px 12px -2px rgb(74 30 21 / 0.10)",
+    "lg": "0 12px 32px -6px rgb(74 30 21 / 0.16)"
+  }
+}

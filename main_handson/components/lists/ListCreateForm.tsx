@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiFetch } from "@/lib/client/apiFetch";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function ListCreateForm({ boardId }: { boardId: string }) {
   const router = useRouter();
@@ -36,24 +38,20 @@ export default function ListCreateForm({ boardId }: { boardId: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex gap-2">
-      <input
+    <form onSubmit={onSubmit} className="flex items-start gap-2">
+      <Input
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="リスト名 (1〜100 文字)"
-        className="flex-1 rounded border border-gray-300 px-3 py-2 max-w-md"
+        className="max-w-md flex-1"
         disabled={submitting}
       />
-      <button
-        type="submit"
-        disabled={submitting}
-        className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-      >
+      <Button type="submit" disabled={submitting}>
         {submitting ? "作成中..." : "リスト追加"}
-      </button>
+      </Button>
       {error ? (
-        <span className="self-center text-sm text-red-600">{error}</span>
+        <span className="self-center text-sm text-destructive">{error}</span>
       ) : null}
     </form>
   );

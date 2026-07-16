@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Board } from "@prisma/client";
 import { apiFetch } from "@/lib/client/apiFetch";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function BoardHeader({
   board,
@@ -54,56 +56,45 @@ export default function BoardHeader({
   }
 
   return (
-    <div className="flex items-baseline justify-between border-b border-gray-200 pb-3">
+    <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
       {editing ? (
         <div className="flex flex-1 items-center gap-2">
-          <input
+          <Input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="flex-1 rounded border border-gray-300 px-3 py-2 text-xl"
+            className="h-9 flex-1 text-xl"
             autoFocus
           />
-          <button
-            onClick={save}
-            className="rounded bg-black px-3 py-1.5 text-white"
-          >
-            保存
-          </button>
-          <button
+          <Button onClick={save}>保存</Button>
+          <Button
+            variant="outline"
             onClick={() => {
               setEditing(false);
               setTitle(board.title);
               setError(null);
             }}
-            className="rounded border border-gray-300 px-3 py-1.5"
           >
             取消
-          </button>
+          </Button>
         </div>
       ) : (
-        <h1 className="text-2xl font-semibold">{board.title}</h1>
+        <h1 className="font-heading text-2xl font-semibold">{board.title}</h1>
       )}
 
       {canEdit && !editing ? (
         <div className="flex gap-2">
-          <button
-            onClick={() => setEditing(true)}
-            className="rounded border border-gray-300 px-3 py-1.5 text-sm"
-          >
+          <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
             名称編集
-          </button>
-          <button
-            onClick={remove}
-            className="rounded border border-red-300 px-3 py-1.5 text-sm text-red-600"
-          >
+          </Button>
+          <Button variant="destructive" size="sm" onClick={remove}>
             削除
-          </button>
+          </Button>
         </div>
       ) : null}
 
       {error ? (
-        <span className="ml-2 text-sm text-red-600">{error}</span>
+        <span className="text-sm text-destructive">{error}</span>
       ) : null}
     </div>
   );

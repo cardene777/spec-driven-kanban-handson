@@ -3,8 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiFetch } from "@/lib/client/apiFetch";
-import CardRow from "@/components/cards/CardRow";
+import CardRow, { type CardRowData } from "@/components/cards/CardRow";
 import CardCreateForm from "@/components/cards/CardCreateForm";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 type ListSummary = {
   id: string;
@@ -13,26 +16,31 @@ type ListSummary = {
   order: number;
 };
 
-type CardSummary = {
-  id: string;
-  listId: string;
-  title: string;
-  order: number;
-};
+type CardSummary = CardRowData & { listId: string };
 
 export default function ListColumn({
   list,
   cards,
   canWrite,
+  visibleCardIds = null,
+  filterActive = false,
 }: {
   list: ListSummary;
   cards: CardSummary[];
   canWrite: boolean;
+  visibleCardIds?: Set<string> | null;
+  filterActive?: boolean;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(list.title);
   const [error, setError] = useState<string | null>(null);
+
+  // 検索 / 絞り込み適用中は結果集合に含まれるカードのみ表示する。
+  const visibleCards =
+    visibleCardIds === null
+      ? cards
+      : cards.filter((c) => visibleCardIds.has(c.id));
 
   async function saveTitle() {
     const res = await apiFetch(`/api/lists/${list.id}`, {
@@ -70,10 +78,10 @@ export default function ListColumn({
   }
 
   return (
-    <div className="w-72 shrink-0 rounded border border-gray-200 bg-gray-50 p-3">
+    <div className="w-72 shrink-0 rounded-lg border border-border bg-muted/40 p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         {editing ? (
-          <input
+          <Input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -85,41 +93,41 @@ export default function ListColumn({
                 setTitle(list.title);
               }
             }}
-            className="flex-1 rounded border border-gray-300 px-2 py-1"
+            className="h-8 flex-1"
             autoFocus
           />
         ) : (
           <h2
-            className="flex-1 cursor-pointer font-medium"
+            className="flex flex-1 cursor-pointer items-center gap-2 font-medium"
             onClick={() => canWrite && setEditing(true)}
           >
-            {list.title}
-            <span className="ml-2 text-xs text-gray-400">
-              (order={list.order})
-            </span>
+            <span className="truncate">{list.title}</span>
+            <Badge variant="secondary">{visibleCards.length}</Badge>
           </h2>
         )}
         {canWrite && !editing ? (
-          <button
+          <Button
+            variant="link"
+            size="xs"
+            className="h-auto p-0 text-destructive"
             onClick={remove}
-            className="text-xs text-red-600 hover:underline"
           >
             削除
-          </button>
+          </Button>
         ) : null}
       </div>
 
       {error ? (
-        <div className="mb-2 text-xs text-red-600">{error}</div>
+        <div className="mb-2 text-xs text-destructive">{error}</div>
       ) : null}
 
       <ul className="mb-2 space-y-2">
-        {cards.length === 0 ? (
-          <li className="rounded border border-dashed border-gray-300 px-3 py-2 text-center text-xs text-gray-500">
-            カードなし
+        {visibleCards.length === 0 ? (
+          <li className="rounded-md border border-dashed border-border px-3 py-2 text-center text-xs text-muted-foreground">
+            {filterActive ? "該当するカードがありません" : "カードなし"}
           </li>
         ) : (
-          cards.map((card) => (
+          visibleCards.map((card) => (
             <li key={card.id}>
               <CardRow card={card} boardId={list.boardId} />
             </li>

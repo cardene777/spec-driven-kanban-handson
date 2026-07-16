@@ -5,6 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiFetch } from "@/lib/client/apiFetch";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 type InviteView = {
   boardId: string;
@@ -26,95 +34,100 @@ export default function InviteAcceptPanel({ token, invite, isLoggedIn }: Props) 
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const disabled =
-    invite.expired || invite.status !== "pending" || busy;
+  const disabled = invite.expired || invite.status !== "pending" || busy;
 
   return (
-    <div className="rounded border border-gray-200 bg-white p-6">
-      <h2 className="text-xl font-semibold">ボード招待</h2>
-      <dl className="mt-4 space-y-2 text-sm">
-        <div>
-          <dt className="inline text-gray-500">ボード名: </dt>
-          <dd className="inline">{invite.boardTitle}</dd>
-        </div>
-        <div>
-          <dt className="inline text-gray-500">付与ロール: </dt>
-          <dd className="inline">{invite.role}</dd>
-        </div>
-        <div>
-          <dt className="inline text-gray-500">状態: </dt>
-          <dd className="inline">{invite.status}</dd>
-        </div>
-        <div>
-          <dt className="inline text-gray-500">有効期限: </dt>
-          <dd className="inline">{invite.expiresAt}</dd>
-        </div>
-      </dl>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">ボード招待</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <dl className="space-y-2 text-sm">
+          <div>
+            <dt className="inline text-muted-foreground">ボード名: </dt>
+            <dd className="inline font-medium">{invite.boardTitle}</dd>
+          </div>
+          <div className="flex items-center gap-2">
+            <dt className="text-muted-foreground">付与ロール</dt>
+            <dd>
+              <Badge variant="secondary">{invite.role}</Badge>
+            </dd>
+          </div>
+          <div>
+            <dt className="inline text-muted-foreground">状態: </dt>
+            <dd className="inline">{invite.status}</dd>
+          </div>
+          <div>
+            <dt className="inline text-muted-foreground">有効期限: </dt>
+            <dd className="inline">{invite.expiresAt}</dd>
+          </div>
+        </dl>
 
-      {invite.expired ? (
-        <p className="mt-4 text-sm text-red-600">この招待は期限切れです。</p>
-      ) : invite.status === "revoked" ? (
-        <p className="mt-4 text-sm text-red-600">この招待は失効済みです。</p>
-      ) : invite.status === "accepted" ? (
-        <p className="mt-4 text-sm text-red-600">
-          この招待は既に使用されています。
-        </p>
-      ) : null}
+        {invite.expired ? (
+          <p className="mt-4 text-sm text-destructive">
+            この招待は期限切れです。
+          </p>
+        ) : invite.status === "revoked" ? (
+          <p className="mt-4 text-sm text-destructive">
+            この招待は失効済みです。
+          </p>
+        ) : invite.status === "accepted" ? (
+          <p className="mt-4 text-sm text-destructive">
+            この招待は既に使用されています。
+          </p>
+        ) : null}
 
-      {message ? (
-        <p className="mt-4 text-sm text-red-600">{message}</p>
-      ) : null}
+        {message ? (
+          <p className="mt-4 text-sm text-destructive">{message}</p>
+        ) : null}
 
-      <div className="mt-6">
-        {!isLoggedIn ? (
-          <Link
-            href={`/login?returnTo=/invites/${token}`}
-            className="inline-block rounded bg-blue-600 px-3 py-2 text-white"
-          >
-            ログインして承認する
-          </Link>
-        ) : (
-          <button
-            type="button"
-            className="rounded bg-blue-600 px-3 py-2 text-white disabled:opacity-50"
-            disabled={disabled}
-            onClick={async () => {
-              setBusy(true);
-              setMessage(null);
-              try {
-                const res = await apiFetch(`/api/invites/${token}/accept`, {
-                  method: "POST",
-                });
-                if (res.status === 200) {
-                  router.push(`/boards/${invite.boardId}`);
-                  router.refresh();
-                  return;
+        <div className="mt-6">
+          {!isLoggedIn ? (
+            <Button render={<Link href={`/login?returnTo=/invites/${token}`} />}>
+              ログインして承認する
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              disabled={disabled}
+              onClick={async () => {
+                setBusy(true);
+                setMessage(null);
+                try {
+                  const res = await apiFetch(`/api/invites/${token}/accept`, {
+                    method: "POST",
+                  });
+                  if (res.status === 200) {
+                    router.push(`/boards/${invite.boardId}`);
+                    router.refresh();
+                    return;
+                  }
+                  const data = await res.json().catch(() => ({}));
+                  if (res.status === 410) {
+                    const reason = data.reason as string | undefined;
+                    const map: Record<string, string> = {
+                      expired: "この招待は期限切れです。",
+                      revoked: "この招待は失効済みです。",
+                      already_used: "この招待は既に使用されています。",
+                    };
+                    setMessage(map[reason ?? ""] ?? "承認できません。");
+                  } else if (res.status === 409) {
+                    setMessage("既にこのボードのメンバーです。");
+                  } else if (res.status === 401) {
+                    router.push(`/login?returnTo=/invites/${token}`);
+                  } else {
+                    setMessage("承認に失敗しました。");
+                  }
+                } finally {
+                  setBusy(false);
                 }
-                const data = await res.json().catch(() => ({}));
-                if (res.status === 410) {
-                  const reason = data.reason as string | undefined;
-                  const map: Record<string, string> = {
-                    expired: "この招待は期限切れです。",
-                    revoked: "この招待は失効済みです。",
-                    already_used: "この招待は既に使用されています。",
-                  };
-                  setMessage(map[reason ?? ""] ?? "承認できません。");
-                } else if (res.status === 409) {
-                  setMessage("既にこのボードのメンバーです。");
-                } else if (res.status === 401) {
-                  router.push(`/login?returnTo=/invites/${token}`);
-                } else {
-                  setMessage("承認に失敗しました。");
-                }
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            {busy ? "承認中..." : "承認する"}
-          </button>
-        )}
-      </div>
-    </div>
+              }}
+            >
+              {busy ? "承認中..." : "承認する"}
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

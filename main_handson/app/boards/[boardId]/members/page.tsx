@@ -1,10 +1,10 @@
 // spec/013_permissions.md § FR-01 / spec/012_member_invite.md § FR-01
 // design/013_permissions.md § UI 構造 + design/012_member_invite.md § UI 構造
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserFromCookies } from "@/lib/auth/currentUserFromCookies";
 import { sortMembers } from "@/lib/permissions/sortMembers";
+import AppShell from "@/components/layout/AppShell";
 import BoardMemberList from "@/components/members/BoardMemberList";
 import InviteCreateForm from "@/components/members/InviteCreateForm";
 import InviteList from "@/components/members/InviteList";
@@ -25,6 +25,17 @@ export default async function BoardMembersPage({ params }: Props) {
     where: { boardId_userId: { boardId, userId: user.id } },
   });
   if (!myMembership) return notFound();
+
+  const myMemberships = await prisma.boardMembership.findMany({
+    where: { userId: user.id },
+    include: { board: true },
+  });
+  const sidebarBoards = myMemberships
+    .map((m) => m.board)
+    .sort((a, b) => {
+      if (a.order !== b.order) return a.order - b.order;
+      return a.createdAt.getTime() - b.createdAt.getTime();
+    });
 
   const memberships = await prisma.boardMembership.findMany({
     where: { boardId },
@@ -57,41 +68,44 @@ export default async function BoardMembersPage({ params }: Props) {
     : [];
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-6">
-      <nav className="mb-4 text-sm">
-        <Link
-          href={`/boards/${boardId}`}
-          className="text-blue-600 hover:underline"
-        >
-          ← ボードへ戻る
-        </Link>
-      </nav>
-      <h1 className="text-2xl font-semibold">
-        {board.title} — メンバー管理
-      </h1>
+    <AppShell
+      user={user}
+      boards={sidebarBoards}
+      activeBoardId={boardId}
+      breadcrumb={[
+        { label: "ボード一覧", href: "/" },
+        { label: board.title, href: `/boards/${boardId}` },
+        { label: "メンバー管理" },
+      ]}
+    >
+      <div className="mx-auto max-w-3xl px-6 py-6">
+        <h1 className="font-heading text-2xl font-semibold">
+          {board.title} — メンバー管理
+        </h1>
 
-      <section className="mt-6">
-        <h2 className="mb-2 text-lg font-medium">メンバー一覧</h2>
-        <BoardMemberList
-          boardId={boardId}
-          members={members}
-          currentUserId={user.id}
-          currentRole={myMembership.role}
-        />
-      </section>
+        <section className="mt-6">
+          <h2 className="mb-2 text-lg font-medium">メンバー一覧</h2>
+          <BoardMemberList
+            boardId={boardId}
+            members={members}
+            currentUserId={user.id}
+            currentRole={myMembership.role}
+          />
+        </section>
 
-      {isOwner ? (
-        <>
-          <section className="mt-8">
-            <h2 className="mb-2 text-lg font-medium">招待</h2>
-            <InviteCreateForm boardId={boardId} />
-          </section>
-          <section className="mt-6">
-            <h2 className="mb-2 text-lg font-medium">Pending の招待</h2>
-            <InviteList boardId={boardId} invites={invites} />
-          </section>
-        </>
-      ) : null}
-    </main>
+        {isOwner ? (
+          <>
+            <section className="mt-8">
+              <h2 className="mb-2 text-lg font-medium">招待</h2>
+              <InviteCreateForm boardId={boardId} />
+            </section>
+            <section className="mt-6">
+              <h2 className="mb-2 text-lg font-medium">Pending の招待</h2>
+              <InviteList boardId={boardId} invites={invites} />
+            </section>
+          </>
+        ) : null}
+      </div>
+    </AppShell>
   );
 }

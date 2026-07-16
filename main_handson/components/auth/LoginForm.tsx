@@ -4,6 +4,9 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { apiFetch } from "@/lib/client/apiFetch";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type Fields = Partial<Record<"email" | "password", string>>;
 
@@ -19,7 +22,7 @@ export default function LoginForm() {
 
   return (
     <form
-      className="space-y-3"
+      className="space-y-4"
       onSubmit={async (e) => {
         e.preventDefault();
         setBusy(true);
@@ -48,42 +51,38 @@ export default function LoginForm() {
         }
       }}
     >
-      <div>
-        <label className="block text-sm">メールアドレス</label>
-        <input
+      <div className="space-y-1.5">
+        <Label htmlFor="login-email">メールアドレス</Label>
+        <Input
+          id="login-email"
           type="email"
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         {fieldErrors.email ? (
-          <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
+          <p className="text-xs text-destructive">{fieldErrors.email}</p>
         ) : null}
       </div>
-      <div>
-        <label className="block text-sm">パスワード</label>
-        <input
+      <div className="space-y-1.5">
+        <Label htmlFor="login-password">パスワード</Label>
+        <Input
+          id="login-password"
           type="password"
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
         {fieldErrors.password ? (
-          <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>
+          <p className="text-xs text-destructive">{fieldErrors.password}</p>
         ) : null}
       </div>
       {topError ? (
-        <p className="text-sm text-red-600">{topError}</p>
+        <p className="text-sm text-destructive">{topError}</p>
       ) : null}
-      <button
-        type="submit"
-        className="w-full rounded bg-blue-600 px-3 py-2 text-white disabled:opacity-50"
-        disabled={busy}
-      >
+      <Button type="submit" className="w-full" disabled={busy}>
         {busy ? "ログイン中..." : "ログインする"}
-      </button>
+      </Button>
     </form>
   );
 }

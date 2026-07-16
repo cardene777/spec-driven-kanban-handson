@@ -6,6 +6,7 @@ import { requireCurrentUser } from "@/lib/auth/requireUser";
 import { assertBoardAccess } from "@/lib/auth/boardAccess";
 import { resolveBoardFromList } from "@/lib/auth/cardAccess";
 import { parseCardCreate } from "@/lib/schemas/cards";
+import { serializeCard } from "@/lib/dueDate/serialize";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export async function GET(request: Request, { params }: Params) {
         where: { listId },
         orderBy: [{ order: "asc" }, { createdAt: "asc" }],
       });
-      return NextResponse.json({ items }, { status: 200 });
+      return NextResponse.json({ items: items.map(serializeCard) }, { status: 200 });
     },
     { event: "card.list", targetType: "card", context: { listId } },
   );

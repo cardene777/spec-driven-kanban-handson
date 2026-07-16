@@ -3,16 +3,20 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { LogOut } from "lucide-react";
 import { apiFetch } from "@/lib/client/apiFetch";
+import { Button } from "@/components/ui/button";
 
 export default function LogoutButton() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   return (
-    <button
+    <Button
       type="button"
-      className="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50"
+      variant="ghost"
+      size="icon-sm"
       disabled={busy}
+      aria-label="ログアウト"
       onClick={async () => {
         setBusy(true);
         await apiFetch("/api/auth/logout", { method: "POST" });
@@ -20,7 +24,7 @@ export default function LogoutButton() {
         router.refresh();
       }}
     >
-      {busy ? "ログアウト中..." : "ログアウト"}
-    </button>
+      <LogOut className="size-4" />
+    </Button>
   );
 }

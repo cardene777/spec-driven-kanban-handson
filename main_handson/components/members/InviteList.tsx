@@ -4,6 +4,16 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiFetch } from "@/lib/client/apiFetch";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 type Invite = {
   id: string;
@@ -45,7 +55,7 @@ export default function InviteList({
   };
 
   const revoke = async (inviteId: string) => {
-    if (!confirm("この招待を失効させますか?")) return;
+    if (!window.confirm("この招待を失効させますか?")) return;
     setBusy(inviteId);
     setMessage(null);
     try {
@@ -65,57 +75,61 @@ export default function InviteList({
 
   if (invites.length === 0) {
     return (
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-muted-foreground">
         pending の招待はありません。
       </p>
     );
   }
   return (
-    <div className="rounded border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
       {message ? (
-        <div className="border-b border-blue-200 bg-blue-50 px-4 py-2 text-xs text-blue-800 break-all">
+        <div className="border-b border-border bg-accent/40 px-4 py-2 text-xs break-all text-accent-foreground">
           {message}
         </div>
       ) : null}
-      <table className="w-full text-sm">
-        <thead className="text-left text-xs text-gray-500">
-          <tr>
-            <th className="px-4 py-2">メール</th>
-            <th className="px-4 py-2">ロール</th>
-            <th className="px-4 py-2">有効期限</th>
-            <th className="px-4 py-2">操作</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>メール</TableHead>
+            <TableHead>ロール</TableHead>
+            <TableHead>有効期限</TableHead>
+            <TableHead>操作</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {invites.map((inv) => (
-            <tr key={inv.id}>
-              <td className="px-4 py-2">{inv.email}</td>
-              <td className="px-4 py-2">{inv.role}</td>
-              <td className="px-4 py-2 text-xs text-gray-600">
+            <TableRow key={inv.id}>
+              <TableCell>{inv.email}</TableCell>
+              <TableCell>
+                <Badge variant="secondary">{inv.role}</Badge>
+              </TableCell>
+              <TableCell className="text-xs text-muted-foreground">
                 {inv.expiresAt}
-              </td>
-              <td className="px-4 py-2 space-x-2">
-                <button
+              </TableCell>
+              <TableCell className="space-x-2">
+                <Button
                   type="button"
-                  className="rounded border border-gray-300 px-2 py-0.5 text-xs hover:bg-gray-50 disabled:opacity-50"
+                  variant="outline"
+                  size="xs"
                   disabled={busy === inv.id}
                   onClick={() => resend(inv.id)}
                 >
                   再送
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className="rounded border border-red-300 px-2 py-0.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-50"
+                  variant="destructive"
+                  size="xs"
                   disabled={busy === inv.id}
                   onClick={() => revoke(inv.id)}
                 >
                   失効
-                </button>
-              </td>
-            </tr>
+                </Button>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }

@@ -4,6 +4,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/client/apiFetch";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 type Comment = {
   id: string;
@@ -90,58 +92,60 @@ export default function CardComments({ cardId }: { cardId: string }) {
   }
 
   return (
-    <div className="border-t border-gray-200 pt-4">
-      <h3 className="mb-2 text-sm font-medium text-gray-700">コメント</h3>
+    <div>
+      <h3 className="mb-2 text-sm font-medium text-foreground">コメント</h3>
       <div className="mb-3 space-y-2">
-        <textarea
+        <Textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="コメントを入力"
-          className="h-20 w-full whitespace-pre-wrap rounded border border-gray-300 px-3 py-2 text-sm"
+          className="h-20 whitespace-pre-wrap text-sm"
         />
         <div className="flex items-center justify-between">
           {postError ? (
-            <p className="text-xs text-red-600">{postError}</p>
+            <p className="text-xs text-destructive">{postError}</p>
           ) : (
             <span />
           )}
-          <button
+          <Button
             type="button"
+            size="sm"
             onClick={submit}
             disabled={submitting}
-            className="rounded bg-black px-3 py-1.5 text-sm text-white disabled:opacity-50"
           >
             投稿
-          </button>
+          </Button>
         </div>
       </div>
       {loadError ? (
-        <p className="text-sm text-red-600">
+        <p className="text-sm text-destructive">
           コメントの取得に失敗しました ({loadError})
         </p>
       ) : items === null ? (
-        <p className="text-sm text-gray-500">読み込み中...</p>
+        <p className="text-sm text-muted-foreground">読み込み中...</p>
       ) : items.length === 0 ? (
-        <p className="text-sm text-gray-500">まだコメントはありません</p>
+        <p className="text-sm text-muted-foreground">まだコメントはありません</p>
       ) : (
         <ul className="space-y-2">
           {items.map((c) => (
             <li
               key={c.id}
-              className="rounded border border-gray-200 p-2 text-sm"
+              className="rounded-md border border-border p-2 text-sm"
             >
-              <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
+              <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
                 <span>
                   {c.authorId} / {c.createdAt}
                 </span>
                 {c.authorId === CURRENT_USER_ID ? (
-                  <button
+                  <Button
                     type="button"
+                    variant="link"
+                    size="xs"
+                    className="h-auto p-0 text-destructive"
                     onClick={() => remove(c.id)}
-                    className="text-red-600 hover:underline"
                   >
                     削除
-                  </button>
+                  </Button>
                 ) : null}
               </div>
               <p className="whitespace-pre-wrap">{c.body}</p>

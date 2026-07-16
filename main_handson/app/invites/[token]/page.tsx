@@ -20,19 +20,21 @@ export default async function InvitePage({ params }: Props) {
 
   const user = await getCurrentUserFromCookies();
   return (
-    <main className="mx-auto max-w-lg px-4 py-8">
-      <InviteAcceptPanel
-        token={token}
-        invite={{
-          boardId: invite.boardId,
-          boardTitle: invite.board.title,
-          role: invite.role,
-          status: invite.status,
-          expiresAt: invite.expiresAt.toISOString(),
-          expired: isExpired(invite.expiresAt),
-        }}
-        isLoggedIn={Boolean(user)}
-      />
+    <main className="flex min-h-full flex-1 items-center justify-center bg-muted/40 px-4 py-12">
+      <div className="w-full max-w-lg">
+        <InviteAcceptPanel
+          token={token}
+          invite={{
+            boardId: invite.boardId,
+            boardTitle: invite.board.title,
+            role: invite.role,
+            status: invite.status,
+            expiresAt: invite.expiresAt.toISOString(),
+            expired: isExpired(invite.expiresAt),
+          }}
+          isLoggedIn={Boolean(user)}
+        />
+      </div>
     </main>
   );
 }

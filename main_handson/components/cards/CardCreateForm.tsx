@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiFetch } from "@/lib/client/apiFetch";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function CardCreateForm({ listId }: { listId: string }) {
   const router = useRouter();
@@ -36,23 +38,24 @@ export default function CardCreateForm({ listId }: { listId: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-1">
-      <input
+    <form onSubmit={onSubmit} className="flex flex-col gap-1.5">
+      <Input
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="カード名 (1〜200 文字)"
-        className="rounded border border-gray-300 px-2 py-1 text-sm"
+        className="text-sm"
         disabled={submitting}
       />
-      <button
+      <Button
         type="submit"
+        size="sm"
+        variant="secondary"
         disabled={submitting || !title}
-        className="rounded bg-gray-800 px-2 py-1 text-xs text-white disabled:opacity-50"
       >
         {submitting ? "追加中..." : "＋ カード追加"}
-      </button>
-      {error ? <span className="text-xs text-red-600">{error}</span> : null}
+      </Button>
+      {error ? <span className="text-xs text-destructive">{error}</span> : null}
     </form>
   );
 }

@@ -6,6 +6,7 @@ import { requireCurrentUser } from "@/lib/auth/requireUser";
 import { assertBoardAccess } from "@/lib/auth/boardAccess";
 import { resolveBoardFromCard } from "@/lib/auth/cardAccess";
 import { parseCardUpdate } from "@/lib/schemas/cards";
+import { serializeCard } from "@/lib/dueDate/serialize";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export async function GET(request: Request, { params }: Params) {
       const card = await resolveBoardFromCard(cardId);
       await assertBoardAccess(user.id, card.boardId, "viewer");
       const full = await prisma.card.findUnique({ where: { id: cardId } });
-      return NextResponse.json(full, { status: 200 });
+      return NextResponse.json(full ? serializeCard(full) : full, { status: 200 });
     },
     { event: "card.get", targetType: "card", targetId: cardId },
   );
@@ -41,7 +42,7 @@ export async function PATCH(request: Request, { params }: Params) {
         where: { id: cardId },
         data,
       });
-      return NextResponse.json(updated, { status: 200 });
+      return NextResponse.json(serializeCard(updated), { status: 200 });
     },
     { event: "card.update", targetType: "card", targetId: cardId },
   );

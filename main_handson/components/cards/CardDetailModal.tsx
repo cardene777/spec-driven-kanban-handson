@@ -2,8 +2,25 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import type { Role } from "@prisma/client";
 import { apiFetch } from "@/lib/client/apiFetch";
 import CardComments from "@/components/cards/CardComments";
+import CardAssigneesField from "@/components/cards/CardAssigneesField";
+import CardDueDateField from "@/components/cards/CardDueDateField";
+import CardLabelsField from "@/components/labels/CardLabelsField";
+import type { Label as BoardLabel } from "@/lib/labels/colors";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 type Card = {
   id: string;
@@ -11,11 +28,22 @@ type Card = {
   title: string;
   description: string;
   order: number;
+  dueDate: string | null;
   createdAt: string;
   updatedAt: string;
 };
 
-export default function CardDetailModal({ cardId }: { cardId: string }) {
+export default function CardDetailModal({
+  cardId,
+  currentUserRole,
+  assigneeCandidates,
+  boardLabels,
+}: {
+  cardId: string;
+  currentUserRole: Role;
+  assigneeCandidates: { userId: string; name: string }[];
+  boardLabels: BoardLabel[];
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -94,85 +122,107 @@ export default function CardDetailModal({ cardId }: { cardId: string }) {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={close}
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open) close();
+      }}
     >
-      <div
-        className="w-full max-w-lg rounded bg-white p-6 shadow-lg"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>カード詳細</DialogTitle>
+        </DialogHeader>
+
         {loading ? (
-          <p>読み込み中...</p>
+          <p className="text-sm text-muted-foreground">読み込み中...</p>
         ) : status === 404 ? (
-          <div>
-            <p className="text-red-600">カードが見つかりません</p>
-            <button
-              onClick={close}
-              className="mt-4 rounded border border-gray-300 px-4 py-2"
-            >
-              閉じる
-            </button>
-          </div>
+          <>
+            <p className="text-sm text-destructive">カードが見つかりません</p>
+            <DialogFooter>
+              <Button variant="outline" onClick={close}>
+                閉じる
+              </Button>
+            </DialogFooter>
+          </>
         ) : card ? (
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs text-gray-500">タイトル</label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded border border-gray-300 px-3 py-2"
-              />
-              {error?.title ? (
-                <p className="text-xs text-red-600">{error.title}</p>
-              ) : null}
-            </div>
-            <div>
-              <label className="text-xs text-gray-500">説明文</label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="h-32 w-full whitespace-pre-wrap rounded border border-gray-300 px-3 py-2"
-              />
-              {error?.description ? (
-                <p className="text-xs text-red-600">{error.description}</p>
-              ) : null}
-            </div>
-            <div className="text-xs text-gray-500">
-              作成: {card.createdAt} / 更新: {card.updatedAt}
-            </div>
-            {error?._ ? (
-              <p className="text-sm text-red-600">{error._}</p>
-            ) : null}
-            <div className="flex justify-between">
-              <button
-                onClick={remove}
-                className="rounded border border-red-300 px-4 py-2 text-red-600"
-              >
-                削除
-              </button>
-              <div className="flex gap-2">
-                <button
-                  onClick={close}
-                  className="rounded border border-gray-300 px-4 py-2"
-                >
-                  閉じる
-                </button>
-                <button
-                  onClick={save}
-                  className="rounded bg-black px-4 py-2 text-white"
-                >
-                  保存
-                </button>
+          <>
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="card-title">タイトル</Label>
+                <Input
+                  id="card-title"
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                {error?.title ? (
+                  <p className="text-xs text-destructive">{error.title}</p>
+                ) : null}
               </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="card-description">説明文</Label>
+                <Textarea
+                  id="card-description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="h-32 whitespace-pre-wrap"
+                />
+                {error?.description ? (
+                  <p className="text-xs text-destructive">{error.description}</p>
+                ) : null}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                作成: {card.createdAt} / 更新: {card.updatedAt}
+              </p>
+              {error?._ ? (
+                <p className="text-sm text-destructive">{error._}</p>
+              ) : null}
+
+              <Separator />
+
+              <CardLabelsField
+                cardId={cardId}
+                boardLabels={boardLabels}
+                currentUserRole={currentUserRole}
+              />
+
+              <Separator />
+
+              <CardDueDateField
+                cardId={cardId}
+                initialDueDate={card.dueDate}
+                currentUserRole={currentUserRole}
+              />
+
+              <Separator />
+
+              <CardAssigneesField
+                cardId={cardId}
+                currentUserRole={currentUserRole}
+                candidates={assigneeCandidates}
+              />
+
+              <Separator />
+
+              <CardComments cardId={cardId} />
             </div>
-            <CardComments cardId={cardId} />
-          </div>
+
+            <DialogFooter className="sm:justify-between">
+              <Button variant="destructive" onClick={remove}>
+                削除
+              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={close}>
+                  閉じる
+                </Button>
+                <Button onClick={save}>保存</Button>
+              </div>
+            </DialogFooter>
+          </>
         ) : (
-          <p>エラー: {status}</p>
+          <p className="text-sm text-destructive">エラー: {status}</p>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

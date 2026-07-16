@@ -4,8 +4,15 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiFetch } from "@/lib/client/apiFetch";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type Fields = Partial<Record<"email" | "role", string>>;
+
+// 置換対象 15 component に <select> は含まれないため、native のまま token 由来 class で見た目だけ統一する。
+const selectClass =
+  "mt-1 h-8 w-full rounded-md border border-input bg-transparent px-2 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 export default function InviteCreateForm({ boardId }: { boardId: string }) {
   const router = useRouter();
@@ -17,7 +24,7 @@ export default function InviteCreateForm({ boardId }: { boardId: string }) {
 
   return (
     <form
-      className="rounded border border-gray-200 bg-white p-4"
+      className="rounded-lg border border-border bg-card p-4"
       onSubmit={async (e) => {
         e.preventDefault();
         setBusy(true);
@@ -46,22 +53,28 @@ export default function InviteCreateForm({ boardId }: { boardId: string }) {
       <h3 className="text-sm font-semibold">新規招待を作成</h3>
       <div className="mt-2 grid gap-2 sm:grid-cols-3">
         <div>
-          <label className="block text-xs">メールアドレス</label>
-          <input
+          <Label className="text-xs" htmlFor="invite-email">
+            メールアドレス
+          </Label>
+          <Input
+            id="invite-email"
             type="email"
-            className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+            className="mt-1 text-sm"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
           {fieldErrors.email ? (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
+            <p className="mt-1 text-xs text-destructive">{fieldErrors.email}</p>
           ) : null}
         </div>
         <div>
-          <label className="block text-xs">ロール</label>
+          <Label className="text-xs" htmlFor="invite-role">
+            ロール
+          </Label>
           <select
-            className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+            id="invite-role"
+            className={selectClass}
             value={role}
             onChange={(e) => setRole(e.target.value as "member" | "viewer")}
           >
@@ -69,22 +82,18 @@ export default function InviteCreateForm({ boardId }: { boardId: string }) {
             <option value="viewer">viewer</option>
           </select>
           {fieldErrors.role ? (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.role}</p>
+            <p className="mt-1 text-xs text-destructive">{fieldErrors.role}</p>
           ) : null}
         </div>
         <div className="flex items-end">
-          <button
-            type="submit"
-            disabled={busy}
-            className="rounded bg-blue-600 px-3 py-1 text-sm text-white disabled:opacity-50"
-          >
+          <Button type="submit" size="sm" disabled={busy}>
             {busy ? "作成中..." : "招待作成"}
-          </button>
+          </Button>
         </div>
       </div>
       {inviteUrl ? (
-        <div className="mt-3 rounded border border-blue-200 bg-blue-50 p-2 text-xs">
-          <p className="mb-1 text-blue-800">招待 URL (1 度だけ表示):</p>
+        <div className="mt-3 rounded-md border border-border bg-accent/40 p-2 text-xs">
+          <p className="mb-1 text-accent-foreground">招待 URL (1 度だけ表示):</p>
           <code className="break-all">{inviteUrl}</code>
         </div>
       ) : null}

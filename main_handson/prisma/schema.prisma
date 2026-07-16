@@ -23,6 +23,18 @@ enum InviteStatus {
   revoked
 }
 
+// spec/006_label.md § 事前定義された色パレット / design/006_label.md § データモデル
+enum LabelColor {
+  red
+  orange
+  yellow
+  green
+  blue
+  purple
+  pink
+  gray
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -35,6 +47,7 @@ model User {
   comments      Comment[]         @relation("CommentAuthor")
   sessions      Session[]         @relation("UserSessions")
   invitesSent   Invite[]          @relation("InviterUser")
+  assignedCards CardAssignee[]    @relation("CardAssignees")
 }
 
 model Session {
@@ -59,6 +72,7 @@ model Board {
   memberships BoardMembership[]
   lists       List[]
   invites     Invite[]
+  labels      Label[]
 
   @@unique([order])
 }
@@ -112,19 +126,67 @@ model List {
 }
 
 model Card {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   listId      String
   title       String
-  description String   @default("")
+  description String    @default("")
   order       Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  dueDate     DateTime? // spec/007_due_date.md § 対象データ: 日付のみ、時刻は 00:00:00 UTC 固定
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  list     List      @relation(fields: [listId], references: [id], onDelete: Cascade)
-  comments Comment[]
+  list       List           @relation(fields: [listId], references: [id], onDelete: Cascade)
+  comments   Comment[]
+  assignees  CardAssignee[]
+  cardLabels CardLabel[]
 
   @@unique([listId, order])
   @@index([listId])
+  @@index([dueDate])
+}
+
+// spec/006_label.md § 対象データ > Label / design/006_label.md § データモデル > Label モデル
+model Label {
+  id        String     @id @default(cuid())
+  boardId   String
+  name      String
+  color     LabelColor
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  board      Board       @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cardLabels CardLabel[]
+
+  @@unique([boardId, name])
+  @@index([boardId])
+}
+
+// spec/006_label.md § CardLabel 関連 / design/006_label.md § データモデル > CardLabel モデル
+model CardLabel {
+  cardId    String
+  labelId   String
+  createdAt DateTime @default(now())
+
+  card  Card  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  label Label @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([cardId, labelId])
+  @@index([labelId])
+}
+
+// spec/009_assignee.md § 対象データ > CardAssignee エンティティ SSOT
+// design/009_assignee.md § データモデル > CardAssignee モデル (新設)
+model CardAssignee {
+  cardId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user User @relation("CardAssignees", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([cardId, userId])
+  @@index([cardId])
+  @@index([userId])
 }
 
 // design/010_comment.md § データモデル > Comment モデル (新設) SSOT
