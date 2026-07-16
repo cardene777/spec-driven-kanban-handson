@@ -75,6 +75,24 @@ describe("parseLabelCreate", () => {
       ValidationError,
     );
   });
+
+  // 境界条件: spec/006_label.md § 境界条件 § name — 長さ判定はトリム後に行う。
+  // 前後空白込みでもトリム後 50 文字ちょうどは受理、51 文字は too_long。
+  it("measures length after trim: padded-to-50 accepted", () => {
+    const padded = `  ${"a".repeat(50)}  `;
+    expect(parseLabelCreate({ name: padded, color: "green" }).name).toBe(
+      "a".repeat(50),
+    );
+  });
+
+  it("measures length after trim: padded-to-51 → too_long", () => {
+    const padded = `  ${"a".repeat(51)}  `;
+    expectField(
+      () => parseLabelCreate({ name: padded, color: "green" }),
+      "name",
+      "too_long",
+    );
+  });
 });
 
 describe("parseLabelUpdate", () => {
@@ -103,5 +121,16 @@ describe("parseLabelUpdate", () => {
 
   it("too-long name on update → 422 too_long", () => {
     expectField(() => parseLabelUpdate({ name: "a".repeat(51) }), "name", "too_long");
+  });
+
+  // 異常系: spec/006_label.md § 異常系 § バリデーションエラー — 編集時も指定された値は検証される。
+  // 空白のみの name は no_updates ではなく required (値は指定されているため)。
+  it("whitespace-only name on update → 422 required (not no_updates)", () => {
+    expectField(() => parseLabelUpdate({ name: "   " }), "name", "required");
+  });
+
+  // 異常系: 編集時の color 型不一致 → invalid_color ではなく invalid_type。
+  it("non-string color on update → 422 invalid_type", () => {
+    expectField(() => parseLabelUpdate({ color: 1 }), "color", "invalid_type");
   });
 });

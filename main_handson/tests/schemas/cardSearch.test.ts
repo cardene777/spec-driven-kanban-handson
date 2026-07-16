@@ -84,6 +84,17 @@ describe("parseCardSearchQuery", () => {
     );
   });
 
+  // 境界条件: spec/008 § 境界条件 § 期限絞り込み — dueDateFrom == dueDateTo はその日 1 日のみ。
+  // from <= to は成立するので invalid_range にならず、両端が同値で受理される。
+  it("dueDateFrom == dueDateTo is accepted (single-day range)", () => {
+    const p = parseCardSearchQuery({
+      dueDateFrom: "2026-07-15",
+      dueDateTo: "2026-07-15",
+    });
+    expect(p.dueDateFrom).toBe("2026-07-15");
+    expect(p.dueDateTo).toBe("2026-07-15");
+  });
+
   it("bad date format / impossible date on range", () => {
     expectField({ dueDateFrom: "2026/07/01" }, "dueDateFrom", "invalid_format");
     expectField({ dueDateTo: "2026-02-30" }, "dueDateTo", "invalid_date");

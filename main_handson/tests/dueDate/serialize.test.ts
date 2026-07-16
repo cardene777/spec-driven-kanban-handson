@@ -48,6 +48,19 @@ describe("addDaysUtc", () => {
   it("crosses year boundary", () => {
     expect(addDaysUtc("2026-12-31", 1)).toBe("2027-01-01");
   });
+
+  // 境界条件: 2 月末をまたぐ加算 (dueDateWithin7Days の範囲計算が閏年で崩れないこと)。
+  it("crosses leap-year Feb 28 → Feb 29", () => {
+    expect(addDaysUtc("2024-02-28", 1)).toBe("2024-02-29");
+  });
+
+  it("crosses non-leap Feb 28 → Mar 1", () => {
+    expect(addDaysUtc("2025-02-28", 1)).toBe("2025-03-01");
+  });
+
+  it("crosses Feb 29 → Mar 1 in a leap year", () => {
+    expect(addDaysUtc("2024-02-29", 1)).toBe("2024-03-01");
+  });
 });
 
 describe("serializeCard", () => {

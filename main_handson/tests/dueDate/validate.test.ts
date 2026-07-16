@@ -32,4 +32,13 @@ describe("isRealDate", () => {
     expect(isRealDate("2026/07/12")).toBe(false);
     expect(isRealDate("")).toBe(false);
   });
+
+  // 境界条件: 日の下限 / 上限外。形式は通るが実在しない日 (00 日 / 32 日) を排除する。
+  it("rejects day 00 (lower day bound)", () => {
+    expect(isRealDate("2026-01-00")).toBe(false);
+  });
+
+  it("rejects day 32 (upper day bound)", () => {
+    expect(isRealDate("2026-01-32")).toBe(false);
+  });
 });

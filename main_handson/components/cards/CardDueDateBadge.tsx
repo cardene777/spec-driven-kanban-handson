@@ -25,13 +25,7 @@ export default function CardDueDateBadge({
 
   if (status === "today") {
     return (
-      <Badge
-        aria-label={`今日が期限: ${dueDate}`}
-        style={{
-          backgroundColor: "var(--warning)",
-          color: "var(--brand-neutral-0)",
-        }}
-      >
+      <Badge variant="warning" aria-label={`今日が期限: ${dueDate}`}>
         今日 {dueDate}
       </Badge>
     );

@@ -54,6 +54,14 @@ export async function POST(request: Request, { params }: Params) {
         });
         if (!membership) throw new ValidationError({ userId: "assignee_not_in_board" });
 
+        // 重複判定は上限判定より前 (spec/009_assignee.md § 境界条件)。
+        // 既割当ユーザーの再 POST は担当者が上限 (10 名) でも 409 already_assigned を返す。
+        const existing = await tx.cardAssignee.findUnique({
+          where: { cardId_userId: { cardId, userId } },
+          select: { userId: true },
+        });
+        if (existing) throw new ConflictError({ userId: "already_assigned" });
+
         const count = await tx.cardAssignee.count({ where: { cardId } });
         assertBelowLimit(count);
 
