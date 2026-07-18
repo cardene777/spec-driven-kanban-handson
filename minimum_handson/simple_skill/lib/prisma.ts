@@ -1,9 +1,19 @@
-import { PrismaClient } from "@prisma/client";
+import "dotenv/config";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaClient } from "../generated/prisma/client";
 
-// 開発時のホットリロードで PrismaClient が量産されるのを防ぐためグローバルに保持する
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const globalForPrisma = globalThis as unknown as {
+  prisma?: PrismaClient;
+};
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+function createPrisma(): PrismaClient {
+  const raw = process.env.DATABASE_URL ?? "file:./dev.db";
+  const url = raw === "file:./dev.db" ? "file:./prisma/dev.db" : raw;
+  const adapter = new PrismaBetterSqlite3({ url });
+  return new PrismaClient({ adapter });
+}
+
+export const prisma: PrismaClient = globalForPrisma.prisma ?? createPrisma();
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;

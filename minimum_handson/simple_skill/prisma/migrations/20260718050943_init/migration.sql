@@ -25,3 +25,9 @@ CREATE TABLE "Card" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Card_listId_fkey" FOREIGN KEY ("listId") REFERENCES "List" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "List_boardId_order_key" ON "List"("boardId", "order");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Card_listId_order_key" ON "Card"("listId", "order");

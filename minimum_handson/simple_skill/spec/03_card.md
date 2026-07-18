@@ -8,24 +8,24 @@
 
 ### FR-001 カード一覧取得
 
-- 入力 list の id（GET /api/lists/[id]/cards）
+- 入力 list の id（GET `/api/lists/[id]/cards`）
 - 条件 指定 id の List が存在する
 - 出力 200 と Card 配列 `[{ id, title, description, order, listId, createdAt }]`
-- 振る舞い 指定リストのカードを order の昇順で返す。0件なら空配列。
+- 振る舞い 指定リストのカードを order 昇順で返す。0 件なら空配列。
 
 ### FR-002 リスト内カードの表示
 
 - 入力 list の id（ボード詳細画面内）
 - 条件 指定リストが存在する
 - 出力 リスト内のカード一覧
-- 振る舞い カードを order 昇順で表示する。0件のリストはカードなしで表示する。
+- 振る舞い カードを order 昇順で表示する。0 件のリストはカードなしで表示する。
 
 ### FR-003 カード作成
 
-- 入力 list の id と `{ title: string }`（POST /api/lists/[id]/cards）
-- 条件 指定リストが存在し、title が trim 後 1〜200文字
+- 入力 list の id と `{ title: string }`（POST `/api/lists/[id]/cards`）
+- 条件 指定リストが存在し、title を trim した結果が 1〜200 文字
 - 出力 201 と作成された Card `{ id, title, description, order, listId, createdAt }`
-- 振る舞い order に「そのリストの既存カード数」を設定し、description は null で、末尾にカードを1件作成して返す。
+- 振る舞い 該当リストの既存 order の最大値 + 1 を order に設定し（0 件なら 0）、description は null で、末尾に Card を 1 件作成して返す。同一 list 内で order は重複させない。
 
 ### FR-004 カード追加フォーム
 
@@ -36,28 +36,36 @@
 
 ## 異常系
 
-| ID | 条件 | HTTPステータス | レスポンス |
+| ID | 条件 | HTTP ステータス | レスポンス |
 |---|---|---|---|
-| E-001 | title が trim 後 0文字 | 400 | `{ "error": { "code": "VALIDATION_ERROR", "message": "titleは1〜200文字で入力してください" } }` |
-| E-002 | title が trim 後 201文字以上 | 400 | 同上 |
-| E-003 | 指定 list の id が存在しない（一覧取得・作成とも） | 404 | `{ "error": { "code": "NOT_FOUND", "message": "指定されたリストが見つかりません" } }` |
+| E-001 | 指定 list の id が存在しない（一覧取得・作成とも） | 404 | `{ "error": { "code": "NOT_FOUND", "message": "指定されたリストが見つかりません" } }` |
+| E-002 | 対象リストは存在し、title trim 後 0 文字 | 400 | `{ "error": { "code": "VALIDATION_ERROR", "message": "titleは1〜200文字で入力してください" } }` |
+| E-003 | 対象リストは存在し、title trim 後 201 文字以上 | 400 | 同上 |
+
+判定順序は 00_common.md に従い、対象リストが存在しない場合は 404 を先に返す（body に不正な title が含まれていても 400 を返さない）。
 
 ## 境界条件
 
-- title trim後 0 / 1 / 200 / 201文字 → エラー / 成功 / 成功 / エラー
-- 空白のみ → trim後0文字 → エラー
-- カード0件のリスト → 一覧は空配列
+- title trim 後 0 / 1 / 200 / 201 文字 → エラー / 成功 / 成功 / エラー
+- 半角・全角空白、タブ、改行のみ → trim 後 0 文字 → エラー
+- カード 0 件のリスト → 一覧は空配列
 - 存在しない listId → 404
 
 ## バリデーション
 
 | フィールド | 必須 | 制約 |
 |---|---|---|
-| title | はい | 文字列、trim後1〜200文字 |
+| title | はい | 文字列。trim（前後の半角・全角空白、タブ、改行を除去）後 1〜200 文字 |
 | listId（パス） | はい | 既存の List.id |
+
+## 並び順
+
+- 同一 list 内の Card は order の昇順で表示する。
+- 新規作成時の order は「同一 list 内の既存最大 order + 1」（0 件なら 0）。
+- 同一 list 内で order を重複させない。
 
 ## 参考
 
 - spec/00_common.md
 - spec/02_list.md
-- constitution.md 「異常系の網羅」
+- constitution.md 「入力エラーと境界値」

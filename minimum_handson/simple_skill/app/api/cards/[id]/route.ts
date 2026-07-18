@@ -1,38 +1,27 @@
-import { NextResponse } from "next/server";
-import { updateCardSchema } from "@/lib/validation/card";
-import { getCard, updateCard } from "@/lib/repository/card";
+// FR-003 (spec/04_card_edit.md)
+import { NextRequest, NextResponse } from "next/server";
+import { cardRepository } from "@/lib/repository/card";
+import { validateTitle } from "@/lib/validation/title";
+import {
+  validationError,
+  notFoundError,
+  internalError,
+} from "@/lib/errors";
 
-type Context = { params: Promise<{ id: string }> };
+type Ctx = { params: Promise<{ id: string }> };
 
-// spec/04_card_edit.md FR-003
-export async function PATCH(request: Request, { params }: Context) {
-  const { id } = await params;
-
-  // spec/04_card_edit.md E-003（存在チェックを先に行う）
-  const card = await getCard(id);
-  if (!card) {
-    return NextResponse.json(
-      { error: { code: "NOT_FOUND", message: "指定されたカードが見つかりません" } },
-      { status: 404 },
-    );
+export async function PATCH(req: NextRequest, ctx: Ctx) {
+  try {
+    const { id } = await ctx.params;
+    const card = await cardRepository.findById(id);
+    if (!card) return notFoundError("指定されたカードが見つかりません");
+    const body = (await req.json().catch(() => ({}))) as { title?: unknown };
+    const result = validateTitle(body.title, 200);
+    if (!result.ok) return validationError(result.message);
+    const updated = await cardRepository.updateTitle(id, result.value);
+    return NextResponse.json(updated);
+  } catch (e) {
+    console.error(e);
+    return internalError();
   }
-
-  const body = await request.json().catch(() => null);
-  const parsed = updateCardSchema.safeParse(body);
-
-  // spec/04_card_edit.md E-001 / E-002
-  if (!parsed.success) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "VALIDATION_ERROR",
-          message: "titleは1〜200文字で入力してください",
-        },
-      },
-      { status: 400 },
-    );
-  }
-
-  const updated = await updateCard(id, parsed.data.title);
-  return NextResponse.json(updated);
 }

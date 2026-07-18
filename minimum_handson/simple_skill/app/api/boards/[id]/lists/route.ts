@@ -1,52 +1,41 @@
-import { NextResponse } from "next/server";
-import { createListSchema } from "@/lib/validation/list";
-import { getBoard } from "@/lib/repository/board";
-import { createList, listLists } from "@/lib/repository/list";
+// FR-001 / FR-003 (spec/02_list.md)
+import { NextRequest, NextResponse } from "next/server";
+import { boardRepository } from "@/lib/repository/board";
+import { listRepository } from "@/lib/repository/list";
+import { validateTitle } from "@/lib/validation/title";
+import {
+  validationError,
+  notFoundError,
+  internalError,
+} from "@/lib/errors";
 
-type Context = { params: Promise<{ id: string }> };
+type Ctx = { params: Promise<{ id: string }> };
 
-const boardNotFound = () =>
-  NextResponse.json(
-    { error: { code: "NOT_FOUND", message: "指定されたボードが見つかりません" } },
-    { status: 404 },
-  );
-
-// spec/02_list.md FR-001
-export async function GET(_request: Request, { params }: Context) {
-  const { id } = await params;
-
-  // spec/02_list.md E-003
-  const board = await getBoard(id);
-  if (!board) return boardNotFound();
-
-  const lists = await listLists(id);
-  return NextResponse.json(lists);
+export async function GET(_req: NextRequest, ctx: Ctx) {
+  try {
+    const { id } = await ctx.params;
+    const board = await boardRepository.findById(id);
+    if (!board) return notFoundError("指定されたボードが見つかりません");
+    const lists = await listRepository.findByBoard(id);
+    return NextResponse.json(lists);
+  } catch (e) {
+    console.error(e);
+    return internalError();
+  }
 }
 
-// spec/02_list.md FR-003
-export async function POST(request: Request, { params }: Context) {
-  const { id } = await params;
-
-  // spec/02_list.md E-003（存在チェックを先に行う）
-  const board = await getBoard(id);
-  if (!board) return boardNotFound();
-
-  const body = await request.json().catch(() => null);
-  const parsed = createListSchema.safeParse(body);
-
-  // spec/02_list.md E-001 / E-002
-  if (!parsed.success) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "VALIDATION_ERROR",
-          message: "titleは1〜100文字で入力してください",
-        },
-      },
-      { status: 400 },
-    );
+export async function POST(req: NextRequest, ctx: Ctx) {
+  try {
+    const { id } = await ctx.params;
+    const board = await boardRepository.findById(id);
+    if (!board) return notFoundError("指定されたボードが見つかりません");
+    const body = (await req.json().catch(() => ({}))) as { title?: unknown };
+    const result = validateTitle(body.title, 100);
+    if (!result.ok) return validationError(result.message);
+    const list = await listRepository.create(id, result.value);
+    return NextResponse.json(list, { status: 201 });
+  } catch (e) {
+    console.error(e);
+    return internalError();
   }
-
-  const list = await createList(id, parsed.data.title);
-  return NextResponse.json(list, { status: 201 });
 }
