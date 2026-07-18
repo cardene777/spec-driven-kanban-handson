@@ -12,5 +12,11 @@ next-env.d.ts.bak
 /prisma/*.db
 /prisma/*.db-journal
 
+# Prisma 生成 client（`npx prisma generate` で再生成）
+/generated
+
+# 前回成果のスナップショット（読者は生成しない、gitで履歴管理する対象外）
+/0_before_regen_snapshot
+
 # misc
 .DS_Store

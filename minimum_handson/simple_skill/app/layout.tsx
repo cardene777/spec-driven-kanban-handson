@@ -2,18 +2,18 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kanban Board",
-  description: "ボードとカードでタスクを管理するシンプルなカンバンアプリ",
+  title: "Simple Kanban",
+  description: "タスクをカードで管理する最小構成のカンバンアプリ",
 };
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ja">
-      <body className="min-h-screen bg-gray-100 text-gray-900">{children}</body>
+    <html lang="ja" className="h-full antialiased">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
+        {children}
+      </body>
     </html>
   );
 }

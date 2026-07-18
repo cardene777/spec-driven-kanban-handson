@@ -2,61 +2,66 @@
 
 ## 概要
 
-ボード一覧画面（app/page.tsx）で作成済みボードをカード形式・createdAt降順で表示し、各カードから /boards/[id] へ遷移できる。「新規ボード作成」フォームからボードを作成できる。
+ボード一覧画面（`app/page.tsx`）で作成済みボードをカード形式・createdAt 降順で表示し、各カードから `/boards/[id]` へ遷移できる。「新規ボード作成」フォームからボードを作成できる。
 
 ## 機能要件
 
 ### FR-001 ボード一覧取得
 
-- 入力 なし（GET /api/boards）
+- 入力 なし（GET `/api/boards`）
 - 条件 常に成立
 - 出力 200 と Board 配列 `[{ id, title, createdAt }]`
-- 振る舞い 全ボードを createdAt の降順で返す。0件なら空配列を返す。
+- 振る舞い 全ボードを createdAt の降順で返す。0 件なら空配列を返す。
 
 ### FR-002 ボード一覧画面の表示
 
-- 入力 なし（app/page.tsx への遷移）
+- 入力 なし（`app/page.tsx` への遷移）
 - 条件 常に成立
 - 出力 ボード一覧画面
-- 振る舞い GET /api/boards の結果をカード形式で createdAt 降順に表示する。各ボードカードは /boards/[id] へのリンクになっている。0件のときは空状態を表示する。
+- 振る舞い repository から Board 一覧を createdAt 降順で取得してカード形式で表示する。各ボードカードは `/boards/[id]` へのリンクになっている。0 件のときは空状態を表示する。
 
 ### FR-003 ボード作成
 
-- 入力 `{ title: string }`（POST /api/boards）
-- 条件 title が trim 後 1〜100文字
+- 入力 `{ title: string }`（POST `/api/boards`）
+- 条件 title を trim（前後の半角・全角空白、タブ、改行の除去）した後 1〜100 文字
 - 出力 201 と作成された Board `{ id, title, createdAt }`
-- 振る舞い trim 後の title で Board を1件作成して返す。
+- 振る舞い trim 後の title で Board を 1 件作成して返す。
 
 ### FR-004 新規ボード作成フォーム
 
 - 入力 ユーザーのボタン操作とタイトル入力
 - 条件 一覧画面上
 - 出力 作成後に一覧へ反映
-- 振る舞い 「新規ボード作成」ボタンでフォームを表示し、タイトル送信で POST /api/boards を呼ぶ。成功後は新しいボードが一覧（先頭）に表示される。
+- 振る舞い 「新規ボード作成」ボタンでフォームを表示し、タイトル送信で POST `/api/boards` を呼ぶ。成功後は新しいボードが一覧の先頭に表示される。
 
 ## 異常系
 
-| ID | 条件 | HTTPステータス | レスポンス |
+| ID | 条件 | HTTP ステータス | レスポンス |
 |---|---|---|---|
-| E-001 | title が trim 後 0文字（空文字・空白のみ含む） | 400 | `{ "error": { "code": "VALIDATION_ERROR", "message": "titleは1〜100文字で入力してください" } }` |
-| E-002 | title が trim 後 101文字以上 | 400 | 同上 |
+| E-001 | title を trim した結果が 0 文字（空文字・空白のみ含む） | 400 | `{ "error": { "code": "VALIDATION_ERROR", "message": "titleは1〜100文字で入力してください" } }` |
+| E-002 | title を trim した結果が 101 文字以上 | 400 | 同上 |
 
 ## 境界条件
 
-- title trim後 0文字 → エラー
-- title trim後 1文字 → 成功
-- title trim後 100文字 → 成功
-- title trim後 101文字 → エラー
-- 空白のみ（例 "　"） → trim後0文字 → エラー
-- ボード0件 → 一覧は空状態を表示
+- title trim 後 0 文字 → エラー
+- title trim 後 1 文字 → 成功
+- title trim 後 100 文字 → 成功
+- title trim 後 101 文字 → エラー
+- 半角・全角空白、タブ、改行のみ → trim 後 0 文字 → エラー
+- ボード 0 件 → 一覧は空状態を表示
 
 ## バリデーション
 
 | フィールド | 必須 | 制約 |
 |---|---|---|
-| title | はい | 文字列、trim後1〜100文字 |
+| title | はい | 文字列。trim（前後の半角・全角空白、タブ、改行を除去）後 1〜100 文字 |
+
+## 並び順
+
+- Board 一覧は createdAt 降順で表示する。
+- Board 自身に order フィールドは持たない。
 
 ## 参考
 
-- spec/00_common.md（データモデル・エラー形式・バリデーション方針）
-- constitution.md 「異常系の網羅」
+- spec/00_common.md（データモデル・エラー形式・判定順序・title 前処理）
+- constitution.md 「入力エラーと境界値」
