@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Prisma が生成するクライアント（自動生成コードは lint 対象外）
+    "generated/**",
   ]),
 ]);
 

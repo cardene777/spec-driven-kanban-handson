@@ -1,52 +1,40 @@
-// FR-002 (spec/02_list.md)
-import Link from "next/link";
+// FR-001 / FR-003 ボード詳細画面
+// repository から対象のボード・リスト・カードを取得して初期描画する
 import { notFound } from "next/navigation";
-import { boardRepository } from "@/lib/repository/board";
-import { listRepository } from "@/lib/repository/list";
-import { cardRepository } from "@/lib/repository/card";
-import ListCreateForm from "./_components/ListCreateForm";
-import ListColumn from "./_components/ListColumn";
+import Link from "next/link";
+import { getBoardDetail } from "@/lib/repository/board";
+import { BoardDetail } from "@/app/boards/[id]/_components/BoardDetail";
 
-export const dynamic = "force-dynamic";
-
-type PageProps = { params: Promise<{ id: string }> };
-
-export default async function BoardDetailPage({ params }: PageProps) {
+export default async function BoardDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
-  const board = await boardRepository.findById(id);
+  const board = await getBoardDetail(id);
   if (!board) notFound();
 
-  const lists = await listRepository.findByBoard(id);
-  const listsWithCards = await Promise.all(
-    lists.map(async (list) => ({
-      list,
-      cards: await cardRepository.findByList(list.id),
+  // リスト・カードは order 昇順で取得済み（repository 側で指定）
+  const initialLists = board.lists.map((list) => ({
+    id: list.id,
+    title: list.title,
+    order: list.order,
+    cards: list.cards.map((card) => ({
+      id: card.id,
+      title: card.title,
+      order: card.order,
     })),
-  );
+  }));
 
   return (
-    <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-10">
-      <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <Link href="/" className="text-sm text-slate-500 hover:underline">
-            ← ボード一覧
-          </Link>
-          <h1 className="mt-1 text-2xl font-semibold">{board.title}</h1>
-        </div>
-        <ListCreateForm boardId={board.id} />
-      </header>
-
-      {listsWithCards.length === 0 ? (
-        <p className="text-slate-500">
-          まだリストがありません。「リスト作成」から追加できます。
-        </p>
-      ) : (
-        <div className="flex flex-nowrap gap-4 overflow-x-auto pb-4">
-          {listsWithCards.map(({ list, cards }) => (
-            <ListColumn key={list.id} list={list} cards={cards} />
-          ))}
-        </div>
-      )}
+    <main className="mx-auto w-full max-w-6xl px-6 py-10">
+      <div className="mb-6">
+        <Link href="/" className="text-sm text-blue-600 hover:underline">
+          ← ボード一覧へ
+        </Link>
+      </div>
+      <h1 className="mb-6 text-2xl font-bold break-words">{board.title}</h1>
+      <BoardDetail boardId={board.id} initialLists={initialLists} />
     </main>
   );
 }

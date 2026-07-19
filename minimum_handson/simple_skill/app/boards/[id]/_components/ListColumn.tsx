@@ -1,45 +1,45 @@
-// FR-002 (spec/02_list.md), FR-002 (spec/03_card.md)
-import CardCreateForm from "./CardCreateForm";
-import CardItem from "./CardItem";
+"use client";
 
-type Card = {
-  id: string;
-  title: string;
-  description: string | null;
-  order: number;
-  listId: string;
-  createdAt: Date | string;
-};
+// FR-301 カード一覧表示、FR-303 カード追加後・FR-402 編集後の GET API による更新
+import { useState } from "react";
+import { CardItem } from "@/app/boards/[id]/_components/CardItem";
+import { CardCreateForm } from "@/app/boards/[id]/_components/CardCreateForm";
 
-type List = {
-  id: string;
-  title: string;
-  order: number;
-  boardId: string;
-};
+type Card = { id: string; title: string; order: number };
+type ListSummary = { id: string; title: string; order: number };
 
-export default function ListColumn({
+export function ListColumn({
   list,
-  cards,
+  initialCards,
 }: {
-  list: List;
-  cards: Card[];
+  list: ListSummary;
+  initialCards: Card[];
 }) {
+  const [cards, setCards] = useState<Card[]>(initialCards);
+
+  // FR-304 GET /api/lists/[id]/cards でカード一覧を取り直す（order 昇順）
+  async function refreshCards() {
+    const res = await fetch(`/api/lists/${list.id}/cards`);
+    if (!res.ok) return;
+    const data: Card[] = await res.json();
+    setCards(data.map((c) => ({ id: c.id, title: c.title, order: c.order })));
+  }
+
   return (
-    <section className="w-72 shrink-0 rounded-lg bg-slate-100 p-3">
-      <h2 className="mb-3 px-1 text-sm font-semibold text-slate-800">
-        {list.title}
-      </h2>
+    <div className="flex w-72 shrink-0 flex-col gap-3 rounded-lg bg-gray-100 p-3">
+      <h2 className="font-semibold break-words">{list.title}</h2>
+
       <ul className="flex flex-col gap-2">
         {cards.map((card) => (
           <li key={card.id}>
-            <CardItem card={card} />
+            {/* FR-401 / FR-402 カードタイトルのインライン編集 */}
+            <CardItem card={card} onSaved={refreshCards} />
           </li>
         ))}
       </ul>
-      <div className="mt-3">
-        <CardCreateForm listId={list.id} />
-      </div>
-    </section>
+
+      {/* FR-302 リスト末尾に「カード追加」ボタン */}
+      <CardCreateForm listId={list.id} onCreated={refreshCards} />
+    </div>
   );
 }
