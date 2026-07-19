@@ -1,50 +1,44 @@
-# simple_prompt
+# simple_prompt — プロンプトだけでカンバンアプリを作る
 
-カンバンアプリを**少しずつ作り上げていくハンズオン**です（プロンプトで進める版）。
+スキル（`/spec` 等）を使わず、現場のチケット程度の粒度のプロンプトだけで
+Claude Code がどこまで作れるかを示すハンズオン。各ステップのプロンプトに
+書かれていない要件（空文字の扱い・文字数上限・存在しない ID への 404 など）は
+あえて作り込んでいない。「プロンプトだけだと要件が抜ける」ことを見せるための章。
 
-## 運用モデル
+## 技術スタック
 
-- **この `simple_prompt/` 直下が「常に最新の稼働アプリ」**です。
-  作業と動作確認はここで行い、`node_modules` と `prisma/dev.db` を置きっぱなしにします。
-  → **データが保持され**、`npm run dev` の起動も速い。
-- **各ステップの成果は、その時点のソースを `1_...` / `2_...` にコピーしたスナップショット**です（累積コピー）。
+- Next.js 16（App Router）+ TypeScript + Tailwind CSS
+- Prisma 7（`@prisma/adapter-better-sqlite3` の adapter 方式）+ SQLite
+- Node.js 20.19 以上 / npm
 
-```
-simple_prompt/
-├── README.md
-├── app/ lib/ prisma/ package.json ...  ← ★ 直下 = 常に最新の稼働アプリ（ここで作業）
-├── 1_board_list/                        ← 各ステップのスナップショット（コピー）
-├── 2_board_detail/
-├── 3_card_create/
-└── 4_card_edit/
-```
-
-## ステップ一覧
-
-| ステップ | ディレクトリ | 内容 | 状態 |
-| --- | --- | --- | --- |
-| 1 | [`1_board_list/`](./1_board_list/) | プロジェクト初期化 + Prisma/SQLite + ボード一覧・新規作成 | ✅ |
-| 2 | [`2_board_detail/`](./2_board_detail/) | ボード詳細ページ + リスト追加・表示（404対応） | ✅ |
-| 3 | [`3_card_create/`](./3_card_create/) | リスト内にカードを追加・表示 | ✅ |
-| 4 | [`4_card_edit/`](./4_card_edit/) | カードタイトルのインライン編集（PATCH /api/cards/[id]） | ✅ |
-
-## 動かし方
-
-`simple_prompt/` 直下で:
+## 起動手順
 
 ```bash
-# 初回のみ（依存インストール + .env 作成 + DB 作成）
 npm install
 cp .env.example .env
 npx prisma migrate dev
-
-# 起動（2回目以降はこれだけ）
 npm run dev
 ```
 
-http://localhost:3000 を開くと最新アプリが表示されます。DB は直下の `prisma/dev.db` に保持されます
-（消さない限りデータは残ります）。
+`http://localhost:3000` を開く。ビルド確認は `npm run build`。
 
-## スナップショットに含めないもの
+## ステップと画面
 
-`node_modules/`・`.next/`・`.env`・`prisma/dev.db`・`next-env.d.ts`（`.env.example` は含めます）。
+| ステップ | 内容 | 主なファイル |
+| --- | --- | --- |
+| 1 | ボード一覧・新規ボード作成 | `app/page.tsx` / `app/api/boards` |
+| 2 | ボード詳細・リスト作成 | `app/boards/[id]/page.tsx` / `app/api/boards/[id]/lists` |
+| 3 | カード追加・表示 | `app/boards/[id]/new-card-form.tsx` / `app/api/lists/[id]/cards` |
+| 4 | カードタイトルのインライン編集 | `app/boards/[id]/card-item.tsx` / `app/api/cards/[id]` |
+
+## スナップショット
+
+各ステップ完了時点のソース一式（`node_modules` / `.next` / `generated` /
+`prisma/dev.db` / `.env` は含まない）:
+
+- `1_board_list/`
+- `2_board_detail/`
+- `3_card_create/`
+- `4_card_edit/`
+
+各スナップショットも上記「起動手順」の 4 コマンドで単体起動できる。
