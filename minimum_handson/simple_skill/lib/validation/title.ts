@@ -1,21 +1,22 @@
-// FR-001 / FR-003 (Board), FR-003 (List), FR-003 (Card), FR-003 (Card edit)
-// spec/00_common.md: trim(前後の半角・全角空白、タブ、改行) してから長さ検証、trim 後の値を保存
+// 共有トリム検証（design/001_minimum_kanban.md バリデーション）
+// Board・List は上限 100、Card は上限 200 と、上限だけを差し替えて使う
+import { ValidationError } from "@/lib/errors";
 
+// 前後の半角・全角空白、タブ、改行を除去する
+// \s は全角空白(U+3000)を含まないため明示的に加える
 const TRIM_PATTERN = /^[\s　]+|[\s　]+$/g;
 
-export type TitleValidationOk = { ok: true; value: string };
-export type TitleValidationErr = { ok: false; message: string };
-export type TitleValidationResult = TitleValidationOk | TitleValidationErr;
-
-export function normalizeTitle(raw: unknown): string {
+export function trimTitle(raw: unknown): string {
   if (typeof raw !== "string") return "";
   return raw.replace(TRIM_PATTERN, "");
 }
 
-export function validateTitle(raw: unknown, max: number): TitleValidationResult {
-  const value = normalizeTitle(raw);
-  if (value.length < 1 || value.length > max) {
-    return { ok: false, message: `titleは1〜${max}文字で入力してください` };
+// トリム後に 1〜maxLength 文字であることを検証し、トリム後の値を返す
+// 失敗時は ValidationError(400) を投げる
+export function validateTitle(raw: unknown, maxLength: number): string {
+  const trimmed = trimTitle(raw);
+  if (trimmed.length < 1 || trimmed.length > maxLength) {
+    throw new ValidationError(`タイトルは1〜${maxLength}文字で入力してください`);
   }
-  return { ok: true, value };
+  return trimmed;
 }

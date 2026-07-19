@@ -1,3 +1,6 @@
+// Simple Kanban のデータモデル
+// 参照: design/001_minimum_kanban.md データモデル / spec/01_board.md, 02_list.md, 03_card.md
+
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -7,6 +10,7 @@ datasource db {
   provider = "sqlite"
 }
 
+// FR-101 / FR-103 ボード
 model Board {
   id        String   @id @default(cuid())
   title     String
@@ -15,6 +19,7 @@ model Board {
   lists List[]
 }
 
+// FR-201 / FR-203 リスト（Board に属し、boardId 内で order 昇順・重複なし）
 model List {
   id        String   @id @default(cuid())
   title     String
@@ -28,6 +33,7 @@ model List {
   @@unique([boardId, order])
 }
 
+// FR-301 / FR-303 カード（List に属し、listId 内で order 昇順・重複なし）
 model Card {
   id          String   @id @default(cuid())
   title       String

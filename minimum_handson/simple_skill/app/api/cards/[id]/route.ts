@@ -1,27 +1,26 @@
-// FR-003 (spec/04_card_edit.md)
+// FR-403 PATCH /api/cards/[id]
 import { NextRequest, NextResponse } from "next/server";
-import { cardRepository } from "@/lib/repository/card";
+import { findCard, updateCardTitle } from "@/lib/repository/card";
 import { validateTitle } from "@/lib/validation/title";
-import {
-  validationError,
-  notFoundError,
-  internalError,
-} from "@/lib/errors";
+import { AppError, NotFoundError, errorResponse } from "@/lib/errors";
 
-type Ctx = { params: Promise<{ id: string }> };
+const TITLE_MAX = 200;
 
-export async function PATCH(req: NextRequest, ctx: Ctx) {
+type Params = { params: Promise<{ id: string }> };
+
+// FR-403 対象カードの存在を先に確認し、存在すればトリム後のタイトルを検証して更新
+export async function PATCH(request: NextRequest, { params }: Params) {
   try {
-    const { id } = await ctx.params;
-    const card = await cardRepository.findById(id);
-    if (!card) return notFoundError("指定されたカードが見つかりません");
-    const body = (await req.json().catch(() => ({}))) as { title?: unknown };
-    const result = validateTitle(body.title, 200);
-    if (!result.ok) return validationError(result.message);
-    const updated = await cardRepository.updateTitle(id, result.value);
+    const { id } = await params;
+    // E-401 存在しないカードは、body が不正でも 404 を優先する
+    const card = await findCard(id);
+    if (!card) throw new NotFoundError("カードが見つかりません");
+    const body = await request.json().catch(() => ({}));
+    const title = validateTitle(body?.title, TITLE_MAX);
+    const updated = await updateCardTitle(id, title);
     return NextResponse.json(updated);
   } catch (e) {
-    console.error(e);
-    return internalError();
+    if (e instanceof AppError) return errorResponse(e);
+    throw e;
   }
 }

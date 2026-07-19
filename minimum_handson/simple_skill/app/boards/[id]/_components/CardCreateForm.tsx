@@ -1,32 +1,41 @@
 "use client";
 
-// FR-004 (spec/03_card.md)
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+// FR-302 「カード追加」ボタンでフォーム表示、FR-303 送信でカード作成
+import { useState } from "react";
 
-export default function CardCreateForm({ listId }: { listId: string }) {
-  const router = useRouter();
+export function CardCreateForm({
+  listId,
+  onCreated,
+}: {
+  listId: string;
+  onCreated: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSubmitting(true);
     setError(null);
-    const res = await fetch(`/api/lists/${listId}/cards`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title }),
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => null);
-      setError(body?.error?.message ?? "作成に失敗しました");
-      return;
+    try {
+      const res = await fetch(`/api/lists/${listId}/cards`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(data?.error?.message ?? "作成に失敗しました");
+        return;
+      }
+      setTitle("");
+      setOpen(false);
+      onCreated();
+    } finally {
+      setSubmitting(false);
     }
-    setTitle("");
-    setOpen(false);
-    startTransition(() => router.refresh());
   }
 
   if (!open) {
@@ -34,7 +43,7 @@ export default function CardCreateForm({ listId }: { listId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full rounded border border-dashed border-slate-400 py-2 text-sm text-slate-600 hover:border-slate-600 hover:text-slate-900"
+        className="rounded-md border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-600 hover:bg-gray-50"
       >
         + カード追加
       </button>
@@ -43,20 +52,20 @@ export default function CardCreateForm({ listId }: { listId: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-      <textarea
+      <input
+        autoFocus
+        type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="カード名を入力"
-        rows={2}
-        className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
-        autoFocus
+        placeholder="カードのタイトル"
+        className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
       />
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
       <div className="flex gap-2">
         <button
           type="submit"
-          disabled={pending}
-          className="rounded bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+          disabled={submitting}
+          className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
           追加
         </button>
@@ -67,7 +76,7 @@ export default function CardCreateForm({ listId }: { listId: string }) {
             setError(null);
             setTitle("");
           }}
-          className="rounded px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-200"
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm"
         >
           キャンセル
         </button>

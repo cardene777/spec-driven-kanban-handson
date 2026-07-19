@@ -1,17 +1,25 @@
-# Simple Kanban Constitution
+# シンプルなカンバン Constitution
 
 ## プロジェクト概要
 
-タスクをカードで管理する最小構成のカンバンアプリ。
+タスクをカードで管理する最小構成のカンバンアプリ（Simple Kanban）。
 
 ## 技術スタック
 
-- フロントエンド Next.js（App Router）+ React
-- バックエンド Next.js Route Handlers（`app/api/`）
-- データベース SQLite + Prisma 7（`@prisma/adapter-better-sqlite3` を利用）
+- フロントエンド Next.js 16（App Router）+ React + Tailwind CSS
+- バックエンド Next.js App Router の Route Handlers（`app/api/`）
+- データベース SQLite + Prisma 7
+  - `@prisma/adapter-better-sqlite3` の adapter 方式
+  - `prisma-client` generator
+  - `output = "../generated/prisma"`
 - スタイル Tailwind CSS
-- テスト Vitest
+- テスト Vitest 4
 - パッケージマネージャ npm
+
+### 初期化方針
+
+- `create-next-app` は `--webpack` で初期化する（Turbopack は使わない）
+- Prisma は adapter 方式（接続 URL は `prisma.config.ts` と `lib/prisma.ts` 側で渡し、`schema.prisma` の `datasource` に `url` は置かない）
 
 ## コーディング規約
 
@@ -19,19 +27,21 @@
 
 - 変数・関数 camelCase
 - 型・コンポーネント PascalCase
-- ファイル名 kebab-case または Next.js の慣習（`page.tsx` `route.ts` など）
+- ファイル名 kebab-case または Next.js の慣習（`page.tsx`、`route.ts`、`_components/`）
 
 ### ファイル構成
 
-- `app/` Next.js App Router のルーティングと API（`app/api/`）
-- `lib/` 共有ロジック（Prisma クライアント、バリデーション、リポジトリ層）
+- `app/` Next.js App Router のルーティングと API
+- `lib/` 共有ロジック（`lib/prisma.ts`、`lib/repository/`、`lib/validation/`、`lib/errors.ts`）
 - `prisma/` データベーススキーマとマイグレーション
+- `generated/prisma/` 生成済み Prisma Client
 - `tests/` テストコード
 
 ### コメント方針
 
 - 「何を」ではなく「なぜ」を書く
 - 自明なコメントは書かない
+- 各ファイルには対応する仕様要件 ID（例 `// FR-001`）を残す
 
 ## 基本原則
 
@@ -47,15 +57,15 @@
 
 ### 入力エラーと境界値
 
-- 空文字、文字数上限、存在しないIDへのアクセスを仕様に含める
-- HTTPステータスと `{ "error": { "code": "...", "message": "..." } }` のエラー形式を統一する
+- 空文字、文字数上限、存在しない ID へのアクセスを仕様に含める
+- 対象リソースが無い場合は 404 を先に返し、対象がある場合だけ入力を検証して 400 を返す
+- HTTP ステータスと `{ "error": { "code": "...", "message": "..." } }` のエラー形式を統一する
 
 ## セキュリティ要件
 
-- 個人開発・ローカル学習用途を前提とし、認証は導入しない
-- 機密データや個人情報は扱わない（Board・List・Card のタイトルと description のみ保存）
-- 入力バリデーションは必ず行い、不正な入力には 400 を返す
-- 認証やロールが必要になった段階で本ファイルを先に更新してから実装に反映する
+- 想定規模は個人開発
+- 認証は不要（ログイン・権限管理・メンバー招待は行わない）
+- 機密データは扱わない
 
 ## 成功基準
 
@@ -64,7 +74,7 @@
 
 ## 検証コマンド
 
-- lint `npm run lint`
+- lint `npm run lint`（eslint を直接使う。`next lint` は使わない）
 - typecheck `npm run typecheck`。script が無い場合は `npx tsc --noEmit`
-- test `npm run test`
+- test `npm run test`（`vitest run`）
 - build `npm run build`

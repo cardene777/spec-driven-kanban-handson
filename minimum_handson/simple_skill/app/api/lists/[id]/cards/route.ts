@@ -1,41 +1,42 @@
-// FR-001 / FR-003 (spec/03_card.md)
+// FR-304 GET /api/lists/[id]/cards, FR-305 POST /api/lists/[id]/cards
 import { NextRequest, NextResponse } from "next/server";
-import { listRepository } from "@/lib/repository/list";
-import { cardRepository } from "@/lib/repository/card";
+import { findList } from "@/lib/repository/list";
+import { listCardsByList, createCard } from "@/lib/repository/card";
 import { validateTitle } from "@/lib/validation/title";
-import {
-  validationError,
-  notFoundError,
-  internalError,
-} from "@/lib/errors";
+import { AppError, NotFoundError, errorResponse } from "@/lib/errors";
 
-type Ctx = { params: Promise<{ id: string }> };
+const TITLE_MAX = 200;
 
-export async function GET(_req: NextRequest, ctx: Ctx) {
+type Params = { params: Promise<{ id: string }> };
+
+// FR-304 対象リストのカードを order 昇順で返す
+export async function GET(_request: NextRequest, { params }: Params) {
   try {
-    const { id } = await ctx.params;
-    const list = await listRepository.findById(id);
-    if (!list) return notFoundError("指定されたリストが見つかりません");
-    const cards = await cardRepository.findByList(id);
+    const { id } = await params;
+    // 対象リストが無ければ 404
+    const list = await findList(id);
+    if (!list) throw new NotFoundError("リストが見つかりません");
+    const cards = await listCardsByList(id);
     return NextResponse.json(cards);
   } catch (e) {
-    console.error(e);
-    return internalError();
+    if (e instanceof AppError) return errorResponse(e);
+    throw e;
   }
 }
 
-export async function POST(req: NextRequest, ctx: Ctx) {
+// FR-305 対象リストの存在を先に確認し、存在すればトリム後のタイトルを検証して作成
+export async function POST(request: NextRequest, { params }: Params) {
   try {
-    const { id } = await ctx.params;
-    const list = await listRepository.findById(id);
-    if (!list) return notFoundError("指定されたリストが見つかりません");
-    const body = (await req.json().catch(() => ({}))) as { title?: unknown };
-    const result = validateTitle(body.title, 200);
-    if (!result.ok) return validationError(result.message);
-    const card = await cardRepository.create(id, result.value);
+    const { id } = await params;
+    // E-301 存在しないリストは、body が不正でも 404 を優先する
+    const list = await findList(id);
+    if (!list) throw new NotFoundError("リストが見つかりません");
+    const body = await request.json().catch(() => ({}));
+    const title = validateTitle(body?.title, TITLE_MAX);
+    const card = await createCard(id, title);
     return NextResponse.json(card, { status: 201 });
   } catch (e) {
-    console.error(e);
-    return internalError();
+    if (e instanceof AppError) return errorResponse(e);
+    throw e;
   }
 }

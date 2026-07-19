@@ -1,64 +1,79 @@
 "use client";
 
-// FR-001 / FR-002 (spec/04_card_edit.md)
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+// FR-401 タイトルクリックでインライン編集、FR-402 フォーカスアウトで自動保存
+import { useState } from "react";
 
-export default function CardItem({ card }: { card: { id: string; title: string } }) {
-  const router = useRouter();
+type Card = { id: string; title: string; order: number };
+
+export function CardItem({
+  card,
+  onSaved,
+}: {
+  card: Card;
+  onSaved: () => void;
+}) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(card.title);
   const [error, setError] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
 
-  async function commit() {
+  function startEdit() {
+    setValue(card.title);
     setError(null);
-    const trimmed = value;
-    if (trimmed === card.title) {
-      setEditing(false);
-      return;
-    }
+    setEditing(true);
+  }
+
+  // FR-402 blur で自動保存。変更が無ければ何もしない
+  async function save() {
+    setEditing(false);
+    if (value === card.title) return;
+
     const res = await fetch(`/api/cards/${card.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: trimmed }),
+      body: JSON.stringify({ title: value }),
     });
+
     if (!res.ok) {
-      const body = await res.json().catch(() => null);
-      setError(body?.error?.message ?? "更新に失敗しました");
+      // 空文字や上限超過は更新されない。表示を元に戻してエラーを示す
+      const data = await res.json().catch(() => null);
+      setError(data?.error?.message ?? "更新に失敗しました");
       setValue(card.title);
       return;
     }
-    setEditing(false);
-    startTransition(() => router.refresh());
+    setError(null);
+    onSaved();
+  }
+
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={save}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") e.currentTarget.blur();
+          if (e.key === "Escape") {
+            setValue(card.title);
+            setError(null);
+            setEditing(false);
+          }
+        }}
+        className="w-full rounded-md border border-blue-400 bg-white px-3 py-2 text-sm"
+      />
+    );
   }
 
   return (
-    <div className="rounded border border-slate-200 bg-white p-2 text-sm shadow-sm">
-      {editing ? (
-        <textarea
-          className="w-full resize-none rounded border border-slate-300 px-2 py-1 text-sm focus:border-slate-500 focus:outline-none"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={commit}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              e.currentTarget.blur();
-            }
-          }}
-          autoFocus
-          rows={2}
-        />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          className="block w-full text-left"
-        >
-          {card.title}
-        </button>
-      )}
+    <div className="rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm">
+      <button
+        type="button"
+        onClick={startEdit}
+        className="w-full text-left text-sm break-words"
+      >
+        {card.title}
+      </button>
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   );
