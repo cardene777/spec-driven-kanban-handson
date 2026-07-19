@@ -1,35 +1,36 @@
-# ステップ3: リスト内にカード追加
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-このステップまでの完成コードのスナップショットです（ソースのみ。生成物は含みません）。
-ステップ1（ボード一覧 + 作成）・ステップ2（ボード詳細 + リスト作成）の内容をすべて含みます。
+## Getting Started
 
-## このステップで追加するもの
-
-- Prisma に `Card` モデルを追加（`id` / `title` / `description?` / `order` / `listId`、`List` と 1..N）
-  - `description` は省略可能（`String?`）
-- API ルート `app/api/lists/[id]/cards/route.ts`
-  - `GET /api/lists/[id]/cards` … 指定リストのカードを `order` 昇順で返す
-  - `POST /api/lists/[id]/cards` … `title`(必須) と `description`(任意) で作成。`order` は末尾に自動採番。存在しないリストは 404、空 `title` は 400。
-- ボード詳細ページ（`app/boards/[id]/page.tsx`）で各リスト内のカードを `order` 昇順で表示
-- 各リストの末尾に「カード追加」ボタン → フォーム（`app/boards/[id]/new-card-form.tsx`、クライアント）
-  - 作成後は `router.refresh()` でリスト末尾に追加されて見える
-
-## 主なファイル
-
-| ファイル | 役割 |
-| --- | --- |
-| `prisma/schema.prisma` | `Board` / `List` / `Card` モデルの定義 |
-| `app/api/lists/[id]/cards/route.ts` | `GET` / `POST /api/lists/[id]/cards` |
-| `app/boards/[id]/page.tsx` | ボード詳細（リスト + カードを order 昇順で表示） |
-| `app/boards/[id]/new-card-form.tsx` | カード追加フォーム（クライアントコンポーネント） |
-
-## 動かし方
+First, run the development server:
 
 ```bash
-npm install
-cp .env.example .env
-npx prisma migrate dev
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-http://localhost:3000 でボードを開き、リスト末尾の「カード追加」からカードを追加できます。
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

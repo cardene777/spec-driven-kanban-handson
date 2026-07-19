@@ -1,38 +1,36 @@
-# ステップ2: ボード詳細ページ + リスト作成
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-このステップまでの完成コードのスナップショットです（ソースのみ。生成物は含みません）。
-ステップ1（ボード一覧 + 作成）の内容をすべて含みます。
+## Getting Started
 
-## このステップで追加するもの
-
-- Prisma に `List` モデルを追加（`id` / `title` / `order` / `boardId`、`Board` と 1..N）
-- ボード詳細ページ `app/boards/[id]/page.tsx`
-  - URL のボード ID からボード情報とリスト一覧を取得して表示
-  - リストは同じボード内で `order` の昇順に並べる
-  - 「リスト作成」ボタンでフォームを表示し、タイトルを入力・送信すると作成 → 一覧に反映
-- API ルート `app/api/boards/[id]/lists/route.ts`
-  - `GET /api/boards/[id]/lists` … 指定ボードのリストを `order` 昇順で返す
-  - `POST /api/boards/[id]/lists` … `title` を受け取り作成（`order` は末尾に自動採番、`title` 必須で空は 400、存在しないボードは 404）
-- ボード一覧（`app/page.tsx`）の各ボードを詳細ページへのリンクに変更
-
-## 主なファイル
-
-| ファイル | 役割 |
-| --- | --- |
-| `prisma/schema.prisma` | `Board` / `List` モデルの定義 |
-| `app/api/boards/[id]/lists/route.ts` | `GET` / `POST /api/boards/[id]/lists` |
-| `app/boards/[id]/page.tsx` | ボード詳細（サーバーコンポーネントでボード + リストを取得） |
-| `app/boards/[id]/new-list-form.tsx` | リスト作成フォーム（クライアントコンポーネント） |
-
-> Next.js 16 では動的ルートの `params` は `Promise` で渡されるため、`await params` で取り出しています。
-
-## 動かし方
+First, run the development server:
 
 ```bash
-npm install
-cp .env.example .env
-npx prisma migrate dev
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-http://localhost:3000 でボード一覧を開き、ボードをクリックすると詳細ページに移動します。
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

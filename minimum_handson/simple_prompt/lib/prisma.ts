@@ -1,13 +1,19 @@
-import { PrismaClient } from "@prisma/client";
+import "dotenv/config";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaClient } from "../generated/prisma/client";
 
-// Next.js の開発時ホットリロードで PrismaClient が量産されるのを防ぐため、
-// グローバルに 1 つだけ保持して使い回す。
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+  prisma?: PrismaClient;
 };
 
-export const prisma =
-  globalForPrisma.prisma ?? new PrismaClient();
+function createPrisma(): PrismaClient {
+  const raw = process.env.DATABASE_URL ?? "file:./dev.db";
+  const url = raw === "file:./dev.db" ? "file:./prisma/dev.db" : raw;
+  const adapter = new PrismaBetterSqlite3({ url });
+  return new PrismaClient({ adapter });
+}
+
+export const prisma: PrismaClient = globalForPrisma.prisma ?? createPrisma();
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
