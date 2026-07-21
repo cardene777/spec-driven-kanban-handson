@@ -1,67 +1,55 @@
 # spec-driven-kanban-handson
 
-Next.js（App Router）+ Prisma + SQLite でカンバンアプリを段階的に作るハンズオンです。
+Next.js、Prisma、SQLiteでカンバンアプリを段階的に作るハンズオンの成果物です。第2章・第5章で扱う、プロンプト駆動とスキル駆動の実装を収録しています。
 
-> **このリポジトリのルートには稼働アプリの実装コードを置きません。**
-> ルートは説明と補助ファイルのみで、実際のアプリコードは各ハンズオンのディレクトリ配下に置いています。
+> ルートに稼働アプリはありません。以下の各ハンズオンディレクトリへ移動して実行してください。
 
-## 全体構成
+## 収録内容
 
-ハンズオン（＝稼働アプリを直下に持つ末端ディレクトリ）を、目的ごとに配置しています。
-関連するものは親ディレクトリでまとめています。
+| ディレクトリ | 内容 | スキル |
+| --- | --- | --- |
+| [`minimum_handson/simple_prompt/`](./minimum_handson/simple_prompt/) | 第2章。プロンプトだけで最小カンバンを作る版 | 使わない |
+| [`minimum_handson/simple_skill/`](./minimum_handson/simple_skill/) | 第2章。同じ題材を4つの固定スキルで作る版 | `constitution`、`spec`、`design`、`implement` |
+| [`main_handson/`](./main_handson/) | 第5章。認証・権限・UI・テスト・文書化まで拡張する版 | 11の汎用スキル |
 
-- [`minimum_handson/`](./minimum_handson/) … 進め方別のハンズオンを束ねる親
-  - [`simple_prompt/`](./minimum_handson/simple_prompt/) … プロンプトで進める版
-  - [`simple_skill/`](./minimum_handson/simple_skill/) … スキルで進める版
-- [`main_handson/`](./main_handson/) … ハンズオン（末端）
+各末端ディレクトリの直下が最新の稼働アプリです。`simple_prompt/` 内の `1_...` から `4_...` は、各ステップ完了時点のスナップショットです。
 
-**各ハンズオン（末端ディレクトリ）の直下が「常に最新の稼働アプリ」**で、作業はここで行います。
-各ステップの成果は、その時点のソースを `1_...` / `2_...` にコピーしたスナップショットとして残します。
+## 動かし方
 
-```
-<repo>/
-├── README.md
-├── Dockerfile                ← Docker補助環境
-├── docker-compose.yml        ← Docker補助環境
-├── docs/
-│   └── docker.md
-├── minimum_handson/
-│   ├── simple_prompt/        ← ハンズオン（末端）
-│   │   ├── app/ prisma/ ...  ← ★ 直下 = 常に最新の稼働アプリ（ここで作業・データ保持）
-│   │   ├── 1_xxx/            ← 各ステップのスナップショット（コピー）
-│   │   └── 2_xxx/
-│   └── simple_skill/         ← ハンズオン（末端・同じ構成）
-└── main_handson/             ← ハンズオン（末端・同じ構成）
+Node.js 20.19以上（22系を推奨）、npm、Gitを用意します。起動したいハンズオンのディレクトリで次を実行します。
+
+```bash
+cd minimum_handson/simple_skill  # 実行したいディレクトリに置き換える
+npm install
+cp .env.example .env
+npx prisma migrate dev
+npm run dev
 ```
 
-詳細は各ディレクトリの README を参照してください。
+`http://localhost:3000` を開きます。SQLiteのデータベースは各ハンズオンの `prisma/dev.db` に作成されます。
 
 ## 技術スタック
 
 - Next.js 16（App Router）/ React 19 / TypeScript
 - Tailwind CSS v4
-- Prisma + SQLite（Node.js v20.12 互換のため Prisma は `6.5.0`）
+- Prisma 7.8（`@prisma/adapter-better-sqlite3` を使うadapter方式）/ SQLite
+- Vitest 4（`simple_skill` と `main_handson`）
 
-## 動かし方
+## 検証
 
-対象ハンズオン（末端ディレクトリ）直下で起動します:
+`simple_skill` と `main_handson` では、各ディレクトリで次を実行できます。
 
 ```bash
-cd minimum_handson/simple_prompt   # 対象のハンズオンへ
-# 初回のみ
-npm install
-cp .env.example .env
-npx prisma migrate dev
-# 起動（2回目以降はこれだけ）
-npm run dev
+npm run lint
+npm run typecheck
+npm test
+npm run build
 ```
 
-http://localhost:3000 を開くと最新アプリが表示されます。
-DB は直下の `prisma/dev.db` に保持されるので、追加したデータは消えません。
+## Docker環境
 
-## Dockerで実行環境を揃える場合
+Node.js、npm、Git、SQLiteの実行環境をDockerでそろえる場合は、[Docker環境](./docs/docker.md)を参照してください。Claude Codeはホスト側に通常どおりインストールして使います。
 
-Node.js、npm、Git、SQLiteの実行環境をDockerで揃えたい場合は、以下を参照してください。
-Claude CodeはDockerに含めず、ホスト側のターミナルに通常どおりインストールして使います。
+## License
 
-- [Docker環境](./docs/docker.md)
+[MIT](./LICENSE)

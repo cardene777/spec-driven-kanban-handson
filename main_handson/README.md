@@ -1,6 +1,6 @@
-# Simple Kanban
+# main_handson — スキル駆動カンバンの完成例
 
-小規模チーム向けのカンバンアプリ（ボード・リスト・カードの作成・表示・編集）。
+第5章のメインハンズオンです。ボード・リスト・カードに加え、移動、アーカイブ、ラベル、期限、検索、認証、招待、権限を実装しています。
 方針は [constitution.md](./constitution.md)、仕様は [spec/](./spec)、設計は [design/](./design) を参照。
 
 ## 技術スタック
@@ -32,3 +32,4 @@ npm run build      # Next.js production build
 - `lib/` … Prisma client・エラー整形・入力検証・監査ログなど共通処理
 - `prisma/` … スキーマとマイグレーション
 - `tests/` … API テスト
+- `.claude/skills/` … 第5章で使う11の汎用スキル
