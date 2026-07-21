@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# simple_skill — 汎用スキルでカンバンアプリを作る
 
-## Getting Started
+`/constitution` `/spec` `/design` `/implement` の4スキルを使って、
+仕様駆動でカンバンアプリを作るハンズオン。`simple_prompt`（プロンプトのみ）と
+同じ最小構成のアプリを、スキル経由で作り直したもの。
 
-First, run the development server:
+スキル自体は技術スタックやドメインを固定しない**汎用定義**（`.claude/skills/`）で、
+カンバンという題材や技術スタックは実行時のプロンプト・入力から決まる。
+そのため空文字の扱い・文字数上限・存在しない ID への 404 などの要件も、
+`constitution.md` と `spec/` に明示したうえで実装される（`simple_prompt` との違い）。
+
+## 技術スタック
+
+- Next.js 16（App Router）+ TypeScript + Tailwind CSS
+- Prisma 7（`@prisma/adapter-better-sqlite3` の adapter 方式）+ SQLite
+- Vitest / Node.js 20.19 以上 / npm
+
+## 起動手順
 
 ```bash
+npm install
+cp .env.example .env
+npx prisma migrate dev
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`http://localhost:3000` を開く。検証は `npm run lint` / `npm run typecheck` / `npm run test` / `npm run build`。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## スキルで生成した成果物
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| 種類 | パス | 内容 |
+| --- | --- | --- |
+| 方針 | `constitution.md` | 技術スタック・命名・エラー形式・検証コマンド |
+| 仕様 | `spec/00_common.md` 〜 `spec/04_card_edit.md` | 共通ルールとボード・リスト・カード・カード編集の仕様 |
+| 設計 | `design/001_minimum_kanban.md` | データモデル・API・画面・実装順序 |
+| 実装 | `app/` `lib/` `prisma/` | ボード/リスト/カードの作成・表示・編集 |
+| テスト | `tests/` | カードタイトルの正常系・空文字・上限・失敗時の非変更 |
 
-## Learn More
+## スキル（`.claude/skills/`）
 
-To learn more about Next.js, take a look at the following resources:
+`constitution` / `spec` / `design` / `implement` の4つ。いずれも技術・ドメインを
+固定しない汎用定義で、別テーマに置き換える際もそのまま使える。書籍側の正本は
+`ai_books/chapters/02_minimum_handson/skills/` にあり、本ディレクトリはその配布コピー。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ステップと画面
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| ステップ | 内容 | 主なファイル |
+| --- | --- | --- |
+| 1 | ボード一覧・新規ボード作成 | `app/page.tsx` / `app/api/boards` |
+| 2 | ボード詳細・リスト作成 | `app/boards/[id]/page.tsx` / `app/api/boards/[id]/lists` |
+| 3 | カード追加・表示 | `app/boards/[id]/_components/CardCreateForm.tsx` / `app/api/lists/[id]/cards` |
+| 4 | カードタイトルのインライン編集 | `app/boards/[id]/_components/CardItem.tsx` / `app/api/cards/[id]` |
