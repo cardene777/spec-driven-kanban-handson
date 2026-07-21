@@ -1,0 +1,37 @@
+/* デザイントークン (SSOT は brand.json)。Height tone = warm cream + terracotta + serif heading。
+   常時ライトのトーンのため prefers-color-scheme: dark ブロックは設けない。 */
+:root {
+  --brand-primary-50: #fbeee9;
+  --brand-primary-500: #d06846;
+  --brand-primary-600: #c85a3c;
+  --brand-primary-700: #a8462d;
+
+  --brand-neutral-0: #ffffff;
+  --brand-neutral-50: #f7f3ec;
+  --brand-neutral-100: #efe9df;
+  --brand-neutral-200: #e4dccf;
+  --brand-neutral-300: #d6ccbb;
+  --brand-neutral-400: #b3a894;
+  --brand-neutral-500: #8c8271;
+  --brand-neutral-600: #6b6252;
+  --brand-neutral-700: #4e4739;
+  --brand-neutral-800: #332e25;
+  --brand-neutral-900: #211d17;
+
+  --brand-success: #4b7f52;
+  --brand-warning: #d08c2a;
+  --brand-danger: #b5432b;
+
+  --brand-font-sans: "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+  --brand-font-serif: Charter, "Iowan Old Style", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --brand-font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --brand-radius-sm: 6px;
+  --brand-radius-md: 10px;
+  --brand-radius-lg: 14px;
+  --brand-radius-full: 9999px;
+
+  --brand-shadow-sm: 0 1px 2px rgba(33, 29, 23, 0.06);
+  --brand-shadow-md: 0 2px 8px rgba(33, 29, 23, 0.08);
+  --brand-shadow-lg: 0 8px 24px rgba(33, 29, 23, 0.12);
+}

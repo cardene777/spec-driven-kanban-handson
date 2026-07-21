@@ -12,9 +12,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // 本章 02 セクションのハンズオンでは対象外
-    "0_before_regen_snapshot/**",
-    "8_document/**",
+    // Prisma が生成する client は lint 対象外
     "generated/**",
   ]),
 ]);

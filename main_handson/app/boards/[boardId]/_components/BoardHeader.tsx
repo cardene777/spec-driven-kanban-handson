@@ -3,16 +3,13 @@
 // spec/001_boards.md § 操作: ボード名編集 / ボード削除
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type Board = { id: string; title: string };
 
-export default function BoardHeader({
-  board,
-  canWrite,
-}: {
-  board: Board;
-  canWrite: boolean;
-}) {
+export default function BoardHeader({ board }: { board: Board }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(board.title);
@@ -54,10 +51,10 @@ export default function BoardHeader({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
-      <div className="flex-1 min-w-0">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         {editing ? (
-          <input
-            className="w-full max-w-xl rounded border border-slate-300 px-3 py-2 text-xl font-semibold focus:border-slate-500 focus:outline-none"
+          <Input
+            className="max-w-xl text-xl font-semibold"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onBlur={commit}
@@ -70,24 +67,23 @@ export default function BoardHeader({
             autoFocus
           />
         ) : (
-          <h1
-            className="text-2xl font-semibold cursor-text"
-            onClick={() => canWrite && setEditing(true)}
-          >
-            {board.title}
-          </h1>
+          <>
+            <h1 className="font-heading text-2xl font-semibold">{board.title}</h1>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="ボード名を編集"
+              onClick={() => setEditing(true)}
+            >
+              <Pencil className="size-4" />
+            </Button>
+          </>
         )}
-        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        {error && <p className="text-xs text-destructive">{error}</p>}
       </div>
-      {canWrite && (
-        <button
-          type="button"
-          onClick={remove}
-          className="rounded border border-red-300 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
-        >
-          ボード削除
-        </button>
-      )}
+      <Button variant="ghost" size="icon" aria-label="ボードを削除" onClick={remove}>
+        <Trash2 className="size-4 text-destructive" />
+      </Button>
     </div>
   );
 }

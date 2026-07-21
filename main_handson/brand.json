@@ -1,0 +1,42 @@
+{
+  "name": "Simple Kanban",
+  "tone": "height",
+  "palette": {
+    "primary": {
+      "50": "#fbeee9",
+      "500": "#d06846",
+      "600": "#c85a3c",
+      "700": "#a8462d"
+    },
+    "neutral": {
+      "0": "#ffffff",
+      "50": "#f7f3ec",
+      "100": "#efe9df",
+      "200": "#e4dccf",
+      "300": "#d6ccbb",
+      "400": "#b3a894",
+      "500": "#8c8271",
+      "600": "#6b6252",
+      "700": "#4e4739",
+      "800": "#332e25",
+      "900": "#211d17"
+    },
+    "semantic": {
+      "success": "#4b7f52",
+      "warning": "#d08c2a",
+      "danger": "#b5432b"
+    }
+  },
+  "typography": {
+    "font-sans": "\"Hiragino Sans\", \"Yu Gothic UI\", system-ui, sans-serif",
+    "font-serif": "Charter, \"Iowan Old Style\", \"Hiragino Mincho ProN\", \"Yu Mincho\", serif",
+    "font-mono": "ui-monospace, \"SFMono-Regular\", Menlo, monospace"
+  },
+  "spacing": { "unit": 4, "scale": [0, 4, 8, 12, 16, 24, 32, 48, 64] },
+  "radius": { "sm": "6px", "md": "10px", "lg": "14px", "full": "9999px" },
+  "shadow": {
+    "sm": "0 1px 2px rgba(33, 29, 23, 0.06)",
+    "md": "0 2px 8px rgba(33, 29, 23, 0.08)",
+    "lg": "0 8px 24px rgba(33, 29, 23, 0.12)"
+  }
+}

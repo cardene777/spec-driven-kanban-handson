@@ -1,1 +1,97 @@
 @import "tailwindcss";
+@import "./tokens.css";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Height tone は常時ライト。dark: ユーティリティのコンパイルのため custom-variant は残すが、
+   .dark クラスは付与せず、明暗反転用の変数上書きブロックは持たない（半分だけダークになる崩れを防ぐ）。 */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--brand-font-sans);
+  --font-heading: var(--brand-font-serif);
+  --font-mono: var(--brand-font-mono);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--brand-success);
+  --color-warning: var(--brand-warning);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 14px);
+  --radius-4xl: 9999px;
+}
+
+:root {
+  --background: var(--brand-neutral-50);
+  --foreground: var(--brand-neutral-900);
+  --card: var(--brand-neutral-0);
+  --card-foreground: var(--brand-neutral-900);
+  --popover: var(--brand-neutral-0);
+  --popover-foreground: var(--brand-neutral-900);
+  --primary: var(--brand-primary-600);
+  --primary-foreground: var(--brand-neutral-0);
+  --secondary: var(--brand-neutral-100);
+  --secondary-foreground: var(--brand-neutral-800);
+  --muted: var(--brand-neutral-100);
+  --muted-foreground: var(--brand-neutral-500);
+  --accent: var(--brand-primary-50);
+  --accent-foreground: var(--brand-primary-700);
+  --destructive: var(--brand-danger);
+  --border: var(--brand-neutral-200);
+  --input: var(--brand-neutral-200);
+  --ring: var(--brand-primary-500);
+  --radius: var(--brand-radius-md);
+
+  --sidebar: var(--brand-neutral-100);
+  --sidebar-foreground: var(--brand-neutral-800);
+  --sidebar-primary: var(--brand-primary-600);
+  --sidebar-primary-foreground: var(--brand-neutral-0);
+  --sidebar-accent: var(--brand-primary-50);
+  --sidebar-accent-foreground: var(--brand-primary-700);
+  --sidebar-border: var(--brand-neutral-200);
+  --sidebar-ring: var(--brand-primary-500);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  .font-heading {
+    font-family: var(--brand-font-serif);
+  }
+}

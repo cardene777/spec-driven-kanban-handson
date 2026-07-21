@@ -3,6 +3,8 @@
 // spec/002_lists.md § 操作: リスト作成
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function ListCreateForm({ boardId }: { boardId: string }) {
   const router = useRouter();
@@ -30,48 +32,36 @@ export default function ListCreateForm({ boardId }: { boardId: string }) {
   }
 
   if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
-      >
-        リスト作成
-      </button>
-    );
+    return <Button onClick={() => setOpen(true)}>リスト作成</Button>;
   }
 
   return (
     <form onSubmit={submit} className="flex items-start gap-2">
       <div className="flex flex-col">
-        <input
+        <Input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="リスト名"
-          className="w-56 rounded border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+          className="w-56"
           autoFocus
         />
-        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
       </div>
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={pending}>
         作成
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
+        variant="outline"
         onClick={() => {
           setOpen(false);
           setError(null);
           setTitle("");
         }}
-        className="rounded border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
       >
         キャンセル
-      </button>
+      </Button>
     </form>
   );
 }

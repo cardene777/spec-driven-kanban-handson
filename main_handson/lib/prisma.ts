@@ -1,4 +1,4 @@
-// design/001_boards.md § 実装方針
+// design/001_boards.md § 実装方針（Prisma 7 adapter 方式）
 import "dotenv/config";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaClient } from "../generated/prisma/client";

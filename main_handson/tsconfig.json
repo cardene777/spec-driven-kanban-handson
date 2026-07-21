@@ -30,5 +30,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "0_before_regen_snapshot", "generated", "8_document"]
+  "exclude": ["node_modules", "generated"]
 }
