@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Card" ADD COLUMN "archivedAt" DATETIME;
+ALTER TABLE "Card" ADD COLUMN "deletedAt" DATETIME;

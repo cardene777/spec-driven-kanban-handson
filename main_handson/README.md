@@ -1,45 +1,34 @@
-# main_handson（教材 第5章）
+# Simple Kanban
 
-カンバンアプリのハンズオン（教材 第5章分）です。運用モデルは `minimum_handson/` と同じです。
+小規模チーム向けのカンバンアプリ（ボード・リスト・カードの作成・表示・編集）。
+方針は [constitution.md](./constitution.md)、仕様は [spec/](./spec)、設計は [design/](./design) を参照。
 
-## 運用モデル
+## 技術スタック
 
-- **この `main_handson/` 直下が「常に最新の稼働アプリ」**です。
-  作業と動作確認はここで行い、`node_modules` と `prisma/dev.db` を置きっぱなしにします。
-- **各ステップの成果は、その時点のソースを `1_...` / `2_...` にコピーしたスナップショット**です（累積コピー）。
+Next.js 16 (App Router) / TypeScript / SQLite / Prisma 7 (better-sqlite3 adapter) / Tailwind CSS / Vitest 4 / npm
 
-```
-main_handson/
-├── README.md
-├── app/ lib/ prisma/ package.json ...  ← ★ 直下 = 常に最新の稼働アプリ（ここで作業）
-├── 1_xxx/                               ← 各ステップのスナップショット（コピー）
-└── 2_xxx/
-```
-
-（教材 第2章分は別ディレクトリ [`../minimum_handson/`](../minimum_handson/) にあります。）
-
-## 一覧
-
-| ステップ | ディレクトリ | 内容 | 状態 |
-| --- | --- | --- | --- |
-| - | （今後追加） | - | 予定 |
-
-## 動かし方
-
-`main_handson/` 直下で:
+## セットアップ
 
 ```bash
-# 初回のみ（依存インストール + .env 作成 + DB 作成）
+# Node.js 20.19 以上（Prisma 7 / Vitest 4 のため 22 系を推奨）
 npm install
 cp .env.example .env
-npx prisma migrate dev
-
-# 起動（2回目以降はこれだけ）
-npm run dev
+npx prisma migrate dev   # SQLite にスキーマを反映
+npm run dev              # http://localhost:3000
 ```
 
-DB は直下の `prisma/dev.db` に保持されます（消さない限りデータは残ります）。
+## 検証コマンド
 
-## スナップショットに含めないもの
+```bash
+npm run lint       # ESLint
+npm run typecheck  # tsc --noEmit
+npm test           # Vitest（Prisma を mock、DB 不要）
+npm run build      # Next.js production build
+```
 
-`node_modules/`・`.next/`・`.env`・`prisma/dev.db`・`next-env.d.ts`（`.env.example` は含めます）。
+## 構成
+
+- `app/` … 画面（`/` ボード一覧、`/boards/[id]` ボード詳細）と Route Handler（`app/api/**`）
+- `lib/` … Prisma client・エラー整形・入力検証・監査ログなど共通処理
+- `prisma/` … スキーマとマイグレーション
+- `tests/` … API テスト

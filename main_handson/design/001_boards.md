@@ -1,150 +1,149 @@
-# ボード機能の設計
+# ボード（Board）の設計
 
 ## 関連仕様
 
-- `spec/000_shared_rules.md`
-- `spec/001_boards.md`
+- spec/000_shared_rules.md
+- spec/001_boards.md
+- constitution.md
 
 ## 前提
 
-- 認証は本章 02 セクションでは開発用固定ユーザー（`dev-user`）で代替する（`spec/000_shared_rules.md § 認証の前提`）。
-- Prisma 7 + `@prisma/adapter-better-sqlite3` を使う（`constitution.md § 技術スタック`）。
-- エラー応答は `{ "error": { "code", "message", "details?" } }` で統一（`spec/000_shared_rules.md`）。
-- 権限判定は「認証 → 対象存在 → 権限 → 入力検証」の順で入口チェック（同上）。
-- 一覧レスポンスは `{ "items": [...] }`（同上）。
+- 技術スタックは constitution.md に従う（Next.js 16 App Router / Prisma 7 adapter 方式 / SQLite / TypeScript / Tailwind / Vitest 4）。
+- Prisma client の output は `../generated/prisma`、adapter は `@prisma/adapter-better-sqlite3`。
+- **認証・メンバーシップ（User / Membership / role）モデルは本コア設計の対象外**（後続機能 auth/invite/permissions で追加）。本設計では権限チェックの「配置」と失敗時応答を定義し、実際のロール解決はその後続機能で接続する。コア実装段階では認証・権限は常に通過する前提で API を組み、チェック点をコメント／関数境界として残す。
+- 共通のエラー応答・一覧レスポンス形状・order/ID/日付/ログ規則は spec/000_shared_rules.md に従う。
 
 ## データモデル
 
-Prisma スキーマ（抜粋）:
+Prisma スキーマ（Board 部分）。List/Card は各設計で定義するが、cascade 関係のためここに全体像を示す。
 
 ```prisma
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
-  memberships BoardMembership[]
-  boards      Board[]  @relation("BoardOwner")
-}
-
 model Board {
   id        String   @id @default(cuid())
   title     String
   order     Int
-  ownerId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  owner       User               @relation("BoardOwner", fields: [ownerId], references: [id])
-  memberships BoardMembership[]
-  lists       List[]
-
-  @@unique([ownerId, order])
-}
-
-enum BoardRole {
-  owner
-  member
-  viewer
-}
-
-model BoardMembership {
-  id      String    @id @default(cuid())
-  boardId String
-  userId  String
-  role    BoardRole
-
-  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([boardId, userId])
+  lists     List[]
 }
 ```
 
-- `BoardMembership` によりユーザーとボードの権限を管理。作成時は `role = owner` のレコードを1件作る。
-- 削除時は `onDelete: Cascade` で BoardMembership / List / Card を巻き取る（`spec/000_shared_rules.md § カスケード削除`）。
-- `@@unique([ownerId, order])` で同一 owner 内で `order` を一意に保つ（本章 02 セクションでは owner 単位の並び順で十分）。
+- `id`: cuid 文字列（サーバー採番、ID 規則準拠）。
+- `order`: 全体スコープの昇順。作成時は既存最大 + 1（0 件なら 0）。
+- Board 削除時は配下 List → Card を cascade 削除（List モデル側で `onDelete: Cascade` を設定）。
 
-## API 設計
+## API設計
 
-| メソッド | パス | 入力 | 出力（成功） | ステータス | 権限 | ログ |
-|---|---|---|---|---|---|---|
-| GET | `/api/boards` | なし | `{ "items": Board[] }` | 200 | ログイン済み | `board.list.view` |
-| GET | `/api/boards/{boardId}` | パス `boardId` | `Board` | 200 | 対象ボードの `viewer` 以上 | `board.view` |
-| POST | `/api/boards` | `{ "title": string }` | `Board` | 201 | ログイン済み | `board.create` |
-| PATCH | `/api/boards/{boardId}` | `{ "title": string }` | `Board` | 200 | 対象ボードの `owner` | `board.update` |
-| DELETE | `/api/boards/{boardId}` | パス `boardId` | なし（body なし） | 204 | 対象ボードの `owner` | `board.delete` |
+### GET /api/boards — ボード一覧取得
 
-- リクエスト側の `id`, `order`, `createdAt`, `updatedAt` はサーバー側で生成し、クライアントからは受け付けない。
-- `POST` では `dev-user` を owner とし、`BoardMembership` に `owner` レコードを作る（同一トランザクション）。
-- 一覧 API はログイン中ユーザーの BoardMembership を JOIN し、`viewer` 以上のボードを返す。
+- 入力: なし。
+- 処理: 全 Board を `order` 昇順で取得。
+- 出力: `{ items: Board[] }`。
+- ステータス: 200。
+- 権限: viewer 以上（コア段階では常時通過）。
+- ログ: リクエスト ID を発行し操作ログに記録。
 
-## UI 構造
+### POST /api/boards — ボード作成
 
-- `/`（ボード一覧）: 全ボードカード（`title` + 作成日時）をグリッド表示。右上に「新規ボード作成」ボタン。0 件時は空状態。
-- `/boards/[boardId]`（ボード詳細）: ヘッダーにボードタイトル + 「編集」「削除」ボタン。本体にリスト一覧（詳細は `002_lists.md`）。
-- コンポーネントの内訳（Atomic の分類は `/ui-design` 側）は本設計では扱わない。領域構成のみ確定する。
+- 入力: `{ title: string }`。
+- 検証: `title` 1〜100文字。違反は 422 / VALIDATION_ERROR。
+- 処理: `order` = 既存最大 + 1 を採番して作成。
+- 出力: 作成した Board。
+- ステータス: 201。
+- 権限: owner。未認証 401 / 権限不足 403（コア段階では通過）。
+- ログ: 操作ログにリクエスト ID・作成 ID を記録。
+
+### PATCH /api/boards/[boardId] — ボード名編集
+
+- 入力: `{ title: string }`。
+- 存在確認: 対象なしは 404 / NOT_FOUND。
+- 検証: `title` 1〜100文字。違反は 422。
+- 出力: 更新後 Board。
+- ステータス: 200。
+- 権限: owner。失敗時 401/403/404。
+- ログ: 操作ログにリクエスト ID・対象 ID を記録。
+
+### DELETE /api/boards/[boardId] — ボード削除
+
+- 存在確認: 対象なしは 404 / NOT_FOUND。
+- 処理: Board を削除（cascade で配下 List/Card も削除）。
+- 出力: なし。
+- ステータス: 200（空ボディ）または 204。→ 本設計では **200 + `{ ok: true }`** に固定。
+- 権限: owner。失敗時 401/403/404。
+- ログ: 操作ログにリクエスト ID・対象 ID を記録。
+
+## UI構造
+
+- `/`（ボード一覧画面, Server Component でデータ取得）
+  - 領域: ボード作成フォーム領域 ＋ ボード一覧領域 ＋ 空状態領域。
+  - ボード作成フォームはクライアント操作（作成後に一覧を再取得／再描画）。
+  - 一覧の各ボードは `/boards/[id]` へのリンク。
+  - 状態の所在: サーバー取得したボード配列を画面が保持。作成・編集・削除後は再取得で反映。
 
 ## 状態遷移
 
-- ボード削除操作は「確認ダイアログ → 実削除 → 一覧へ戻る」の 3 段階。UI 詳細は `/ui-design` で決める。
+- Board のライフサイクル: 作成 → （名称編集）→ 削除。中間状態なし（アーカイブは後続機能）。
 
 ## 非機能の実装方針
 
 ### 性能
 
-- 一覧 API は BoardMembership JOIN + `order` 索引で 200ms 以内を狙う。
-- `@@unique([ownerId, order])` に索引を張り、末尾追加時の `MAX(order)` 参照を高速化する。
+- 一覧は単一クエリ（`order` 昇順 orderBy）で取得。P95 200ms 以内（少量データ前提）。
+- 書き込みは単一トランザクション。P95 300ms 以内。
 
 ### セキュリティ
 
-- 認証は `lib/auth/currentUser.ts` で「開発用固定ユーザー」を返す。将来的にセッション実装へ差し替え可能な interface を守る。
-- Board にアクセスするたびに BoardMembership の存在と `role` を確認し、存在確認だけで 404 と 403 を切り分ける。
+- ローカル SQLite・機密データなし。入力は検証層で長さチェック。
 
 ### 運用
 
-- 各 Route Handler の冒頭で `requestId`（`crypto.randomUUID()`）を発行し、成功 / 失敗ログに含める。
-- 監査ログは `lib/audit/log.ts` を経由し、コンソールに `console.info(JSON.stringify({ ts, requestId, actor, action, target, status }))` の 1 行 JSON を出す。DB 保存は本章 02 セクションの範囲外。
+- リクエスト ID を各リクエスト冒頭で発行し、操作ログ・エラーログ両方に付与（lib 共通処理）。
 
 ## 権限チェックの配置
 
 | 対象 | チェック内容 | 失敗時 |
 |---|---|---|
-| Route Handler 冒頭 | `currentUser()` が null | 401 UNAUTHORIZED |
-| 対象存在確認 | Board が存在するか（`viewer` 以上のメンバーシップがあるか） | 404 NOT_FOUND |
-| 書き込み系 | 対象ボードの `role === "owner"` | 403 FORBIDDEN |
-| POST 前 | `validateBoardTitle(body.title)` | 422 VALIDATION_ERROR |
+| GET /api/boards | 認証 → viewer 以上 | 401 / (権限なし)404 |
+| POST /api/boards | 認証 → owner | 401 / 403 |
+| PATCH /api/boards/[boardId] | 認証 → 対象存在 → owner → 入力検証 | 401 / 404 / 403 / 422 |
+| DELETE /api/boards/[boardId] | 認証 → 対象存在 → owner | 401 / 404 / 403 |
+
+（コア段階ではロール解決が未接続のため通過。チェック順序「認証→存在→権限→検証」を関数構造として固定する。）
 
 ## 監査ログ
 
 | 操作 | ログレベル | 記録する項目 |
 |---|---|---|
-| `board.create` | info | `actor`, `boardId`, `title` |
-| `board.update` | info | `actor`, `boardId`, `title`（変更後） |
-| `board.delete` | info | `actor`, `boardId` |
-| 401/403/404/422 | warn | `actor` (推測)、`method`、`path`、`code` |
+| ボード作成 | info | requestId, 操作種別, boardId |
+| ボード編集 | info | requestId, 操作種別, boardId |
+| ボード削除 | info | requestId, 操作種別, boardId |
+| エラー応答 | error | requestId, ステータス, code, message |
 
 ## 実装方針
 
-- 認証取得と権限判定を Route Handler の共通関数として抽出（`lib/auth/currentUser.ts`、`lib/auth/requireBoardRole.ts`）。理由: 4 章以降で同じ判定を再利用するため。
-- Prisma クライアントは `lib/prisma.ts` に集約し、adapter 経由でシングルトン化。
-- `validateBoardTitle(raw)` で trim → 1〜100 文字を判定。共通の `lib/validation/text.ts` を作り、Board / List / Card 共通で使えるようにする（Card は上限 200）。
-- 監査ログは `lib/audit/log.ts` に集約し、`log("board.create", { actor, boardId })` の1関数で呼べる形にする。
+- ID は Prisma `@default(cuid())` を採用（サーバー採番・衝突しない一意値の要件を満たす）。UUID も候補だが cuid で統一（理由: 単一方式に固定）。
+- 削除応答は 200 + `{ ok: true }` に固定（204 も可だがテスト検証を容易にするため本文ありに統一）。
+- 入力検証・エラー整形・リクエスト ID 発行・権限チェック境界は `lib/` の共通関数に集約（各 Route Handler から再利用）。
 
 ## テスト方針
 
-- `tests/api/boards.test.ts` で Board CRUD の受入条件 FR-001〜FR-009 をカバー。
-- Prisma を実 DB ではなくインメモリのモックに差し替える（第2章の `simple_skill/tests/api/kanban.test.ts` と同方式）。
-- 認証は `currentUser()` をモック化し、`dev-user` を返す・null を返すの切り替えで 401 パターンも検証する。
-- ロールは BoardMembership のモックで切り替えて 403 と 404 の区別を検証する。
+- Vitest 4 で API レベルのテスト（正常系・異常系・境界条件）。
+- ケース: 一覧取得（0件/複数・order昇順）、作成（正常・空文字422・101文字422・order採番）、編集（正常・404）、削除（正常・cascade・404）。
+- テストは SQLite を用い、各テストで DB をクリーンにするヘルパを用意。
 
 ## 実装順序
 
-1. `prisma/schema.prisma` に User / Board / BoardMembership を定義し、`npx prisma migrate dev --name init` で `dev.db` を作る。
-   理由: 以後のリポジトリ層・API 実装がスキーマに依存する。
-2. `lib/prisma.ts`、`lib/auth/currentUser.ts`、`lib/auth/requireBoardRole.ts`、`lib/validation/text.ts`、`lib/errors.ts`、`lib/audit/log.ts` を作成。
-   理由: 権限判定・バリデーション・エラー応答を Route Handler から呼べるようにする。
-3. `lib/repository/board.ts` を作り、`list()`, `findById()`, `create()`, `updateTitle()`, `delete()` を実装。
-4. `app/api/boards/route.ts` と `app/api/boards/[boardId]/route.ts` を実装（GET/POST、PATCH/DELETE、GET single）。
-5. `app/page.tsx`（ボード一覧）と `app/_components/BoardCreateForm.tsx` を実装。
-6. `app/boards/[boardId]/page.tsx`（ボード詳細ヘッダー + リスト領域 placeholder）を実装。
-7. `tests/api/boards.test.ts` を書き、`npm run lint / typecheck / test / build` を全通しにする。
+1. 共通部品（`lib/`）
+   Prisma client（adapter 方式）、エラー応答整形、リクエスト ID／ログ、入力検証、権限チェック境界。理由: 全 API が依存。
+2. Prisma スキーマ + migration
+   Board/List/Card モデルと cascade。理由: API・テストが依存。
+3. Board API（Route Handler）
+   一覧・作成・編集・削除。理由: 共通部品とスキーマに依存。
+4. 一覧画面（`/`）
+   API を接続。理由: API 完成後に描画・操作を接続。
+5. テスト
+   受入条件に対応する API テスト。理由: 実装確定後に検証。
+
+## 未決事項
+
+- 認証・メンバーシップ・実ロール解決（User/Membership/role）は後続機能 auth/invite/permissions で決定する。本設計では配置のみ定義。

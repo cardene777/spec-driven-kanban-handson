@@ -1,22 +1,49 @@
 "use client";
 
-// spec/003_cards.md § カード詳細モーダルの基本構造
+// spec/003 / 005 / 006 / 007: カード詳細モーダル（タイトル・説明・ラベル・期限）
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import LabelChip from "./LabelChip";
+import LabelPicker from "./LabelPicker";
+import DueDateField from "./DueDateField";
+import DueDateBadge from "./DueDateBadge";
 
+type CardLabel = { id: string; name: string; color: string };
 type Card = {
   id: string;
   title: string;
   description: string;
+  dueDate?: string | Date | null;
+  labels?: CardLabel[];
 };
 
-export default function CardItem({ card }: { card: Card }) {
+export default function CardItem({
+  card,
+  boardLabels = [],
+}: {
+  card: Card;
+  boardLabels?: CardLabel[];
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState(card.title);
   const [description, setDescription] = useState(card.description);
   const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const labels = card.labels ?? [];
+  const dueDate = card.dueDate ?? null;
 
   async function save() {
     setError(null);
@@ -41,8 +68,20 @@ export default function CardItem({ card }: { card: Card }) {
     startTransition(() => router.refresh());
   }
 
+  async function archive() {
+    setError(null);
+    const res = await fetch(`/api/cards/${card.id}/archive`, { method: "POST" });
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      setError(body?.error?.message ?? "アーカイブに失敗しました");
+      return;
+    }
+    setOpen(false);
+    startTransition(() => router.refresh());
+  }
+
   async function remove() {
-    if (!confirm("このカードを削除します。よろしいですか？")) return;
+    if (!confirm("このカードをゴミ箱へ移動します。よろしいですか？")) return;
     const res = await fetch(`/api/cards/${card.id}`, { method: "DELETE" });
     if (!res.ok) {
       const body = await res.json().catch(() => null);
@@ -58,61 +97,82 @@ export default function CardItem({ card }: { card: Card }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="block w-full rounded border border-slate-200 bg-white p-2 text-left text-sm shadow-sm hover:border-slate-400"
+        className="block w-full rounded-lg border border-border bg-card p-2 text-left text-sm shadow-xs hover:border-primary/50"
       >
-        {card.title}
+        {labels.length > 0 && (
+          <span className="mb-1 flex flex-wrap gap-1">
+            {labels.map((l) => (
+              <LabelChip key={l.id} label={l} />
+            ))}
+          </span>
+        )}
+        <span className="block text-card-foreground">{card.title}</span>
+        {dueDate && (
+          <span className="mt-1 block">
+            <DueDateBadge dueDate={dueDate} />
+          </span>
+        )}
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
-          onClick={(e) => e.target === e.currentTarget && setOpen(false)}
-        >
-          <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="mb-3 text-sm font-semibold text-slate-500">
-              カード詳細
-            </h3>
-            <label className="block text-xs text-slate-600">タイトル</label>
-            <input
-              className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <label className="mt-4 block text-xs text-slate-600">説明</label>
-            <textarea
-              className="mt-1 h-32 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
-            <div className="mt-5 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={remove}
-                className="rounded border border-red-300 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
-              >
-                削除
-              </button>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100"
-                >
-                  キャンセル
-                </button>
-                <button
-                  type="button"
-                  onClick={save}
-                  className="rounded bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700"
-                >
-                  保存
-                </button>
-              </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-heading">カード詳細</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor={`card-title-${card.id}`}>タイトル</Label>
+              <Input
+                id={`card-title-${card.id}`}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
             </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor={`card-desc-${card.id}`}>説明</Label>
+              <Textarea
+                id={`card-desc-${card.id}`}
+                className="h-28"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+
+            <Separator />
+            <div className="flex flex-col gap-1.5">
+              <p className="text-xs font-semibold text-muted-foreground">ラベル</p>
+              <LabelPicker cardId={card.id} boardLabels={boardLabels} assigned={labels} />
+            </div>
+
+            <Separator />
+            <div className="flex flex-col gap-1.5">
+              <p className="text-xs font-semibold text-muted-foreground">期限</p>
+              <DueDateField cardId={card.id} dueDate={dueDate} />
+            </div>
+
+            {error && <p className="text-xs text-destructive">{error}</p>}
           </div>
-        </div>
-      )}
+
+          <DialogFooter className="flex-row items-center justify-between sm:justify-between">
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={archive}>
+                アーカイブ
+              </Button>
+              <Button variant="destructive" onClick={remove}>
+                削除（ゴミ箱へ）
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setOpen(false)}>
+                キャンセル
+              </Button>
+              <Button onClick={save}>保存</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

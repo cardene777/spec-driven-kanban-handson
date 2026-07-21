@@ -1,115 +1,150 @@
-# カード機能の設計
+# カード（Card）の設計
 
 ## 関連仕様
 
-- `spec/000_shared_rules.md`
-- `spec/001_boards.md`
-- `spec/002_lists.md`
-- `spec/003_cards.md`
+- spec/000_shared_rules.md
+- spec/003_cards.md
+- spec/002_lists.md
+- constitution.md
 
 ## 前提
 
-- List と Board のデータモデル・権限判定・監査ログ方針は `design/001_boards.md` と `design/002_lists.md` を継承。
-- Card 詳細モーダルは「基本構造」のみ本設計で扱い、ラベル / 期限 / 担当者 / コメントは本章 03 以降のセクションで拡張する。
+- design/001_boards.md・design/002_lists.md の前提（技術スタック・認証未接続・共通規則）を継承する。
+- Card は List に属する。Board→List→Card の cascade 削除で末端。
+- 認証・権限の実ロール解決は後続機能で接続（コア段階は通過）。
 
 ## データモデル
-
-Prisma スキーマ（抜粋）:
 
 ```prisma
 model Card {
   id          String   @id @default(cuid())
   listId      String
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
   title       String
   description String   @default("")
   order       Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  list List @relation(fields: [listId], references: [id], onDelete: Cascade)
-
-  @@unique([listId, order])
+  @@index([listId])
 }
 ```
 
-- `description` は `""` をデフォルトにする（`null` を使わない：0 文字と「未指定」を分けない）。
-- `@@unique([listId, order])` で同一リスト内の並び順を一意に保つ。
-- List 削除で Card も `onDelete: Cascade` により消える。
+- `title`: 1〜200文字。
+- `description`: 0〜2000文字。デフォルト空文字（省略時 `""`）。
+- `order`: 同一 `listId` 内の昇順。作成時は同一リスト内既存最大 + 1（0 件なら 0）。
+- List 削除時に cascade 削除。
 
-## API 設計
+## API設計
 
-| メソッド | パス | 入力 | 出力（成功） | ステータス | 権限 | ログ |
-|---|---|---|---|---|---|---|
-| GET | `/api/lists/{listId}/cards` | パス `listId` | `{ "items": Card[] }` | 200 | 所属ボードの `viewer` 以上 | `card.list.view` |
-| GET | `/api/cards/{cardId}` | パス `cardId` | `Card` | 200 | 所属ボードの `viewer` 以上 | `card.view` |
-| POST | `/api/lists/{listId}/cards` | `{ "title": string }` | `Card` | 201 | 所属ボードの `member` 以上 | `card.create` |
-| PATCH | `/api/cards/{cardId}` | `{ "title"?: string, "description"?: string }` | `Card` | 200 | 所属ボードの `member` 以上 | `card.update` |
-| DELETE | `/api/cards/{cardId}` | パス `cardId` | なし | 204 | 所属ボードの `member` 以上 | `card.delete` |
+### GET /api/lists/[listId]/cards — カード一覧取得
 
-- `PATCH` は `title` と `description` の片方または両方を許可、両方省略は `422 { "_root": "no_fields" }`。
-- 作成時 `description` は空文字を保存。
+- 入力: パス `listId`。
+- 存在確認: List なしは 404 / NOT_FOUND。
+- 処理: 該当 List の Card を `order` 昇順で取得。
+- 出力: `{ items: Card[] }`。
+- ステータス: 200。
+- 権限: viewer 以上。
+- ログ: requestId を操作ログに記録。
 
-## UI 構造
+### POST /api/lists/[listId]/cards — カード作成
 
-- ボード詳細（`/boards/[boardId]`）内で、リスト列の中にカードを縦並びに表示する。
-- 各カードは `title` を表示し、クリックでカード詳細モーダルを開く。
-- モーダルの中に `title`（入力欄）、`description`（複数行入力欄）、`createdAt` / `updatedAt`（読み取り専用）を配置。
-- 部品分割・階層・トークン参照は `/ui-design` と `/design-system` に委ねる。
+- 入力: パス `listId`、body `{ title: string, description?: string }`。
+- 存在確認: List なしは 404。
+- 検証: `title` 1〜200文字（違反 422）。`description` 0〜2000文字（違反 422）。省略時 `description` は `""`。
+- 処理: `order` = 同一リスト内既存最大 + 1 を採番して作成。
+- 出力: 作成した Card。
+- ステータス: 201。
+- 権限: member 以上。失敗時 401/403。
+- ログ: requestId・cardId を操作ログに記録。
+
+### PATCH /api/cards/[cardId] — カードタイトル・説明文編集・並び順変更
+
+- 入力: body `{ title?: string, description?: string, order?: number }`。
+- 存在確認: Card なしは 404。
+- 検証: `title` 指定時 1〜200文字（違反 422）。`description` 指定時 0〜2000文字（違反 422）。`order` 指定時は整数。
+- 処理: 指定フィールドを更新。
+- 出力: 更新後 Card。
+- ステータス: 200。
+- 権限: member 以上。失敗時 401/403/404。
+- ログ: requestId・cardId を操作ログに記録。
+
+### DELETE /api/cards/[cardId] — カード削除
+
+- 存在確認: Card なしは 404。
+- 処理: Card 削除。
+- 出力: `{ ok: true }`。
+- ステータス: 200。
+- 権限: member 以上。失敗時 401/403/404。
+- ログ: requestId・cardId を操作ログに記録。
+
+## UI構造
+
+- `/boards/[id]`（ボード詳細画面）内、各リスト列のカード領域。
+  - 領域: リスト列内にカード一覧領域（order 昇順）＋ カード作成フォーム領域。
+  - カードが 0 件のリストは空状態を表示。
+  - カードクリックでカード詳細モーダルを開く。
+- カード詳細モーダル（基本構造, クライアント）
+  - 領域: `title` 編集領域 ＋ `description` 編集領域 ＋ 閉じる操作。
+  - 状態の所在: 開閉状態と編集中の値はモーダルコンポーネントが保持。保存後に一覧を再取得／再描画で反映。
 
 ## 状態遷移
 
-- カード追加: 「+ カード追加」→ タイトル入力 → 保存 → リスト末尾に追加。
-- カード編集: モーダルを開き、`title` / `description` を編集 → blur または 保存ボタンで PATCH。
-- カード削除: モーダル内「削除」→ 確認 → DELETE → モーダル閉じる。
+- Card のライフサイクル: 作成 →（タイトル編集 / 説明編集 / 並び順変更）→ 削除。
+- モーダル UI 状態: 閉 → 開（カードクリック）→ 閉（閉じる操作 / 保存後）。
 
 ## 非機能の実装方針
 
 ### 性能
 
-- 一覧 API は `WHERE listId=? ORDER BY order ASC` を索引で高速化。P95 200ms 以内。
+- 一覧は `where listId` + `orderBy order` の単一クエリ。`@@index([listId])` で引く。P95 200ms 以内。
+- 書き込みは単一トランザクション。P95 300ms 以内。
 
 ### セキュリティ
 
-- `PATCH` / `DELETE` は Card から listId → boardId を辿って `requireBoardRole(boardId, "member")` を実行する。
+- 入力長（title 200 / description 2000）を検証層でチェック。ローカル SQLite・機密データなし。
 
 ### 運用
 
-- 監査ログは `card.create` / `card.update` / `card.delete` の 3 種類。
-- `PATCH` では変更フィールドをログに残す（`title` のみ / `description` のみ / 両方）。
+- requestId を操作ログ・エラーログに付与（lib 共通処理）。
 
 ## 権限チェックの配置
 
 | 対象 | チェック内容 | 失敗時 |
 |---|---|---|
-| Route Handler 冒頭 | `currentUser()` が null | 401 UNAUTHORIZED |
-| 対象存在確認 | 対象 List（一覧・作成）/ 対象 Card（詳細・更新・削除） | 404 NOT_FOUND |
-| Membership 確認 | `viewer` 以上（GET）/ `member` 以上（POST/PATCH/DELETE） | 一覧 404、書き込み 403 |
-| POST/PATCH 前 | `validateTitle(body.title, 200)` / `validateDescription(body.description, 2000)` / PATCH 両方省略チェック | 422 VALIDATION_ERROR |
+| GET /api/lists/[listId]/cards | 認証 → 対象存在 → viewer 以上 | 401 / 404 / (権限なし)404 |
+| POST /api/lists/[listId]/cards | 認証 → 対象存在 → member → 検証 | 401 / 404 / 403 / 422 |
+| PATCH /api/cards/[cardId] | 認証 → 対象存在 → member → 検証 | 401 / 404 / 403 / 422 |
+| DELETE /api/cards/[cardId] | 認証 → 対象存在 → member | 401 / 404 / 403 |
 
 ## 監査ログ
 
 | 操作 | ログレベル | 記録する項目 |
 |---|---|---|
-| `card.create` | info | `actor`, `boardId`, `listId`, `cardId`, `title` |
-| `card.update` | info | `actor`, `boardId`, `listId`, `cardId`, `fields`(変更フィールド名の配列) |
-| `card.delete` | info | `actor`, `boardId`, `listId`, `cardId` |
+| カード作成 | info | requestId, 操作種別, listId, cardId |
+| カード編集・並び替え | info | requestId, 操作種別, cardId |
+| カード削除 | info | requestId, 操作種別, cardId |
+| エラー応答 | error | requestId, ステータス, code, message |
 
 ## 実装方針
 
-- Card Route Handler は listId → boardId 変換のためにリポジトリ層 `lib/repository/card.ts` に `findById()` を用意する。
-- `validateDescription(raw, max)` を `lib/validation/text.ts` に追加し、`title` と共通ロジックを共有する。
-- モーダル UI は `app/boards/[boardId]/_components/CardDetailModal.tsx` に切り出す。
-- モーダル内の保存はデバウンスや複雑な状態管理を避け、`onBlur` または「保存」ボタンで PATCH。
+- `description` は Prisma `@default("")` を採用し、省略時は空文字を保存（仕様「省略時は空文字」に一致）。
+- 並び順変更は PATCH の `order` で対象 Card の値を更新する方式に固定（リスト間移動・一括再採番は本コアでは扱わない。理由: 仕様は同一リスト内の order 更新のみ要求。カード移動は後続機能）。
+- 共通部品（Prisma client・エラー整形・requestId・検証・権限境界）は design/001・002 と共有。
 
 ## テスト方針
 
-- `tests/api/cards.test.ts` で FR-001〜FR-012 をカバー。
-- カード作成／更新／削除、`title` と `description` の境界（1/200/201、0/2000/2001）、PATCH の両フィールド省略、404 / 403 / 422 の区別、末尾追加の連番。
+- Vitest 4 で API テスト（正常系・異常系・境界条件）。
+- ケース: 一覧（0件/複数・order昇順・list404）、作成（正常・description省略で空文字・空title422・201文字title422・2001文字desc422・order採番）、編集（title正常・description正常・order正常・404）、削除（正常・404）。
 
 ## 実装順序
 
-1. `prisma/schema.prisma` に `Card` を追加、`npx prisma migrate dev --name add_card` を実行。
-2. `lib/repository/card.ts` を実装。
-3. `app/api/lists/[listId]/cards/route.ts`（GET/POST）と `app/api/cards/[cardId]/route.ts`（GET/PATCH/DELETE）を実装。
-4. `app/boards/[boardId]/_components/CardItem.tsx` と `CardCreateForm.tsx`、`CardDetailModal.tsx` を実装。
-5. `tests/api/cards.test.ts` を書き、`npm run lint / typecheck / test / build` を全通しにする。
+1. 共通部品・Prisma スキーマ（Card モデルを含める、design/001 で作成）。
+2. Card API（Route Handler）。理由: List API・共通部品に依存。
+3. ボード詳細画面のカード描画 ＋ カード詳細モーダル。理由: API 完成後に接続。
+4. テスト。理由: 実装確定後に検証。
+
+## 未決事項
+
+- 認証・実ロール解決は後続機能で決定。
+- カードのリスト間移動・アーカイブ・担当者・期限・ラベル・コメントは後続機能（本コア対象外）。

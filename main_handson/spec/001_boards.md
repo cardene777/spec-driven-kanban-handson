@@ -1,155 +1,130 @@
-# ボード機能の仕様
+# ボード（Board）の仕様
 
 ## 概要
 
-ボード（Board）はカンバンの最上位単位である。
-本ファイルは、ボード一覧画面、ボード詳細画面（レイアウトのみ）、ボードの作成、名称編集、削除の仕様を定義する。
-共通ルールは `spec/000_shared_rules.md` を参照する。
+カンバンアプリの最上位単位である「ボード」の一覧表示・作成・名称編集・削除を定義する。
 
 ## 既存仕様との関係
 
-- 本章 02 セクションで新規作成。既存の Board 仕様はない。
-- 共通規約は `spec/000_shared_rules.md` に集約。
+- 共通規約は `spec/000_shared_rules.md` を参照する。
+- ボードはリスト（`spec/002_lists.md`）を内包する。
 
 ## 対象データ
 
-`Board` エンティティのフィールド。
-
-| フィールド | 型 | 説明 |
-|---|---|---|
-| `id` | 文字列 | ボードを一意に識別する ID |
-| `title` | 文字列 | ボード名（trim 後 1〜100 文字） |
-| `order` | 数値 | ボード一覧内での並び順（昇順） |
-| `createdAt` | ISO8601 UTC | 作成日時 |
-| `updatedAt` | ISO8601 UTC | 更新日時 |
+- Board
+  - `id`: string（サーバー採番）
+  - `title`: string（1〜100文字）
+  - `order`: integer（採番は全体スコープ。一覧はメンバーであるボードに絞るため連番の連続性は保証しない）
+  - `createdAt`: datetime
+  - `updatedAt`: datetime
 
 ## 機能要件
 
-### 操作: ボード一覧の閲覧
+### 操作: ボード一覧取得
 
-- ログイン中のユーザーが閲覧権限（`viewer` 以上）を持つ全ボードを、`order` 昇順、`createdAt` 昇順の順で一覧取得する。
-- ボードが 0 件でも `200` で `{ "items": [] }` を返す。
-
-### 操作: ボード詳細の閲覧
-
-- 指定 ID のボードが存在し、かつ閲覧権限（`viewer` 以上）がある場合、そのボードの `title` を返す。
-- 対象ボードが存在しない場合、または閲覧権限がない場合の挙動は `§ 異常系` に従う。
+- **認証ユーザーがメンバーであるボードのみ**を `order` 昇順で取得する（`spec/013_permissions.md` の BoardMembership に基づく）。他ユーザーのみがメンバーのボードは含めない。
+- 連番の連続性は保証しない（`spec/000_shared_rules.md` § order 規則）。
 
 ### 操作: ボード作成
 
-- 入力項目は `title` のみ。
-- 作成後、新規ボードは既存ボード群の末尾（`order = max + 1`、0 件なら 0）に配置される。
-- 作成者は自動的にそのボードの `owner` として関連付けられる。
+- `title` を指定して新規ボードを作成する。**認証済みユーザーであれば誰でも作成できる**（作成前のボードには owner が存在しないため、ロールによる判定は行わない）。
+- 作成と同時に、**作成者を `owner` とする BoardMembership を作成する**（同一トランザクション。`spec/013_permissions.md`）。
+- `order` は既存最大 + 1 を採番する。
 
 ### 操作: ボード名編集
 
-- 変更対象は `title` のみ。
-- `updatedAt` を更新する。
+- 対象ボードの `title` を更新する。
 
 ### 操作: ボード削除
 
-- 削除操作は明示的な確認（確認ダイアログ等）を伴う。UI 詳細は `ui-design/` で決定する。
-- 削除時、`spec/000_shared_rules.md § カスケード削除` に従い、配下のリストとカードを全て削除する。
+- 対象ボードを削除する。配下のリスト・カードに加えて、そのボードの **BoardMembership と Invite も削除する**（`spec/000_shared_rules.md` § 削除の連鎖）。
 
 ## 画面
 
-- ボード一覧（`/`）: `viewer` 以上のボードを一覧表示。1 行 = `title` クリックで `/boards/[id]` へ遷移。新規作成の導線を配置する（詳細な UI は `ui-design/` で決定）。0 件時は空状態を表示する。
-- ボード詳細（`/boards/[id]`）: ボード名を画面上部に表示。ボード内のリスト一覧を画面本体に表示（詳細は `spec/002_lists.md`）、各リスト内のカード一覧を表示（詳細は `spec/003_cards.md`）。
+- `/`（ボード一覧画面）
+  - ボードを `order` 昇順のカード一覧で表示する。
+  - 各ボードは詳細（`/boards/[id]`）へ遷移できる。
+  - ボード作成フォーム（`title` 入力）を持つ。
+  - ボードが 0 件のとき空状態を表示する。
 
 ## API
 
 | メソッド | パス | 用途 | 必要権限 |
 |---|---|---|---|
-| `GET` | `/api/boards` | 閲覧可能なボード一覧を取得 | `viewer` 以上 |
-| `GET` | `/api/boards/{boardId}` | 指定ボードの詳細を取得 | 対象ボードの `viewer` 以上 |
-| `POST` | `/api/boards` | ボードを新規作成（作成者が `owner`） | ログイン済み |
-| `PATCH` | `/api/boards/{boardId}` | ボード名を更新 | 対象ボードの `owner` |
-| `DELETE` | `/api/boards/{boardId}` | ボードを削除 | 対象ボードの `owner` |
-
-- 一覧 API のレスポンスは `{ "items": Board[] }`、単体 API のレスポンスは `Board` オブジェクト。
-- 認証、存在、権限、バリデーションの判定順序は `spec/000_shared_rules.md § Route Handler の入口チェック順序` に従う。
+| GET | /api/boards | ボード一覧取得（メンバーであるボードのみ） | 認証済み |
+| POST | /api/boards | ボード作成（作成者が owner になる） | 認証済み（ロール不問） |
+| PATCH | /api/boards/[boardId] | ボード名編集 | owner |
+| DELETE | /api/boards/[boardId] | ボード削除 | owner |
 
 ## 受入条件
 
-- [ ] FR-001: ログイン済みユーザーが `GET /api/boards` を呼ぶと、閲覧可能なボードが `order` 昇順・`createdAt` 昇順で `{ "items": [...] }` として返る。
-- [ ] FR-002: ボードが 0 件のとき、`GET /api/boards` は `200` で `{ "items": [] }` を返す。
-- [ ] FR-003: ログイン済みユーザーが `POST /api/boards` で `title` を 1〜100 文字で送ると、`201` と作成された Board が返り、作成者は `owner` となる。
-- [ ] FR-004: `PATCH /api/boards/{boardId}` に `title` を 1〜100 文字で送ると、`200` と更新された Board が返る。
-- [ ] FR-005: `DELETE /api/boards/{boardId}` を送ると、`204` を返し、当該ボード配下の List と Card もすべて削除される。
-- [ ] FR-006: 未ログインで `/api/boards` 系を呼ぶと `401 UNAUTHORIZED` が返る。
-- [ ] FR-007: 閲覧権限のない `boardId` を GET / PATCH / DELETE すると `404 NOT_FOUND` が返る（存在有無を漏らさない）。
-- [ ] FR-008: 認証済みだが `owner` でないユーザーが `POST /api/boards` 以外の書き込み API を呼ぶと `403 FORBIDDEN` が返る。
-- [ ] FR-009: `title` が空・101 文字以上・非文字列だと `422 VALIDATION_ERROR` が返り、Board は作成／更新されない。
+- [ ] GET /api/boards は `{ items: [...] }` 形状で 200 を返す
+- [ ] GET /api/boards は items を `order` 昇順で返す
+- [ ] GET /api/boards は認証ユーザーがメンバーであるボードのみを返し、他ユーザーのみがメンバーのボードは items に含まれない
+- [ ] 未認証で GET /api/boards を呼ぶと 401 / UNAUTHORIZED を返す
+- [ ] メンバーであるボードが 0 件のとき GET /api/boards は `{ items: [] }` を 200 で返す
+- [ ] POST /api/boards に有効な `title` を渡すと 201 で作成済みボードを返す
+- [ ] POST /api/boards は認証済みであればロールに関わらず成功する（403 を返さない）
+- [ ] POST /api/boards の直後、作成者を `owner` とする BoardMembership が作成されている
+- [ ] POST /api/boards の直後、作成者が GET /api/boards/[boardId] を呼ぶと 200 を返す
+- [ ] 未認証で POST /api/boards を呼ぶと 401 / UNAUTHORIZED を返す
+- [ ] POST /api/boards で作成したボードの `order` は既存最大 + 1 になる
+- [ ] POST /api/boards に空文字 `title` を渡すと 422 / VALIDATION_ERROR を返す
+- [ ] POST /api/boards に101文字の `title` を渡すと 422 / VALIDATION_ERROR を返す
+- [ ] PATCH /api/boards/[boardId] に有効な `title` を渡すと 200 で更新済みボードを返す
+- [ ] PATCH /api/boards/[boardId] で存在しない ID を指定すると 404 / NOT_FOUND を返す
+- [ ] DELETE /api/boards/[boardId] は 200（または 204）を返し、配下のリスト・カードも削除される
+- [ ] DELETE /api/boards/[boardId] 後、そのボードの BoardMembership と Invite も削除される
+- [ ] DELETE /api/boards/[boardId] 後、そのボードの招待 token で承認すると 404 / NOT_FOUND を返す
+- [ ] DELETE /api/boards/[boardId] で存在しない ID を指定すると 404 / NOT_FOUND を返す
 
 ## 異常系
 
-`spec/000_shared_rules.md § HTTP ステータスコードとエラーレスポンス` と `§ Route Handler の入口チェック順序` に従う。
-
-### 認証、権限、存在チェック
-
-| 状況 | ステータス | 補足 |
-|---|---|---|
-| 未ログインで API 呼出 | `401 UNAUTHORIZED` | 全 API 共通 |
-| 存在しない `boardId` を指定 | `404 NOT_FOUND` | 個別取得、更新、削除 API |
-| 閲覧権限（`viewer` 以上）がないボードを指定 | `404 NOT_FOUND` | 存在有無を漏らさないため 404 に統一 |
-| ボード編集、削除 API を `owner` 以外が呼ぶ | `403 FORBIDDEN` | 認証済み、閲覧可の状態が前提 |
-
-### バリデーションエラー
-
-| 状況 | ステータス | エラーコード | details |
-|---|---|---|---|
-| `title` 未指定または trim 後 0 文字 | `422` | `VALIDATION_ERROR` | `{ "title": "required" }` |
-| `title` が trim 後 101 文字以上 | `422` | `VALIDATION_ERROR` | `{ "title": "too_long" }` |
-| `title` が文字列型でない | `422` | `VALIDATION_ERROR` | `{ "title": "invalid_type" }` |
+- 存在しない `boardId` を指定した編集・削除は 404 / NOT_FOUND。
+- `title` が空文字・上限超過は 422 / VALIDATION_ERROR。
+- 未認証は 401 / UNAUTHORIZED。
+- owner 権限のないボード操作は 403 / FORBIDDEN（閲覧権限もない場合は 404）。
 
 ## 境界条件
 
-- `title` = 1 文字（下限ちょうど）: 受け付ける。
-- `title` = 100 文字（上限ちょうど）: 受け付ける。
-- `title` = 101 文字: `422` を返す。
-- `title` = 0 文字（空文字）: `422` を返す。
-- `title` に前後の空白のみが含まれる場合: バリデーション判定はトリム後の長さで行う（トリム後 0 文字なら `422`）。
-- ボード 0 件: 一覧 API は `{ "items": [] }` を `200` で返す。画面は空状態を表示する。
-- 同一 `title` のボードが複数存在してよい（title は一意制約なし）。
-- ボード削除直後に同 ID を GET すると `404` を返す。
+- `title` 1文字: 許可。
+- `title` 100文字: 許可。
+- `title` 0文字（空）: 422。
+- `title` 101文字: 422。
 
 ## バリデーション
 
-| フィールド | 必須 | ルール |
-|---|---|---|
-| `title` | はい | 文字列。前後の半角・全角空白、タブ、改行を除去した後 1〜100 文字。 |
-| `boardId`（パス） | はい | 文字列。存在しなければ `404`。 |
-
-作成 API では `id` / `order` / `createdAt` / `updatedAt` はクライアントから受け取らない（サーバー側で生成、設定する）。
-更新 API で受け付けるのは `title` のみとする（`order` は並び替え API を将来別途定義する）。
+- `title`: 必須、1〜100文字。空文字・上限超過は 422 / VALIDATION_ERROR。
 
 ## 権限境界
 
-| 操作 | 必要権限 | 権限不足時の挙動 |
+| 操作 | 必要権限 | 異常時の動作 |
 |---|---|---|
-| ボード一覧取得（`GET /api/boards`） | ログイン済み | 未ログイン `401` |
-| ボード詳細取得（`GET /api/boards/{id}`） | 対象ボードの `viewer` 以上 | 未ログイン `401`、閲覧不可 `404` |
-| ボード作成（`POST /api/boards`） | ログイン済みユーザー（作成者が `owner` となる） | 未ログイン `401` |
-| ボード編集（`PATCH /api/boards/{id}`） | 対象ボードの `owner` | 未ログイン `401`、閲覧不可 `404`、`owner` 以外 `403` |
-| ボード削除（`DELETE /api/boards/{id}`） | 対象ボードの `owner` | 未ログイン `401`、閲覧不可 `404`、`owner` 以外 `403` |
+| ボード一覧取得 | 認証済み（メンバーであるボードのみ返す） | 未認証は 401 |
+| ボード詳細閲覧 | viewer 以上 | 非メンバーは 404、未認証は 401 |
+| ボード作成 | 認証済み（ロール不問。作成者が owner になる） | 未認証は 401 |
+| ボード名編集 | owner | 権限不足は 403、未認証は 401、存在なしは 404 |
+| ボード削除 | owner | 権限不足は 403、未認証は 401、存在なしは 404 |
 
 ## 非機能要件
 
-`spec/000_shared_rules.md § 非機能要件` に従う。ボード固有の追加要件は無し。
+- 一覧取得 API の P95 は 200ms 以内（constitution.md § 性能）。
+- 書き込み API の P95 は 300ms 以内（constitution.md § 性能）。
+- 操作ログ・エラーログにリクエスト ID を付与する（spec/000_shared_rules.md § ログ方針）。
 
 ## 使用する用語
 
-- ボード（Board）（`constitution.md § 用語集` 参照）
+- ボード（Board）（constitution.md § 用語集 参照）
 
 ## 参照する既存ファイル
 
-- `constitution.md`
-- `spec/000_shared_rules.md`
-- `inputs/001_core_kanban_spec_input.md`
+- constitution.md
+- spec/000_shared_rules.md
+- spec/011_auth.md（認証・セッション）
+- spec/012_member_invite.md（招待の cascade 削除）
+- spec/013_permissions.md（BoardMembership・ロール判定）
+- inputs/001_core_kanban_spec_input.md
 
 ## 未決事項
 
-- 初期実装での「ログイン中のユーザー」の取得方式（本章 02 セクションでは固定ユーザーで代替可）は設計工程で決める。
-- 閲覧可能ボードの取得を「メンバーシップテーブル JOIN」で行うか「別経路」で行うかは設計工程で決める。
-- ボード並び替え API（`order` の更新）は本 spec の対象外とし、別 spec で扱う。
-- 削除確認ダイアログの文言、空状態の文言、エラー画面の文言は `ui-design/` で決める。
+- なし

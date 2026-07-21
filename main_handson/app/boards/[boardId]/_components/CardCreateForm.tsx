@@ -3,6 +3,8 @@
 // spec/003_cards.md § 操作: カード作成
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function CardCreateForm({ listId }: { listId: string }) {
   const router = useRouter();
@@ -34,7 +36,7 @@ export default function CardCreateForm({ listId }: { listId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full rounded border border-dashed border-slate-400 py-2 text-sm text-slate-600 hover:border-slate-600 hover:text-slate-900"
+        className="w-full rounded-lg border border-dashed border-border py-2 text-sm text-muted-foreground hover:border-primary hover:text-foreground"
       >
         + カード追加
       </button>
@@ -43,34 +45,31 @@ export default function CardCreateForm({ listId }: { listId: string }) {
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-2">
-      <textarea
+      <Textarea
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="カード名"
         rows={2}
-        className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+        className="bg-card"
         autoFocus
       />
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-destructive">{error}</p>}
       <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-        >
+        <Button type="submit" size="sm" disabled={pending}>
           追加
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          size="sm"
+          variant="ghost"
           onClick={() => {
             setOpen(false);
             setError(null);
             setTitle("");
           }}
-          className="rounded px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-200"
         >
           キャンセル
-        </button>
+        </Button>
       </div>
     </form>
   );

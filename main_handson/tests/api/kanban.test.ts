@@ -1,285 +1,261 @@
-// spec/001_boards.md / spec/002_lists.md / spec/003_cards.md 受入条件から抜粋
+// spec/001-004 受入条件から抜粋。Prisma を in-memory mock に差し替え、Route Handler を直接呼ぶ。
+// ロール依存の 403 は auth 未接続のため対象外（design/004 § 前提）。状態遷移・並び替え・422 系を検証。
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
-type User = { id: string; email: string };
-type Board = {
-  id: string;
-  title: string;
-  order: number;
-  ownerId: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
-type Membership = {
-  id: string;
-  boardId: string;
-  userId: string;
-  role: "owner" | "member" | "viewer";
-};
-type List = {
-  id: string;
-  boardId: string;
-  title: string;
-  order: number;
-  createdAt: Date;
-  updatedAt: Date;
-};
-type Card = {
-  id: string;
-  listId: string;
-  title: string;
-  description: string;
-  order: number;
-  createdAt: Date;
-  updatedAt: Date;
-};
+type Row = Record<string, unknown>;
 
-const users: User[] = [];
-const boards: Board[] = [];
-const memberships: Membership[] = [];
-const lists: List[] = [];
-const cards: Card[] = [];
+const boards: Row[] = [];
+const lists: Row[] = [];
+const cards: Row[] = [];
+const labels: Row[] = [];
+const cardLabels: Row[] = [];
+const memberships: Row[] = [];
 
 let seq = 1;
 const genId = () => `id_${seq++}`;
 
-let currentUserId: string | null = null;
-function setCurrentUser(id: string | null) {
-  currentUserId = id;
+function matchWhere(row: Row, where?: Row): boolean {
+  if (!where) return true;
+  for (const [k, cond] of Object.entries(where)) {
+    // リレーションフィルタ: { memberships: { some: { userId } } }
+    if (k === "memberships" && cond && typeof cond === "object" && "some" in (cond as object)) {
+      const some = (cond as { some: Row }).some;
+      if (!memberships.some((m) => m.boardId === row.id && matchWhere(m, some))) return false;
+      continue;
+    }
+    const v = row[k];
+    if (cond === null) {
+      if (v !== null && v !== undefined) return false;
+    } else if (cond && typeof cond === "object" && "not" in (cond as object)) {
+      const not = (cond as { not: unknown }).not;
+      if (not === null) {
+        if (v === null || v === undefined) return false;
+      } else if (v === not) {
+        return false;
+      }
+    } else if (cond && typeof cond === "object" && "in" in (cond as object)) {
+      const arr = (cond as { in: unknown[] }).in;
+      if (!arr.includes(v)) return false;
+    } else if (v !== cond) {
+      return false;
+    }
+  }
+  return true;
 }
 
-vi.mock("@/lib/auth/currentUser", () => ({
-  currentUser: async () => {
-    if (currentUserId === null) return null;
-    const user = users.find((u) => u.id === currentUserId);
-    return user ?? null;
+function sortRows(rows: Row[], orderBy?: Row | Row[]): Row[] {
+  if (!orderBy) return rows;
+  const keys = Array.isArray(orderBy) ? orderBy : [orderBy];
+  return [...rows].sort((a, b) => {
+    for (const o of keys) {
+      const [field, dir] = Object.entries(o)[0] as [string, "asc" | "desc"];
+      const av = a[field];
+      const bv = b[field];
+      let cmp = 0;
+      if (av instanceof Date && bv instanceof Date) cmp = av.getTime() - bv.getTime();
+      else if ((av as number) < (bv as number)) cmp = -1;
+      else if ((av as number) > (bv as number)) cmp = 1;
+      if (cmp !== 0) return dir === "desc" ? -cmp : cmp;
+    }
+    return 0;
+  });
+}
+
+function makeTable(rows: Row[], defaults: Row = {}) {
+  return {
+    findMany: async ({ where, orderBy }: { where?: Row; orderBy?: Row | Row[] } = {}) =>
+      sortRows(rows.filter((r) => matchWhere(r, where)), orderBy),
+    findFirst: async ({ where, orderBy }: { where?: Row; orderBy?: Row | Row[] } = {}) =>
+      sortRows(rows.filter((r) => matchWhere(r, where)), orderBy)[0] ?? null,
+    findUnique: async ({ where }: { where: Row }) => {
+      if ("id" in where) return rows.find((r) => r.id === where.id) ?? null;
+      // 複合ユニーク（例 cardId_labelId: { cardId, labelId }）
+      const inner = where[Object.keys(where)[0]] as Row;
+      return rows.find((r) => matchWhere(r, inner)) ?? null;
+    },
+    deleteMany: async ({ where }: { where?: Row } = {}) => {
+      let count = 0;
+      for (let i = rows.length - 1; i >= 0; i--) {
+        if (matchWhere(rows[i], where)) {
+          rows.splice(i, 1);
+          count++;
+        }
+      }
+      return { count };
+    },
+    create: async ({ data }: { data: Row }) => {
+      const now = new Date();
+      const row: Row = { ...defaults, ...data, id: genId(), createdAt: now, updatedAt: now };
+      rows.push(row);
+      return row;
+    },
+    update: async ({ where, data }: { where: { id: string }; data: Row }) => {
+      const row = rows.find((r) => r.id === where.id);
+      if (!row) throw new Error("not_found");
+      Object.assign(row, data);
+      row.updatedAt = new Date();
+      return row;
+    },
+    delete: async ({ where }: { where: { id: string } }) => {
+      const i = rows.findIndex((r) => r.id === where.id);
+      if (i < 0) throw new Error("not_found");
+      return rows.splice(i, 1)[0];
+    },
+  };
+}
+
+vi.mock("@/lib/audit/log", () => ({
+  newRequestId: () => "test-request-id",
+  auditLog: () => {},
+  errorLog: () => {},
+}));
+
+// spec/013: 全 API が認証・権限を要求するため、テストではセッションのみ差し替える
+let currentUser: { id: string; email: string; name: string } | null = null;
+vi.mock("@/lib/auth/session", () => ({
+  SESSION_COOKIE: "session",
+  getSessionUser: async () => currentUser,
+  createSession: async () => "test-token",
+  destroySession: async () => {
+    currentUser = null;
   },
 }));
 
-vi.mock("@/lib/audit/log", () => ({
-  auditLog: () => {},
-}));
-
 vi.mock("@/lib/prisma", () => {
-  const prisma: Record<string, unknown> = {
-    user: {
-      findUnique: async ({ where }: { where: { email?: string; id?: string } }) => {
-        if (where.email) return users.find((u) => u.email === where.email) ?? null;
-        if (where.id) return users.find((u) => u.id === where.id) ?? null;
-        return null;
-      },
-      create: async ({ data }: { data: { email: string } }) => {
-        const user: User = { id: genId(), email: data.email };
-        users.push(user);
-        return user;
-      },
-    },
-    board: {
-      findMany: async ({ where }: { where: { memberships: { some: { userId: string } } } }) => {
-        const uid = where.memberships.some.userId;
-        const boardIds = new Set(
-          memberships.filter((m) => m.userId === uid).map((m) => m.boardId),
-        );
-        return boards
-          .filter((b) => boardIds.has(b.id))
-          .sort((a, b) => a.order - b.order || a.createdAt.getTime() - b.createdAt.getTime());
-      },
-      findUnique: async ({ where: { id } }: { where: { id: string } }) =>
-        boards.find((b) => b.id === id) ?? null,
-      findFirst: async ({ where }: { where: { ownerId: string } }) => {
-        const rows = boards
-          .filter((b) => b.ownerId === where.ownerId)
-          .sort((a, b) => b.order - a.order);
-        return rows[0] ?? null;
-      },
-      create: async ({ data }: { data: { title: string; order: number; ownerId: string } }) => {
-        const now = new Date();
-        const board: Board = {
-          id: genId(),
-          title: data.title,
-          order: data.order,
-          ownerId: data.ownerId,
-          createdAt: now,
-          updatedAt: now,
-        };
-        boards.push(board);
-        return board;
-      },
-      update: async ({ where, data }: { where: { id: string }; data: { title: string } }) => {
-        const board = boards.find((b) => b.id === where.id);
-        if (!board) throw new Error("not_found");
-        board.title = data.title;
-        board.updatedAt = new Date();
-        return board;
-      },
-      delete: async ({ where: { id } }: { where: { id: string } }) => {
-        const index = boards.findIndex((b) => b.id === id);
-        if (index < 0) throw new Error("not_found");
-        const [board] = boards.splice(index, 1);
-        const listsToDelete = lists.filter((l) => l.boardId === id).map((l) => l.id);
-        for (const lid of listsToDelete) {
-          for (let i = cards.length - 1; i >= 0; i--) {
-            if (cards[i].listId === lid) cards.splice(i, 1);
-          }
-        }
-        for (let i = lists.length - 1; i >= 0; i--) {
-          if (lists[i].boardId === id) lists.splice(i, 1);
-        }
-        for (let i = memberships.length - 1; i >= 0; i--) {
-          if (memberships[i].boardId === id) memberships.splice(i, 1);
-        }
-        return board;
-      },
-    },
-    boardMembership: {
-      findUnique: async ({
-        where: { boardId_userId: { boardId, userId } },
-      }: {
-        where: { boardId_userId: { boardId: string; userId: string } };
-      }) => memberships.find((m) => m.boardId === boardId && m.userId === userId) ?? null,
-      create: async ({
-        data,
-      }: {
-        data: { boardId: string; userId: string; role: Membership["role"] };
-      }) => {
-        const row: Membership = { id: genId(), ...data };
-        memberships.push(row);
-        return row;
-      },
-    },
-    list: {
-      findMany: async ({ where }: { where: { boardId: string } }) =>
-        lists
-          .filter((l) => l.boardId === where.boardId)
-          .sort((a, b) => a.order - b.order || a.createdAt.getTime() - b.createdAt.getTime()),
-      findUnique: async ({ where: { id } }: { where: { id: string } }) =>
-        lists.find((l) => l.id === id) ?? null,
-      findFirst: async ({ where }: { where: { boardId: string } }) => {
-        const rows = lists.filter((l) => l.boardId === where.boardId).sort((a, b) => b.order - a.order);
-        return rows[0] ?? null;
-      },
-      create: async ({ data }: { data: { boardId: string; title: string; order: number } }) => {
-        const now = new Date();
-        const list: List = {
-          id: genId(),
-          boardId: data.boardId,
-          title: data.title,
-          order: data.order,
-          createdAt: now,
-          updatedAt: now,
-        };
-        lists.push(list);
-        return list;
-      },
-      update: async ({ where, data }: { where: { id: string }; data: { title: string } }) => {
-        const list = lists.find((l) => l.id === where.id);
-        if (!list) throw new Error("not_found");
-        list.title = data.title;
-        list.updatedAt = new Date();
-        return list;
-      },
-      delete: async ({ where: { id } }: { where: { id: string } }) => {
-        const index = lists.findIndex((l) => l.id === id);
-        if (index < 0) throw new Error("not_found");
-        const [list] = lists.splice(index, 1);
-        for (let i = cards.length - 1; i >= 0; i--) {
-          if (cards[i].listId === id) cards.splice(i, 1);
-        }
-        return list;
-      },
-    },
-    card: {
-      findMany: async ({ where }: { where: { listId: string } }) =>
-        cards
-          .filter((c) => c.listId === where.listId)
-          .sort((a, b) => a.order - b.order || a.createdAt.getTime() - b.createdAt.getTime()),
-      findUnique: async ({ where: { id } }: { where: { id: string } }) =>
-        cards.find((c) => c.id === id) ?? null,
-      findFirst: async ({ where }: { where: { listId: string } }) => {
-        const rows = cards.filter((c) => c.listId === where.listId).sort((a, b) => b.order - a.order);
-        return rows[0] ?? null;
-      },
-      create: async ({
-        data,
-      }: {
-        data: { listId: string; title: string; description: string; order: number };
-      }) => {
-        const now = new Date();
-        const card: Card = {
-          id: genId(),
-          listId: data.listId,
-          title: data.title,
-          description: data.description,
-          order: data.order,
-          createdAt: now,
-          updatedAt: now,
-        };
-        cards.push(card);
-        return card;
-      },
-      update: async ({
-        where,
-        data,
-      }: {
-        where: { id: string };
-        data: { title?: string; description?: string };
-      }) => {
-        const card = cards.find((c) => c.id === where.id);
-        if (!card) throw new Error("not_found");
-        if (data.title !== undefined) card.title = data.title;
-        if (data.description !== undefined) card.description = data.description;
-        card.updatedAt = new Date();
-        return card;
-      },
-      delete: async ({ where: { id } }: { where: { id: string } }) => {
-        const index = cards.findIndex((c) => c.id === id);
-        if (index < 0) throw new Error("not_found");
-        const [card] = cards.splice(index, 1);
-        return card;
-      },
-    },
+  const boardTable = makeTable(boards);
+  const listTable = makeTable(lists);
+  const cardTable = makeTable(cards, { archivedAt: null, deletedAt: null, dueDate: null });
+  const labelTable = makeTable(labels);
+  const cardLabelTable = makeTable(cardLabels);
+  const membershipTable = makeTable(memberships);
+
+  const dropCardLabelsByCard = (cardId: string) => {
+    for (let j = cardLabels.length - 1; j >= 0; j--) {
+      if (cardLabels[j].cardId === cardId) cardLabels.splice(j, 1);
+    }
+  };
+
+  // cascade を Prisma の onDelete: Cascade に合わせて再現
+  boardTable.delete = async ({ where }: { where: { id: string } }) => {
+    const i = boards.findIndex((b) => b.id === where.id);
+    if (i < 0) throw new Error("not_found");
+    const [board] = boards.splice(i, 1);
+    const listIds = lists.filter((l) => l.boardId === where.id).map((l) => l.id);
+    for (let j = cards.length - 1; j >= 0; j--) {
+      if (listIds.includes(cards[j].listId as string)) {
+        dropCardLabelsByCard(cards[j].id as string);
+        cards.splice(j, 1);
+      }
+    }
+    for (let j = lists.length - 1; j >= 0; j--) {
+      if (lists[j].boardId === where.id) lists.splice(j, 1);
+    }
+    for (let j = labels.length - 1; j >= 0; j--) {
+      if (labels[j].boardId === where.id) labels.splice(j, 1);
+    }
+    for (let j = memberships.length - 1; j >= 0; j--) {
+      if (memberships[j].boardId === where.id) memberships.splice(j, 1);
+    }
+    return board;
+  };
+  listTable.delete = async ({ where }: { where: { id: string } }) => {
+    const i = lists.findIndex((l) => l.id === where.id);
+    if (i < 0) throw new Error("not_found");
+    const [list] = lists.splice(i, 1);
+    for (let j = cards.length - 1; j >= 0; j--) {
+      if (cards[j].listId === where.id) {
+        dropCardLabelsByCard(cards[j].id as string);
+        cards.splice(j, 1);
+      }
+    }
+    return list;
+  };
+  cardTable.delete = async ({ where }: { where: { id: string } }) => {
+    const i = cards.findIndex((c) => c.id === where.id);
+    if (i < 0) throw new Error("not_found");
+    dropCardLabelsByCard(where.id);
+    return cards.splice(i, 1)[0];
+  };
+  labelTable.delete = async ({ where }: { where: { id: string } }) => {
+    const i = labels.findIndex((l) => l.id === where.id);
+    if (i < 0) throw new Error("not_found");
+    for (let j = cardLabels.length - 1; j >= 0; j--) {
+      if (cardLabels[j].labelId === where.id) cardLabels.splice(j, 1);
+    }
+    return labels.splice(i, 1)[0];
+  };
+
+  const prisma = {
+    board: boardTable,
+    list: listTable,
+    card: cardTable,
+    label: labelTable,
+    cardLabel: cardLabelTable,
+    boardMembership: membershipTable,
     $transaction: async <T>(fn: (tx: unknown) => Promise<T>) => fn(prisma),
   };
   return { prisma };
 });
 
-// prisma mock 内で $transaction コールバックに渡す tx は上位の prisma object と同じ関数を参照させたい。
-// Vitest の hoist を避けるため、遅延 import。
-let boardsGET: typeof import("@/app/api/boards/route").GET;
-let boardsPOST: typeof import("@/app/api/boards/route").POST;
-let boardGET: typeof import("@/app/api/boards/[boardId]/route").GET;
-let boardPATCH: typeof import("@/app/api/boards/[boardId]/route").PATCH;
-let boardDELETE: typeof import("@/app/api/boards/[boardId]/route").DELETE;
-let listsPOST: typeof import("@/app/api/boards/[boardId]/lists/route").POST;
-let listPATCH: typeof import("@/app/api/lists/[listId]/route").PATCH;
-let cardsGET: typeof import("@/app/api/lists/[listId]/cards/route").GET;
-let cardsPOST: typeof import("@/app/api/lists/[listId]/cards/route").POST;
-let cardPATCH: typeof import("@/app/api/cards/[cardId]/route").PATCH;
-let cardDELETE: typeof import("@/app/api/cards/[cardId]/route").DELETE;
+// 遅延 import（mock hoist 回避）
+type Handler = (...args: unknown[]) => Promise<Response>;
+let boardsGET: Handler, boardsPOST: Handler;
+let boardPATCH: Handler, boardDELETE: Handler;
+let listsGET: Handler, listsPOST: Handler;
+let listMovePOST: Handler;
+let cardsGET: Handler, cardsPOST: Handler;
+let cardDELETE: Handler, cardDetailGET: Handler, cardPATCH: Handler;
+let cardMovePOST: Handler, archivePOST: Handler, unarchivePOST: Handler;
+let restorePOST: Handler, purgeDELETE: Handler;
+let labelsGET: Handler, labelsPOST: Handler, labelPATCH: Handler, labelDELETE: Handler;
+let cardLabelPOST: Handler, cardLabelDELETE: Handler, searchGET: Handler;
 
 beforeAll(async () => {
-  ({ GET: boardsGET, POST: boardsPOST } = await import("@/app/api/boards/route"));
-  ({ GET: boardGET, PATCH: boardPATCH, DELETE: boardDELETE } = await import(
+  ({ GET: boardsGET, POST: boardsPOST } = (await import("@/app/api/boards/route")) as never);
+  ({ PATCH: boardPATCH, DELETE: boardDELETE } = (await import(
     "@/app/api/boards/[boardId]/route"
-  ));
-  ({ POST: listsPOST } = await import(
+  )) as never);
+  ({ GET: listsGET, POST: listsPOST } = (await import(
     "@/app/api/boards/[boardId]/lists/route"
-  ));
-  ({ PATCH: listPATCH } = await import("@/app/api/lists/[listId]/route"));
-  ({ GET: cardsGET, POST: cardsPOST } = await import(
+  )) as never);
+  ({ POST: listMovePOST } = (await import("@/app/api/lists/[listId]/move/route")) as never);
+  ({ GET: cardsGET, POST: cardsPOST } = (await import(
     "@/app/api/lists/[listId]/cards/route"
-  ));
-  ({ PATCH: cardPATCH, DELETE: cardDELETE } = await import("@/app/api/cards/[cardId]/route"));
+  )) as never);
+  ({
+    GET: cardDetailGET,
+    PATCH: cardPATCH,
+    DELETE: cardDELETE,
+  } = (await import("@/app/api/cards/[cardId]/route")) as never);
+  ({ POST: cardMovePOST } = (await import("@/app/api/cards/[cardId]/move/route")) as never);
+  ({ POST: archivePOST } = (await import("@/app/api/cards/[cardId]/archive/route")) as never);
+  ({ POST: unarchivePOST } = (await import(
+    "@/app/api/cards/[cardId]/unarchive/route"
+  )) as never);
+  ({ POST: restorePOST } = (await import("@/app/api/cards/[cardId]/restore/route")) as never);
+  ({ DELETE: purgeDELETE } = (await import("@/app/api/cards/[cardId]/purge/route")) as never);
+  ({ GET: labelsGET, POST: labelsPOST } = (await import(
+    "@/app/api/boards/[boardId]/labels/route"
+  )) as never);
+  ({ PATCH: labelPATCH, DELETE: labelDELETE } = (await import(
+    "@/app/api/labels/[labelId]/route"
+  )) as never);
+  ({ POST: cardLabelPOST } = (await import("@/app/api/cards/[cardId]/labels/route")) as never);
+  ({ DELETE: cardLabelDELETE } = (await import(
+    "@/app/api/cards/[cardId]/labels/[labelId]/route"
+  )) as never);
+  ({ GET: searchGET } = (await import("@/app/api/boards/[boardId]/search/route")) as never);
 });
 
 afterEach(() => {
-  users.length = 0;
-  boards.length = 0;
+  currentUser = null;
   memberships.length = 0;
+  boards.length = 0;
   lists.length = 0;
   cards.length = 0;
+  labels.length = 0;
+  cardLabels.length = 0;
   seq = 1;
-  currentUserId = null;
 });
 
 function jsonReq(url: string, body: unknown, method: "POST" | "PATCH" = "POST") {
@@ -287,226 +263,528 @@ function jsonReq(url: string, body: unknown, method: "POST" | "PATCH" = "POST") 
     method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-  }) as unknown as import("next/server").NextRequest;
+  }) as unknown;
 }
 function bareReq(url: string, method: "GET" | "DELETE" = "GET") {
-  return new Request(url, { method }) as unknown as import("next/server").NextRequest;
+  return new Request(url, { method }) as unknown;
 }
 const boardCtx = (boardId: string) => ({ params: Promise.resolve({ boardId }) });
 const listCtx = (listId: string) => ({ params: Promise.resolve({ listId }) });
 const cardCtx = (cardId: string) => ({ params: Promise.resolve({ cardId }) });
 
-function loginAs(id: string, email = `${id}@example.com`) {
-  if (!users.find((u) => u.id === id)) users.push({ id, email });
-  setCurrentUser(id);
+function loginAsTestUser() {
+  currentUser = { id: "u_test", email: "test@example.com", name: "Test" };
 }
-function addMembership(boardId: string, userId: string, role: Membership["role"]) {
-  memberships.push({ id: genId(), boardId, userId, role });
-}
-async function createBoard(userId: string, title = "Board") {
-  loginAs(userId);
+
+async function createBoard(title = "Board") {
+  loginAsTestUser();
   const res = await boardsPOST(jsonReq("http://localhost/api/boards", { title }));
-  return res.json() as Promise<Board>;
+  return res.json();
+}
+async function createList(boardId: string, title = "L") {
+  const res = await listsPOST(
+    jsonReq(`http://localhost/api/boards/${boardId}/lists`, { title }),
+    boardCtx(boardId),
+  );
+  return res.json();
+}
+async function createCard(listId: string, title: string) {
+  const res = await cardsPOST(
+    jsonReq(`http://localhost/api/lists/${listId}/cards`, { title }),
+    listCtx(listId),
+  );
+  return res.json();
+}
+async function activeTitles(listId: string) {
+  const res = await cardsGET(bareReq(`http://localhost/api/lists/${listId}/cards`), listCtx(listId));
+  const body = await res.json();
+  return body.items.map((c: { title: string }) => c.title);
 }
 
-describe("boards", () => {
-  it("FR-001/003: owner が作成すると order は 0 から連番、一覧は owner に見える", async () => {
-    const a = await createBoard("u1", "A");
-    const b = await createBoard("u1", "B");
-    expect(a.order).toBe(0);
-    expect(b.order).toBe(1);
+// ---- 既存コア（回帰防止） ----
+describe("core boards/lists/cards", () => {
+  it("ボード作成 order 連番、一覧 order 昇順", async () => {
+    const a = await createBoard("A");
+    const b = await createBoard("B");
+    expect([a.order, b.order]).toEqual([0, 1]);
     const res = await boardsGET();
-    const body = await res.json();
-    expect(body.items.map((x: Board) => x.title)).toEqual(["A", "B"]);
+    expect((await res.json()).items.map((x: { title: string }) => x.title)).toEqual(["A", "B"]);
   });
 
-  it("FR-006: 未ログインだと 401", async () => {
-    setCurrentUser(null);
-    const res = await boardsGET();
-    expect(res.status).toBe(401);
-    const body = await res.json();
-    expect(body.error.code).toBe("UNAUTHORIZED");
-  });
-
-  it("FR-007: メンバーでないユーザーには 404", async () => {
-    const board = await createBoard("u1");
-    loginAs("u2");
-    const res = await boardGET(bareReq(`http://localhost/api/boards/${board.id}`), boardCtx(board.id));
-    expect(res.status).toBe(404);
-  });
-
-  it("FR-008: viewer は PATCH で 403", async () => {
-    const board = await createBoard("u1");
-    loginAs("u2");
-    addMembership(board.id, "u2", "viewer");
-    const res = await boardPATCH(
-      jsonReq(`http://localhost/api/boards/${board.id}`, { title: "X" }, "PATCH"),
-      boardCtx(board.id),
+  it("ボード名編集の 404、空タイトル 422、削除で cascade", async () => {
+    loginAsTestUser();
+    const nf = await boardPATCH(
+      jsonReq("http://localhost/api/boards/none", { title: "X" }, "PATCH"),
+      boardCtx("none"),
     );
-    expect(res.status).toBe(403);
-  });
+    expect(nf.status).toBe(404);
 
-  it("FR-009: 空タイトルは 422, 101 文字も 422", async () => {
-    loginAs("u1");
-    for (const bad of ["   ", "a".repeat(101)]) {
-      const res = await boardsPOST(jsonReq("http://localhost/api/boards", { title: bad }));
-      expect(res.status).toBe(422);
-    }
-    expect(boards.length).toBe(0);
-  });
+    const bad = await boardsPOST(jsonReq("http://localhost/api/boards", { title: "" }));
+    expect(bad.status).toBe(422);
 
-  it("FR-005: DELETE すると 204、配下の List/Card も消える", async () => {
-    const board = await createBoard("u1");
-    const listRes = await listsPOST(
-      jsonReq(`http://localhost/api/boards/${board.id}/lists`, { title: "L" }),
-      boardCtx(board.id),
-    );
-    const list = (await listRes.json()) as List;
-    await cardsPOST(
-      jsonReq(`http://localhost/api/lists/${list.id}/cards`, { title: "C" }),
-      listCtx(list.id),
-    );
-    const res = await boardDELETE(bareReq(`http://localhost/api/boards/${board.id}`, "DELETE"), boardCtx(board.id));
-    expect(res.status).toBe(204);
-    expect(boards.length).toBe(0);
-    expect(lists.length).toBe(0);
+    const board = await createBoard();
+    const list = await createList(board.id);
+    await createCard(list.id, "C");
+    const del = await boardDELETE(bareReq(`http://localhost/api/boards/${board.id}`, "DELETE"), boardCtx(board.id));
+    expect(del.status).toBe(200);
     expect(cards.length).toBe(0);
-  });
-});
-
-describe("lists", () => {
-  it("FR-003: member 以上が作成できる、viewer は 403", async () => {
-    const board = await createBoard("u1");
-    loginAs("u2");
-    addMembership(board.id, "u2", "viewer");
-    const res403 = await listsPOST(
-      jsonReq(`http://localhost/api/boards/${board.id}/lists`, { title: "X" }),
-      boardCtx(board.id),
-    );
-    expect(res403.status).toBe(403);
-
-    loginAs("u3");
-    addMembership(board.id, "u3", "member");
-    const res201 = await listsPOST(
-      jsonReq(`http://localhost/api/boards/${board.id}/lists`, { title: "X" }),
-      boardCtx(board.id),
-    );
-    expect(res201.status).toBe(201);
-    expect(lists.length).toBe(1);
-    expect(lists[0].order).toBe(0);
+    expect(lists.length).toBe(0);
   });
 
-  it("FR-006: 存在しない listId の PATCH は 404", async () => {
-    loginAs("u1");
-    const res = await listPATCH(
-      jsonReq(`http://localhost/api/lists/no-such`, { title: "X" }, "PATCH"),
-      listCtx("no-such"),
-    );
-    expect(res.status).toBe(404);
-  });
-});
-
-describe("cards", () => {
-  it("FR-003/005: title と description の PATCH", async () => {
-    const board = await createBoard("u1");
-    const listRes = await listsPOST(
-      jsonReq(`http://localhost/api/boards/${board.id}/lists`, { title: "L" }),
-      boardCtx(board.id),
-    );
-    const list = (await listRes.json()) as List;
-    const cardRes = await cardsPOST(
-      jsonReq(`http://localhost/api/lists/${list.id}/cards`, { title: "C" }),
-      listCtx(list.id),
-    );
-    const card = (await cardRes.json()) as Card;
-
-    const patch1 = await cardPATCH(
-      jsonReq(`http://localhost/api/cards/${card.id}`, { description: "d" }, "PATCH"),
-      cardCtx(card.id),
-    );
-    expect(patch1.status).toBe(200);
-    const body1 = await patch1.json();
-    expect(body1.description).toBe("d");
-    expect(body1.title).toBe("C");
-
-    const patch2 = await cardPATCH(
-      jsonReq(`http://localhost/api/cards/${card.id}`, {}, "PATCH"),
-      cardCtx(card.id),
-    );
-    expect(patch2.status).toBe(422);
-    const body2 = await patch2.json();
-    expect(body2.error.details).toEqual({ _root: "no_fields" });
-  });
-
-  it("FR-010/011: title 空・201 文字、description 2001 文字は 422", async () => {
-    const board = await createBoard("u1");
-    const listRes = await listsPOST(
-      jsonReq(`http://localhost/api/boards/${board.id}/lists`, { title: "L" }),
-      boardCtx(board.id),
-    );
-    const list = (await listRes.json()) as List;
-    const cardRes = await cardsPOST(
-      jsonReq(`http://localhost/api/lists/${list.id}/cards`, { title: "C" }),
-      listCtx(list.id),
-    );
-    const card = (await cardRes.json()) as Card;
+  it("リスト作成/編集/削除、カード作成の境界", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const c = await createCard(list.id, "C");
+    expect(c.description).toBe("");
+    expect(c.order).toBe(0);
 
     for (const bad of ["", "a".repeat(201)]) {
+      const res = await cardsPOST(
+        jsonReq(`http://localhost/api/lists/${list.id}/cards`, { title: bad }),
+        listCtx(list.id),
+      );
+      expect(res.status).toBe(422);
+    }
+    const okDesc = await cardsPOST(
+      jsonReq(`http://localhost/api/lists/${list.id}/cards`, { title: "C2", description: "a".repeat(2000) }),
+      listCtx(list.id),
+    );
+    expect(okDesc.status).toBe(201);
+  });
+});
+
+// ---- spec/004: 移動 ----
+describe("card move", () => {
+  it("同一リスト内で末尾へ並べ替え、order 再採番", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const c0 = await createCard(list.id, "c0");
+    await createCard(list.id, "c1");
+    await createCard(list.id, "c2");
+    const res = await cardMovePOST(
+      jsonReq(`http://localhost/api/cards/${c0.id}/move`, {
+        sourceListId: list.id,
+        targetListId: list.id,
+        targetOrder: 2,
+      }),
+      cardCtx(c0.id),
+    );
+    expect(res.status).toBe(200);
+    expect(await activeTitles(list.id)).toEqual(["c1", "c2", "c0"]);
+  });
+
+  it("別リストへ移動、listId 変更＋両リスト再採番", async () => {
+    const board = await createBoard();
+    const l1 = await createList(board.id, "L1");
+    const l2 = await createList(board.id, "L2");
+    const c0 = await createCard(l1.id, "c0");
+    await createCard(l1.id, "c1");
+    await createCard(l2.id, "x0");
+    const res = await cardMovePOST(
+      jsonReq(`http://localhost/api/cards/${c0.id}/move`, {
+        sourceListId: l1.id,
+        targetListId: l2.id,
+        targetOrder: 0,
+      }),
+      cardCtx(c0.id),
+    );
+    expect(res.status).toBe(200);
+    expect((await res.json()).listId).toBe(l2.id);
+    expect(await activeTitles(l1.id)).toEqual(["c1"]);
+    expect(await activeTitles(l2.id)).toEqual(["c0", "x0"]);
+  });
+
+  it("空リストへ移動 targetOrder=0", async () => {
+    const board = await createBoard();
+    const l1 = await createList(board.id, "L1");
+    const l2 = await createList(board.id, "L2");
+    const c0 = await createCard(l1.id, "c0");
+    const res = await cardMovePOST(
+      jsonReq(`http://localhost/api/cards/${c0.id}/move`, {
+        sourceListId: l1.id,
+        targetListId: l2.id,
+        targetOrder: 0,
+      }),
+      cardCtx(c0.id),
+    );
+    expect(res.status).toBe(200);
+    expect((await res.json()).order).toBe(0);
+  });
+
+  it("sourceList 不一致・別ボード・範囲外・非active・存在なしは 422/404", async () => {
+    const b1 = await createBoard("B1");
+    const b2 = await createBoard("B2");
+    const l1 = await createList(b1.id, "L1");
+    const l2 = await createList(b2.id, "L2");
+    const c0 = await createCard(l1.id, "c0");
+
+    const mismatch = await cardMovePOST(
+      jsonReq(`http://localhost/api/cards/${c0.id}/move`, { sourceListId: "wrong", targetListId: l1.id, targetOrder: 0 }),
+      cardCtx(c0.id),
+    );
+    expect(mismatch.status).toBe(422);
+
+    const crossBoard = await cardMovePOST(
+      jsonReq(`http://localhost/api/cards/${c0.id}/move`, { sourceListId: l1.id, targetListId: l2.id, targetOrder: 0 }),
+      cardCtx(c0.id),
+    );
+    expect(crossBoard.status).toBe(422);
+
+    const range = await cardMovePOST(
+      jsonReq(`http://localhost/api/cards/${c0.id}/move`, { sourceListId: l1.id, targetListId: l1.id, targetOrder: 5 }),
+      cardCtx(c0.id),
+    );
+    expect(range.status).toBe(422);
+
+    const notFound = await cardMovePOST(
+      jsonReq(`http://localhost/api/cards/none/move`, { sourceListId: l1.id, targetListId: l1.id, targetOrder: 0 }),
+      cardCtx("none"),
+    );
+    expect(notFound.status).toBe(404);
+  });
+
+  it("リスト並べ替え order 再採番、範囲外 422", async () => {
+    const board = await createBoard();
+    const a = await createList(board.id, "A");
+    const b = await createList(board.id, "B");
+    const c = await createList(board.id, "C");
+    const res = await listMovePOST(
+      jsonReq(`http://localhost/api/lists/${c.id}/move`, { targetOrder: 0 }),
+      listCtx(c.id),
+    );
+    expect(res.status).toBe(200);
+    const listed = await listsGET(bareReq(`http://localhost/api/boards/${board.id}/lists`), boardCtx(board.id));
+    expect((await listed.json()).items.map((l: { id: string }) => l.id)).toEqual([c.id, a.id, b.id]);
+
+    const bad = await listMovePOST(
+      jsonReq(`http://localhost/api/lists/${a.id}/move`, { targetOrder: 9 }),
+      listCtx(a.id),
+    );
+    expect(bad.status).toBe(422);
+  });
+});
+
+// ---- spec/004: アーカイブ / 削除 / 復元 ----
+describe("archive / delete / restore", () => {
+  it("archive で active から外れ、archived 一覧に入る。冪等・末尾復元", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const c0 = await createCard(list.id, "c0");
+    await createCard(list.id, "c1");
+
+    const res = await archivePOST(bareReq(`http://localhost/api/cards/${c0.id}/archive`, "DELETE"), cardCtx(c0.id));
+    expect(res.status).toBe(200);
+    expect(await activeTitles(list.id)).toEqual(["c1"]);
+
+    const arch = await cardsGET(
+      new Request(`http://localhost/api/lists/${list.id}/cards?status=archived`) as unknown,
+      listCtx(list.id),
+    );
+    expect((await arch.json()).items.map((c: { title: string }) => c.title)).toEqual(["c0"]);
+
+    // 冪等
+    const again = await archivePOST(bareReq(`http://localhost/api/cards/${c0.id}/archive`), cardCtx(c0.id));
+    expect(again.status).toBe(200);
+
+    // 復元は末尾（active 件数 = 1 → order 1）
+    const un = await unarchivePOST(bareReq(`http://localhost/api/cards/${c0.id}/unarchive`), cardCtx(c0.id));
+    expect((await un.json()).order).toBe(1);
+    expect(await activeTitles(list.id)).toEqual(["c1", "c0"]);
+  });
+
+  it("DELETE はソフト削除（deletedAt 設定）、restore で戻る", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const c0 = await createCard(list.id, "c0");
+
+    const del = await cardDELETE(bareReq(`http://localhost/api/cards/${c0.id}`, "DELETE"), cardCtx(c0.id));
+    expect(del.status).toBe(200);
+    expect((await del.json()).deletedAt).not.toBeNull();
+    expect(await activeTitles(list.id)).toEqual([]);
+    expect(cards.length).toBe(1); // 物理削除されない
+
+    const restore = await restorePOST(bareReq(`http://localhost/api/cards/${c0.id}/restore`), cardCtx(c0.id));
+    expect(restore.status).toBe(200);
+    expect(await activeTitles(list.id)).toEqual(["c0"]);
+  });
+
+  it("排他: archived への delete、deleted への archive は 422", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const c0 = await createCard(list.id, "c0");
+
+    await archivePOST(bareReq(`http://localhost/api/cards/${c0.id}/archive`), cardCtx(c0.id));
+    const delArchived = await cardDELETE(bareReq(`http://localhost/api/cards/${c0.id}`, "DELETE"), cardCtx(c0.id));
+    expect(delArchived.status).toBe(422);
+
+    await unarchivePOST(bareReq(`http://localhost/api/cards/${c0.id}/unarchive`), cardCtx(c0.id));
+    await cardDELETE(bareReq(`http://localhost/api/cards/${c0.id}`, "DELETE"), cardCtx(c0.id));
+    const archiveDeleted = await archivePOST(bareReq(`http://localhost/api/cards/${c0.id}/archive`), cardCtx(c0.id));
+    expect(archiveDeleted.status).toBe(422);
+  });
+
+  it("move は非 active カードで 422", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const c0 = await createCard(list.id, "c0");
+    await archivePOST(bareReq(`http://localhost/api/cards/${c0.id}/archive`), cardCtx(c0.id));
+    const res = await cardMovePOST(
+      jsonReq(`http://localhost/api/cards/${c0.id}/move`, { sourceListId: list.id, targetListId: list.id, targetOrder: 0 }),
+      cardCtx(c0.id),
+    );
+    expect(res.status).toBe(422);
+  });
+
+  it("purge は deleted のみ物理削除、非 deleted は 422、status 不正は 422", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const c0 = await createCard(list.id, "c0");
+
+    const purgeActive = await purgeDELETE(bareReq(`http://localhost/api/cards/${c0.id}/purge`, "DELETE"), cardCtx(c0.id));
+    expect(purgeActive.status).toBe(422);
+
+    await cardDELETE(bareReq(`http://localhost/api/cards/${c0.id}`, "DELETE"), cardCtx(c0.id));
+    const purge = await purgeDELETE(bareReq(`http://localhost/api/cards/${c0.id}/purge`, "DELETE"), cardCtx(c0.id));
+    expect(purge.status).toBe(200);
+    expect(cards.length).toBe(0);
+
+    const c1 = await createCard(list.id, "c1");
+    void c1;
+    const badStatus = await cardsGET(
+      new Request(`http://localhost/api/lists/${list.id}/cards?status=foo`) as unknown,
+      listCtx(list.id),
+    );
+    expect(badStatus.status).toBe(422);
+  });
+});
+
+// ---- spec/006: ラベル ----
+const labelCtx = (labelId: string) => ({ params: Promise.resolve({ labelId }) });
+const cardLabelCtx = (cardId: string, labelId: string) => ({
+  params: Promise.resolve({ cardId, labelId }),
+});
+async function createLabel(boardId: string, name = "L", color = "red") {
+  const res = await labelsPOST(
+    jsonReq(`http://localhost/api/boards/${boardId}/labels`, { name, color }),
+    boardCtx(boardId),
+  );
+  return res.json();
+}
+
+describe("labels", () => {
+  it("作成の検証（name 空/51文字 422、color 不正 422、正常 201）", async () => {
+    const board = await createBoard();
+    for (const bad of [{ name: "", color: "red" }, { name: "a".repeat(51), color: "red" }, { name: "ok", color: "no-such" }]) {
+      const res = await labelsPOST(
+        jsonReq(`http://localhost/api/boards/${board.id}/labels`, bad),
+        boardCtx(board.id),
+      );
+      expect(res.status).toBe(422);
+    }
+    const ok = await labelsPOST(
+      jsonReq(`http://localhost/api/boards/${board.id}/labels`, { name: "Bug", color: "red" }),
+      boardCtx(board.id),
+    );
+    expect(ok.status).toBe(201);
+  });
+
+  it("一覧 {items}・0件・board 404、編集・削除で付与も解除", async () => {
+    loginAsTestUser();
+    const nf = await labelsGET(bareReq("http://localhost/api/boards/none/labels"), boardCtx("none"));
+    expect(nf.status).toBe(404);
+
+    const board = await createBoard();
+    const empty = await labelsGET(
+      bareReq(`http://localhost/api/boards/${board.id}/labels`),
+      boardCtx(board.id),
+    );
+    expect((await empty.json()).items).toEqual([]);
+
+    const label = await createLabel(board.id, "Bug", "red");
+    const patch = await labelPATCH(
+      jsonReq(`http://localhost/api/labels/${label.id}`, { name: "Fix", color: "green" }, "PATCH"),
+      labelCtx(label.id),
+    );
+    expect(patch.status).toBe(200);
+    expect((await patch.json()).name).toBe("Fix");
+
+    // 付与してから削除 → 付与も消える
+    const list = await createList(board.id);
+    const card = await createCard(list.id, "c");
+    await cardLabelPOST(
+      jsonReq(`http://localhost/api/cards/${card.id}/labels`, { labelId: label.id }),
+      cardCtx(card.id),
+    );
+    expect(cardLabels.length).toBe(1);
+    const del = await labelDELETE(
+      bareReq(`http://localhost/api/labels/${label.id}`, "DELETE"),
+      labelCtx(label.id),
+    );
+    expect(del.status).toBe(200);
+    expect(cardLabels.length).toBe(0);
+
+    const nf2 = await labelPATCH(
+      jsonReq("http://localhost/api/labels/none", { name: "X" }, "PATCH"),
+      labelCtx("none"),
+    );
+    expect(nf2.status).toBe(404);
+  });
+
+  it("付与は冪等・越境は 404、解除できる", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const card = await createCard(list.id, "c");
+    const label = await createLabel(board.id);
+
+    const a1 = await cardLabelPOST(
+      jsonReq(`http://localhost/api/cards/${card.id}/labels`, { labelId: label.id }),
+      cardCtx(card.id),
+    );
+    expect(a1.status).toBe(201);
+    const a2 = await cardLabelPOST(
+      jsonReq(`http://localhost/api/cards/${card.id}/labels`, { labelId: label.id }),
+      cardCtx(card.id),
+    );
+    expect(a2.status).toBe(200);
+    expect(cardLabels.length).toBe(1);
+
+    // 別ボードのラベルを付与 → 404
+    const board2 = await createBoard("B2");
+    const label2 = await createLabel(board2.id);
+    const cross = await cardLabelPOST(
+      jsonReq(`http://localhost/api/cards/${card.id}/labels`, { labelId: label2.id }),
+      cardCtx(card.id),
+    );
+    expect(cross.status).toBe(404);
+
+    const un = await cardLabelDELETE(
+      bareReq(`http://localhost/api/cards/${card.id}/labels/${label.id}`, "DELETE"),
+      cardLabelCtx(card.id, label.id),
+    );
+    expect(un.status).toBe(200);
+    expect(cardLabels.length).toBe(0);
+  });
+});
+
+// ---- spec/005 + 007: カード詳細 / 期限 ----
+describe("card detail & due date", () => {
+  it("詳細は labels/dueDate を含む（初期は [] と null）", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const card = await createCard(list.id, "c");
+    const res = await cardDetailGET(bareReq(`http://localhost/api/cards/${card.id}`), cardCtx(card.id));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.labels).toEqual([]);
+    expect(body.dueDate).toBeNull();
+
+    const label = await createLabel(board.id, "Bug", "red");
+    await cardLabelPOST(
+      jsonReq(`http://localhost/api/cards/${card.id}/labels`, { labelId: label.id }),
+      cardCtx(card.id),
+    );
+    const res2 = await cardDetailGET(bareReq(`http://localhost/api/cards/${card.id}`), cardCtx(card.id));
+    expect((await res2.json()).labels.map((l: { name: string }) => l.name)).toEqual(["Bug"]);
+
+    const nf = await cardDetailGET(bareReq("http://localhost/api/cards/none"), cardCtx("none"));
+    expect(nf.status).toBe(404);
+  });
+
+  it("dueDate 設定/解除/不正/404", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const card = await createCard(list.id, "c");
+
+    const set = await cardPATCH(
+      jsonReq(`http://localhost/api/cards/${card.id}`, { dueDate: "2026-08-01" }, "PATCH"),
+      cardCtx(card.id),
+    );
+    expect(set.status).toBe(200);
+    expect((await set.json()).dueDate).not.toBeNull();
+
+    const clear = await cardPATCH(
+      jsonReq(`http://localhost/api/cards/${card.id}`, { dueDate: null }, "PATCH"),
+      cardCtx(card.id),
+    );
+    expect((await clear.json()).dueDate).toBeNull();
+
+    for (const bad of ["2026-13-40", "abc"]) {
       const res = await cardPATCH(
-        jsonReq(`http://localhost/api/cards/${card.id}`, { title: bad }, "PATCH"),
+        jsonReq(`http://localhost/api/cards/${card.id}`, { dueDate: bad }, "PATCH"),
         cardCtx(card.id),
       );
       expect(res.status).toBe(422);
     }
-    const res2001 = await cardPATCH(
-      jsonReq(`http://localhost/api/cards/${card.id}`, { description: "a".repeat(2001) }, "PATCH"),
-      cardCtx(card.id),
+
+    const nf = await cardPATCH(
+      jsonReq("http://localhost/api/cards/none", { dueDate: "2026-08-01" }, "PATCH"),
+      cardCtx("none"),
     );
-    expect(res2001.status).toBe(422);
-    const stored = cards.find((c) => c.id === card.id);
-    expect(stored?.title).toBe("C");
-    expect(stored?.description).toBe("");
+    expect(nf.status).toBe(404);
+  });
+});
+
+// ---- spec/008: 検索・絞り込み ----
+describe("search & filter", () => {
+  function searchReq(boardId: string, query = "") {
+    return new Request(`http://localhost/api/boards/${boardId}/search${query}`) as unknown;
+  }
+  async function ids(res: Response) {
+    return (await res.json()).items.map((c: { title: string }) => c.title).sort();
+  }
+
+  it("keyword / label / due / status / 0件 と検証", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const alpha = await createCard(list.id, "Alpha");
+    const beta = await createCard(list.id, "Beta");
+    await cardPATCH(
+      jsonReq(`http://localhost/api/cards/${beta.id}`, { description: "keyword-in-desc" }, "PATCH"),
+      cardCtx(beta.id),
+    );
+    // 期限: alpha=過去, beta=なし
+    await cardPATCH(
+      jsonReq(`http://localhost/api/cards/${alpha.id}`, { dueDate: "2000-01-01" }, "PATCH"),
+      cardCtx(alpha.id),
+    );
+    // ラベル: alpha に付与
+    const label = await createLabel(board.id, "Bug", "red");
+    await cardLabelPOST(
+      jsonReq(`http://localhost/api/cards/${alpha.id}/labels`, { labelId: label.id }),
+      cardCtx(alpha.id),
+    );
+
+    // keyword（title と description、大文字小文字非依存）
+    expect(await ids(await searchGET(searchReq(board.id, "?keyword=alph"), boardCtx(board.id)))).toEqual(["Alpha"]);
+    expect(await ids(await searchGET(searchReq(board.id, "?keyword=KEYWORD"), boardCtx(board.id)))).toEqual(["Beta"]);
+    // 空 keyword は全件
+    expect(await ids(await searchGET(searchReq(board.id, ""), boardCtx(board.id)))).toEqual(["Alpha", "Beta"]);
+    // label 絞り込み
+    expect(await ids(await searchGET(searchReq(board.id, `?labelId=${label.id}`), boardCtx(board.id)))).toEqual(["Alpha"]);
+    // due
+    expect(await ids(await searchGET(searchReq(board.id, "?due=overdue"), boardCtx(board.id)))).toEqual(["Alpha"]);
+    expect(await ids(await searchGET(searchReq(board.id, "?due=set"), boardCtx(board.id)))).toEqual(["Alpha"]);
+    expect(await ids(await searchGET(searchReq(board.id, "?due=unset"), boardCtx(board.id)))).toEqual(["Beta"]);
+
+    // status: beta をアーカイブ
+    await archivePOST(bareReq(`http://localhost/api/cards/${beta.id}/archive`), cardCtx(beta.id));
+    expect(await ids(await searchGET(searchReq(board.id, "?status=active"), boardCtx(board.id)))).toEqual(["Alpha"]);
+    expect(await ids(await searchGET(searchReq(board.id, "?status=archived"), boardCtx(board.id)))).toEqual(["Beta"]);
+
+    // 0件
+    const none = await searchGET(searchReq(board.id, "?keyword=zzzzz"), boardCtx(board.id));
+    expect((await none.json()).items).toEqual([]);
   });
 
-  it("FR-007: 存在しない listId への一覧は 404", async () => {
-    loginAs("u1");
-    const res = await cardsGET(bareReq(`http://localhost/api/lists/no-such/cards`), listCtx("no-such"));
-    expect(res.status).toBe(404);
-  });
-
-  it("FR-008: 閲覧不可 list への POST は 404 を優先", async () => {
-    const board = await createBoard("u1");
-    const listRes = await listsPOST(
-      jsonReq(`http://localhost/api/boards/${board.id}/lists`, { title: "L" }),
-      boardCtx(board.id),
-    );
-    const list = (await listRes.json()) as List;
-    loginAs("u2");
-    const res = await cardsPOST(
-      jsonReq(`http://localhost/api/lists/${list.id}/cards`, { title: "" }, "POST"),
-      listCtx(list.id),
-    );
-    expect(res.status).toBe(404);
-  });
-
-  it("FR-006: DELETE 後の同 ID PATCH は 404", async () => {
-    const board = await createBoard("u1");
-    const listRes = await listsPOST(
-      jsonReq(`http://localhost/api/boards/${board.id}/lists`, { title: "L" }),
-      boardCtx(board.id),
-    );
-    const list = (await listRes.json()) as List;
-    const cardRes = await cardsPOST(
-      jsonReq(`http://localhost/api/lists/${list.id}/cards`, { title: "C" }),
-      listCtx(list.id),
-    );
-    const card = (await cardRes.json()) as Card;
-    const del = await cardDELETE(bareReq(`http://localhost/api/cards/${card.id}`, "DELETE"), cardCtx(card.id));
-    expect(del.status).toBe(204);
-    const patch = await cardPATCH(
-      jsonReq(`http://localhost/api/cards/${card.id}`, { title: "X" }, "PATCH"),
-      cardCtx(card.id),
-    );
-    expect(patch.status).toBe(404);
+  it("keyword 101文字・due/status 不正は 422、board なしは 404", async () => {
+    const board = await createBoard();
+    const long = await searchGET(searchReq(board.id, `?keyword=${"a".repeat(101)}`), boardCtx(board.id));
+    expect(long.status).toBe(422);
+    const badDue = await searchGET(searchReq(board.id, "?due=foo"), boardCtx(board.id));
+    expect(badDue.status).toBe(422);
+    const badStatus = await searchGET(searchReq(board.id, "?status=foo"), boardCtx(board.id));
+    expect(badStatus.status).toBe(422);
+    const nf = await searchGET(searchReq("none"), boardCtx("none"));
+    expect(nf.status).toBe(404);
   });
 });

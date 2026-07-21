@@ -1,75 +1,79 @@
-// spec/002_lists.md FR-004, FR-005
+// spec/002_lists.md § API（リスト名編集・並び順変更・削除）/ spec/013_permissions.md
 import { NextRequest, NextResponse } from "next/server";
 import { listRepository } from "@/lib/repository/list";
-import { currentUser } from "@/lib/auth/currentUser";
-import { checkBoardAccess } from "@/lib/auth/requireBoardRole";
-import { auditLog } from "@/lib/audit/log";
-import { validateTitle } from "@/lib/validation/text";
-import {
-  unauthorized,
-  forbidden,
-  notFound,
-  validationError,
-  internalError,
-} from "@/lib/errors";
+import { checkListAccess, accessErrorResponse } from "@/lib/auth/permissions";
+import { auditLog, errorLog, newRequestId } from "@/lib/audit/log";
+import { validateTitle, validateOrder } from "@/lib/validation/text";
+import { validationError, internalError } from "@/lib/errors";
 
 type Ctx = { params: Promise<{ listId: string }> };
-
-async function loadListWithAccess(userId: string, listId: string, minRole: "viewer" | "member") {
-  const list = await listRepository.findById(listId);
-  if (!list) return { kind: "not_found" as const };
-  const access = await checkBoardAccess(userId, list.boardId, minRole);
-  if (access.kind === "not_found") return { kind: "not_found" as const };
-  if (access.kind === "forbidden") return { kind: "forbidden" as const };
-  return { kind: "ok" as const, list };
-}
+const NOT_FOUND_MESSAGE = "指定されたリストが見つかりません";
 
 export async function PATCH(req: NextRequest, ctx: Ctx) {
+  const requestId = newRequestId();
   try {
-    const user = await currentUser();
-    if (!user) return unauthorized();
     const { listId } = await ctx.params;
-    const found = await loadListWithAccess(user.id, listId, "member");
-    if (found.kind === "not_found") return notFound("指定されたリストが見つかりません");
-    if (found.kind === "forbidden") return forbidden();
-    const body = (await req.json().catch(() => ({}))) as { title?: unknown };
-    const result = validateTitle(body.title, 100);
-    if (!result.ok) {
-      return validationError("titleは1〜100文字で入力してください", {
-        title: result.reason,
+    const access = await checkListAccess(listId, "member");
+    const err = accessErrorResponse(access, NOT_FOUND_MESSAGE);
+    if (err) return err;
+
+    const body = (await req.json().catch(() => ({}))) as {
+      title?: unknown;
+      order?: unknown;
+    };
+    const hasTitle = Object.prototype.hasOwnProperty.call(body, "title");
+    const hasOrder = Object.prototype.hasOwnProperty.call(body, "order");
+    if (!hasTitle && !hasOrder) {
+      return validationError("titleまたはorderを指定してください", {
+        _root: "no_fields",
       });
     }
-    const list = await listRepository.updateTitle(listId, result.value);
-    auditLog("list.update", {
-      actor: user.id,
-      boardId: list.boardId,
-      listId: list.id,
-      title: list.title,
+
+    const patch: { title?: string; order?: number } = {};
+    if (hasTitle) {
+      const r = validateTitle(body.title, 100);
+      if (!r.ok) {
+        return validationError("titleは1〜100文字で入力してください", {
+          title: r.reason,
+        });
+      }
+      patch.title = r.value;
+    }
+    if (hasOrder) {
+      const r = validateOrder(body.order);
+      if (!r.ok) {
+        return validationError("orderは整数で指定してください", { order: r.reason });
+      }
+      patch.order = r.value;
+    }
+
+    const updated = await listRepository.update(listId, patch);
+    auditLog(requestId, "list.update", {
+      boardId: updated.boardId,
+      listId,
+      fields: Object.keys(patch),
     });
-    return NextResponse.json(list);
+    return NextResponse.json(updated);
   } catch (e) {
-    console.error(e);
+    errorLog(requestId, e, 500);
     return internalError();
   }
 }
 
 export async function DELETE(_req: NextRequest, ctx: Ctx) {
+  const requestId = newRequestId();
   try {
-    const user = await currentUser();
-    if (!user) return unauthorized();
     const { listId } = await ctx.params;
-    const found = await loadListWithAccess(user.id, listId, "member");
-    if (found.kind === "not_found") return notFound("指定されたリストが見つかりません");
-    if (found.kind === "forbidden") return forbidden();
+    const access = await checkListAccess(listId, "member");
+    const err = accessErrorResponse(access, NOT_FOUND_MESSAGE);
+    if (err) return err;
+
+    const list = await listRepository.findById(listId);
     await listRepository.delete(listId);
-    auditLog("list.delete", {
-      actor: user.id,
-      boardId: found.list.boardId,
-      listId,
-    });
-    return new NextResponse(null, { status: 204 });
+    auditLog(requestId, "list.delete", { boardId: list?.boardId, listId });
+    return NextResponse.json({ ok: true });
   } catch (e) {
-    console.error(e);
+    errorLog(requestId, e, 500);
     return internalError();
   }
 }

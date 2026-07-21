@@ -1,45 +1,39 @@
-// spec/001_boards.md FR-004, FR-005
+// spec/001_boards.md § API（ボード名編集・削除）/ spec/013_permissions.md
 import { NextRequest, NextResponse } from "next/server";
 import { boardRepository } from "@/lib/repository/board";
-import { currentUser } from "@/lib/auth/currentUser";
-import { checkBoardAccess } from "@/lib/auth/requireBoardRole";
-import { auditLog } from "@/lib/audit/log";
+import { checkBoardAccess, accessErrorResponse } from "@/lib/auth/permissions";
+import { auditLog, errorLog, newRequestId } from "@/lib/audit/log";
 import { validateTitle } from "@/lib/validation/text";
-import {
-  unauthorized,
-  forbidden,
-  notFound,
-  validationError,
-  internalError,
-} from "@/lib/errors";
+import { notFound, validationError, internalError } from "@/lib/errors";
 
 type Ctx = { params: Promise<{ boardId: string }> };
+const NOT_FOUND_MESSAGE = "指定されたボードが見つかりません";
 
 export async function GET(_req: NextRequest, ctx: Ctx) {
+  const requestId = newRequestId();
   try {
-    const user = await currentUser();
-    if (!user) return unauthorized();
     const { boardId } = await ctx.params;
-    const access = await checkBoardAccess(user.id, boardId, "viewer");
-    if (access.kind === "not_found") return notFound("指定されたボードが見つかりません");
-    if (access.kind === "forbidden") return forbidden();
+    const access = await checkBoardAccess(boardId, "viewer");
+    const err = accessErrorResponse(access, NOT_FOUND_MESSAGE);
+    if (err) return err;
+
     const board = await boardRepository.findById(boardId);
-    if (!board) return notFound("指定されたボードが見つかりません");
+    if (!board) return notFound(NOT_FOUND_MESSAGE);
     return NextResponse.json(board);
   } catch (e) {
-    console.error(e);
+    errorLog(requestId, e, 500);
     return internalError();
   }
 }
 
 export async function PATCH(req: NextRequest, ctx: Ctx) {
+  const requestId = newRequestId();
   try {
-    const user = await currentUser();
-    if (!user) return unauthorized();
     const { boardId } = await ctx.params;
-    const access = await checkBoardAccess(user.id, boardId, "owner");
-    if (access.kind === "not_found") return notFound("指定されたボードが見つかりません");
-    if (access.kind === "forbidden") return forbidden();
+    const access = await checkBoardAccess(boardId, "owner");
+    const err = accessErrorResponse(access, NOT_FOUND_MESSAGE);
+    if (err) return err;
+
     const body = (await req.json().catch(() => ({}))) as { title?: unknown };
     const result = validateTitle(body.title, 100);
     if (!result.ok) {
@@ -47,28 +41,29 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
         title: result.reason,
       });
     }
-    const board = await boardRepository.updateTitle(boardId, result.value);
-    auditLog("board.update", { actor: user.id, boardId, title: board.title });
-    return NextResponse.json(board);
+    const updated = await boardRepository.updateTitle(boardId, result.value);
+    auditLog(requestId, "board.update", { boardId, title: updated.title });
+    return NextResponse.json(updated);
   } catch (e) {
-    console.error(e);
+    errorLog(requestId, e, 500);
     return internalError();
   }
 }
 
 export async function DELETE(_req: NextRequest, ctx: Ctx) {
+  const requestId = newRequestId();
   try {
-    const user = await currentUser();
-    if (!user) return unauthorized();
     const { boardId } = await ctx.params;
-    const access = await checkBoardAccess(user.id, boardId, "owner");
-    if (access.kind === "not_found") return notFound("指定されたボードが見つかりません");
-    if (access.kind === "forbidden") return forbidden();
+    const access = await checkBoardAccess(boardId, "owner");
+    const err = accessErrorResponse(access, NOT_FOUND_MESSAGE);
+    if (err) return err;
+
+    // 配下の List/Card/Label と BoardMembership/Invite は cascade で削除される
     await boardRepository.delete(boardId);
-    auditLog("board.delete", { actor: user.id, boardId });
-    return new NextResponse(null, { status: 204 });
+    auditLog(requestId, "board.delete", { boardId });
+    return NextResponse.json({ ok: true });
   } catch (e) {
-    console.error(e);
+    errorLog(requestId, e, 500);
     return internalError();
   }
 }
