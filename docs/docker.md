@@ -46,6 +46,7 @@ cd minimum_handson/simple_prompt
 npm install
 cp .env.example .env
 npx prisma migrate dev
+npx prisma generate
 npm run dev -- --hostname 0.0.0.0
 ```
 

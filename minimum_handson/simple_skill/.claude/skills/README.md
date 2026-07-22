@@ -1,7 +1,6 @@
 # 第2章 ハンズオン用スキル
 
-第2章 ミニマムハンズオン の第2段で使う4つのスキル定義です。
-読者は、これらをそのままコピーするか、自分のテーマに合わせて手を入れて使うことを想定しています。
+第2章ミニマムハンズオンのスキル版で使う4つのスキル定義です。スキル自体は題材と技術スタックを固定しません。このハンズオンでは、プロンプト版と同じ最小カンバンを比較するため、入力で題材と技術スタックを指定します。
 
 ## スキル一覧
 
@@ -26,35 +25,27 @@
 
 ## 自分のClaude Codeに導入する方法
 
-このディレクトリ配下のスキルを、自分のClaude Codeのskillsディレクトリにコピーします。
+このディレクトリ配下のスキルは、すでにこのハンズオンに配置されています。別の作業ディレクトリで第2章のスキル版を試す場合は、リポジトリのルートから次のようにコピーします。
 
 ```bash
-# プロジェクトルートで実行（プロジェクト単位で使う場合）
+# プロジェクト単位で使う場合
 mkdir -p .claude/skills
-cp -r chapters/02_minimum_handson/skills/{constitution,spec,design,implement} .claude/skills/
+cp -r minimum_handson/simple_skill/.claude/skills/{constitution,spec,design,implement} .claude/skills/
 
-# またはユーザー単位で使う場合
+# ユーザー単位で使う場合
 mkdir -p ~/.claude/skills
-cp -r chapters/02_minimum_handson/skills/{constitution,spec,design,implement} ~/.claude/skills/
+cp -r minimum_handson/simple_skill/.claude/skills/{constitution,spec,design,implement} ~/.claude/skills/
 ```
 
 コピー後、Claude Codeを再起動すれば `/constitution` `/spec` `/design` `/implement` が使えるようになります。
 
-## 自分のテーマに合わせてカスタマイズする
+## 適用範囲
 
-各スキルのSKILL.mdは最小構成です。
-自分のテーマに合わせて以下のような変更ができます。
-
-- `/constitution` テンプレートのセクションを増減する
-- `/spec` フィールドや異常系の項目を増減する
-- `/design` UI構造の表現をFigmaリンク等に変える
-- `/implement` 生成ファイルの配置を変える
-
-スキルの記述はMarkdownなので、その場でファイルを編集すれば反映されます。
+この4スキルは、別のテーマにも転用できます。`/constitution` と各スキルへの入力で、対象プロジェクトの技術スタック、要件、制約、出力先を与えてください。確認手順や出力先などワークフロー自体を変えたい場合だけ、`SKILL.md`を編集します。
 
 ## 第5章で扱う強化スキル
 
-第5章では、これら4スキルを「強化版」に置き換え、さらに以下を追加していきます。
+第5章では、同じ4つの役割を強化し、以下のスキルを追加します。
 
 - `/ui-design` UIをAtomic Designで整える
 - `/test` 仕様からテストを生成する
