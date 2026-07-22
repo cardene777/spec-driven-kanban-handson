@@ -47,6 +47,13 @@ npm test
 npm run build
 ```
 
+## 実行ログ
+
+本書で実行した対話ログを、再現手順の参考記録として収録しています。thinkingとローカルパスは公開版から除いています。ログ自体を完了判定には使わず、手元で生成した成果物と検証コマンドの結果を確認してください。
+
+- [第2章の正式ログ](./minimum_handson/logs/)
+- [第5章のセクション別ログ](./main_handson/logs/)
+
 ## Docker環境
 
 Node.js、npm、Git、SQLiteの実行環境をDockerでそろえる場合は、[Docker環境](./docs/docker.md)を参照してください。Claude Codeはホスト側に通常どおりインストールして使います。
