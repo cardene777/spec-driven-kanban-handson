@@ -14,6 +14,7 @@ Next.js 16 (App Router) / TypeScript / SQLite / Prisma 7 (better-sqlite3 adapter
 npm install
 cp .env.example .env
 npx prisma migrate dev   # SQLite にスキーマを反映
+npx prisma generate      # Prisma Client を生成
 npm run dev              # http://localhost:3000
 ```
 

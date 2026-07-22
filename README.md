@@ -9,7 +9,7 @@ Next.js、Prisma、SQLiteでカンバンアプリを段階的に作るハンズ�
 | ディレクトリ | 内容 | スキル |
 | --- | --- | --- |
 | [`minimum_handson/simple_prompt/`](./minimum_handson/simple_prompt/) | 第2章。プロンプトだけで最小カンバンを作る版 | 使わない |
-| [`minimum_handson/simple_skill/`](./minimum_handson/simple_skill/) | 第2章。同じ題材を4つの固定スキルで作る版 | `constitution`、`spec`、`design`、`implement` |
+| [`minimum_handson/simple_skill/`](./minimum_handson/simple_skill/) | 第2章。同じ題材を4つの汎用スキルで作る版 | `constitution`、`spec`、`design`、`implement` |
 | [`main_handson/`](./main_handson/) | 第5章。認証・権限・UI・テスト・文書化まで拡張する版 | 11の汎用スキル |
 
 各末端ディレクトリの直下が最新の稼働アプリです。`simple_prompt/` 内の `1_...` から `4_...` は、各ステップ完了時点のスナップショットです。
@@ -23,6 +23,7 @@ cd minimum_handson/simple_skill  # 実行したいディレクトリに置き換
 npm install
 cp .env.example .env
 npx prisma migrate dev
+npx prisma generate
 npm run dev
 ```
 

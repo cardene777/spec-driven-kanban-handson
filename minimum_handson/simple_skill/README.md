@@ -2,7 +2,7 @@
 
 第2章のスキル版ハンズオンです。`simple_prompt` と同じ最小カンバンを、`/constitution`、`/spec`、`/design`、`/implement` の4スキルを順に使って作ります。
 
-このディレクトリのスキルは、第2章で同じ題材・実装条件を比較するための**固定版**です。カンバン、Next.js、Prisma 7、SQLite、Vitestを前提にしています。第5章の `main_handson` にある11スキルは、技術やドメインを固定しない汎用版です。
+このディレクトリの4スキルは、技術やドメインを固定しない汎用的なひな形です。このハンズオンでは、入力とプロンプトでカンバン、Next.js、Prisma 7、SQLite、Vitestを指定しています。第5章の `main_handson` は、同じ4つの役割を強化し、7つの追加スキルを加えた構成です。
 
 ## 技術スタック
 
@@ -16,6 +16,7 @@
 npm install
 cp .env.example .env
 npx prisma migrate dev
+npx prisma generate
 npm run dev
 ```
 
@@ -42,7 +43,7 @@ npm run build
 
 ## スキル（`.claude/skills/`）
 
-第2章で使う4つの固定スキルを含みます。導入方法と呼び出し順は[スキルのREADME](./.claude/skills/README.md)を参照してください。
+第2章で使う4つの汎用スキルを含みます。導入方法と呼び出し順は[スキルのREADME](./.claude/skills/README.md)を参照してください。
 
 ## ステップと画面
 
