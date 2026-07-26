@@ -115,9 +115,9 @@ description: 対話でブランドトーンを決めた後、shadcn/ui の insta
 
 ### `app/globals.css` のテンプレート
 
-`npx shadcn init` は既存の `app/globals.css` を merge せず**丸ごと上書きする**。既存の `:root` や `body` 定義は消えるので、init 実行後に本テンプレートへ書き戻す前提で進める。
+`npx shadcn init` は既存のグローバルCSSや設定ファイルを更新することがある。変更範囲を固定せず、実行前後の差分を確認する。既存の `:root` や `body` 定義、ブランド用のトークン定義を残す必要がある場合は、生成された構成に合わせて統合する。
 
-`@import` の行 (`@import "shadcn/tailwind.css";` と runtime dependency の `shadcn` package 追加を含む) は init が自動生成する。手で消さない。
+`init` が追加・更新する `@import` の行や依存パッケージは、CLIの版と初期化時の設定で変わる。生成後の差分と `package.json` を確認し、ブランド用のトークンと矛盾しない形で統合する。
 
 ```css
 @import "tailwindcss";
@@ -125,7 +125,7 @@ description: 対話でブランドトーンを決めた後、shadcn/ui の insta
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* init が生成する dark 定義 (`&:is(.dark *)` の class 方式 + `.dark {}` block) は、
+/* class 方式の dark 定義 (`&:is(.dark *)` や `.dark {}` block) が存在する場合は、
    prefers-color-scheme でトーンを切り替える方針と衝突する。
    ブランド方針が OS のダーク設定に追従する場合は、custom-variant を media query に再定義し、
    明暗の反転は tokens.css の @media ブロックに一本化する。 */
@@ -179,45 +179,53 @@ type Props = {
 
 ## 作業手順
 
-1. 入力ファイル確認
+1. **入力ファイル確認**
+
    `constitution.md` と `app/globals.css` を読み、既存の見た目方針とテック選択を把握する。
 
-2. ブランド方針の対話決定
+2. **ブランド方針の対話決定**
+
    トーン / アクセント色 / 書体 / 角丸・余白 / layout preference をユーザーとの対話で確定する。
    トーンは「Linear」「Notion」「Vercel」「Attio」「Height」「Trello Modern」等の参照例で合意し、パレットと書体は参照例からデフォルト値を提示する。
    例: Height tone → warm cream bg + terracotta accent + serif heading。
 
-3. shadcn/ui の install
-   初期化前に `components.json`、`components/ui/`、`app/globals.css` の有無を確認する。既存ファイルを上書きする場合は、対象ファイルと理由を示して確認を取ってから `npx shadcn@latest init --defaults --force` を実行する。初期化済みで上書きが不要な場合は `--force` を付けない。
-   `init` が生成した `button` は再追加しない。続けて `npx shadcn@latest add card dialog input label textarea avatar badge separator dropdown-menu table sheet scroll-area sonner tooltip -y` を実行する。既存componentを上書きする必要がある場合は、対象と理由を示して確認を取る。
-   実挙動の注意点を 3 つ押さえる。
-   - `--defaults` は現行版 (shadcn 4.x) で `style: base-nova` を選び、`@radix-ui/*` ではなく `@base-ui/react` を入れる。Radix 版の `asChild` prop は使わない。リンクをボタン風に見せる場合は `Button` に `render` を渡さず、`buttonVariants` を適用した `Link` または `a` を使う。
-   - `init` は `button` とユーティリティを先に生成することがある。生成されるファイル名・数はCLIバージョンで変わるため、件数を成功条件にせず、必要なcomponentを import できることを確認する。
-   - `add sonner` は `components/ui/sonner.tsx` が `next-themes` を参照するため依存に `next-themes` が増える。`Tooltip` はここでは install するが後続機能で使う枠で、初期実装では使用箇所 0 でよい。
+3. **shadcn/ui の install**
 
-4. `brand.json` 生成
+   初期化前に `components.json`、`components/ui/`、`app/globals.css` の有無を確認する。既存ファイルを上書きする場合は、対象ファイルと理由を示して確認を取ってから `npx shadcn@latest init --defaults --force` を実行する。初期化済みで上書きが不要な場合は `--force` を付けない。
+   `Button` がすでに生成されている場合は再追加しない。続けて必要なコンポーネントを `npx shadcn@latest add` で追加する。既存componentを上書きする必要がある場合は、対象と理由を示して確認を取る。
+   実行後に、生成された `components.json`、依存パッケージ、`Button` のAPIを確認する。選択されたbaseやコンポーネントAPIはCLIの版と初期化時の選択で変わる。リンクをボタン風に見せる場合も、生成されたコンポーネントのAPIに従う。あわせて、次の点を確認する。
+   - 初期化で生成されるファイル名・数はCLIバージョンで変わるため、件数を成功条件にせず、必要なコンポーネントを import できることを確認する。
+   - コンポーネントの追加で依存パッケージが増える場合は、追加後の `package.json` と生成ファイルを確認する。まだ使わないコンポーネントは、導入理由と未使用である理由を最終報告に残す。
+
+4. **`brand.json` 生成**
+
    合意した内容を出力テンプレートに沿って `brand.json` に書き出す。
    palette の各段階 (50 / 100 / 500 / 600 / 700 等) はトーンの参照例と Tailwind の hue scale を参考に決める。
 
-5. `app/tokens.css` 生成
+5. **`app/tokens.css` 生成**
+
    `brand.json` の各値を CSS 変数として書き出す。プレフィックスは `--brand-*` で統一する。
    neutral は 10 段すべて書き出す (globals.css が中間段を参照するため)。
-   OSのダーク設定に追従する方針を選んだ場合は、`prefers-color-scheme: dark` で切り替える。initが生成するclass方式のdark定義とは方針が衝突するので、手順6でcustom-variantをmedia query側に再定義して一本化する。常時ライトの方針では、この設定を追加しない。
+   OSのダーク設定に追従する方針を選んだ場合は、`prefers-color-scheme: dark` で切り替える。class方式のdark定義が存在する場合は方針が衝突するため、手順6でcustom-variantをmedia query側に再定義して一本化する。常時ライトの方針では、この設定を追加しない。
 
-6. `app/globals.css` 更新
+6. **`app/globals.css` 更新**
+
    `@import "./tokens.css"` を追加し、shadcn 側の `:root` 定義 (`--background` / `--primary` / `--border` / `--sidebar` 等) をすべて `var(--brand-*)` に置き換える。
    `@theme inline` ブロックで Tailwind utility class (`bg-primary-500` など) を brand token 経由で有効化する。serif heading を選んだ場合は `--font-heading: var(--brand-font-serif)` を定義し、実際の `h1`、`CardTitle`、`DialogTitle` などに `font-heading` を適用する。
 
-7. `AppShell` component 生成
+7. **`AppShell` component 生成**
+
    `components/layout/AppShell.tsx` を新規作成する。
    左 sidebar (brand mark + navigation + 最近のボード + user footer) + 上 header (breadcrumb + 通知 bell + user avatar) + main slot の 3 面構造。
    ダイアログで決めた tone に沿ってタイポグラフィ (serif / sans) を切り替える。
 
-8. 存在する page を `AppShell` で包む
+8. **存在する page を `AppShell` で包む**
+
    現在存在する `app/page.tsx` と生成済みのボード詳細pageを `AppShell` で包み、`boards` と `breadcrumb` props を渡す（prop名はAppShellの型定義に合わせる）。動的セグメント名は実在するファイルに合わせる。存在しないpageをこの工程で作らない。
    認証系 page が既に存在する場合は `AppShell` を使わず、full-screen 中央配置 + card panel の tone に統一する。後続セクションで認証・招待・メンバー page を作る際に、このルールを適用する。
 
-9. 既存 UI の検出と置換
+9. **既存 UI の検出と置換**
+
    `app/**/*.tsx` と `components/**/*.tsx` を検索し、色コード直書き (`#[0-9a-fA-F]{3,6}` / `bg-black` / `text-white` / `bg-blue-*` / `text-gray-*` 等) と px 直書き (`p-[8px]` などの arbitrary value) を検出する。
    トークン参照 (`bg-[var(--brand-primary-500)]` / `text-[var(--brand-neutral-900)]` / `bg-primary` 等) と shadcn component (`Button` / `Card` / `Input` / `Avatar` / `Badge` 等) に置換する。
    独自 modal を shadcn の `Dialog` に置き換える場合、`DialogFooter` (削除 / 保存 / 閉じるなどの操作ボタン) は body の全内容 (説明文 / 担当者 / コメント等) の**後**に置き、ダイアログ最下部に配置する。既存実装がボタンを body の途中に置いていても、Dialog 化のタイミングで最下部へ移動する (操作ボタンが本文の間に挟まる崩れを防ぐ)。
