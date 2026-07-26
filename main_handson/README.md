@@ -33,5 +33,5 @@ npm run build      # Next.js production build
 - `lib/` … Prisma client・エラー整形・入力検証・監査ログなど共通処理
 - `prisma/` … スキーマとマイグレーション
 - `tests/` … API テスト
-- `.claude/skills/` … 第5章で使う11の汎用スキル
+- `.claude/skills/` … 基本4 Skillと、第5章用の追加7 Skill
 - `logs/` … Claude Opus 4.8で実行したセクション別の対話ログ

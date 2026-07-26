@@ -1,14 +1,14 @@
 ---
 name: design-system
-description: 対話でブランドトーンを決めた後、shadcn/ui の install、`brand.json`、デザイントークン、グローバルスタイル、AppShell (sidebar layout) を生成し、既存 UI をトークンと shadcn component 経由の記述に置き換える
+description: ブランド方針を入力として受け取り、shadcn/uiの導入、`brand.json`、デザイントークン、グローバルスタイル、AppShellを生成し、既存UIをトークンとshadcnコンポーネント経由の記述に置き換える
 ---
 
 # /design-system
 
-見た目を揃えるためのデザインシステム基盤を作るスキル。
-色、余白、書体、角丸、影のような繰り返し使う値を先に定義し、`shadcn/ui` の再利用可能な component を導入し、`AppShell` で sidebar + header の枠組みを整えたうえで、以降の実装が個別の色コードやピクセル値を直接書かなくて済む状態にする。
+見た目の方針を実装へ反映するためのデザインシステム基盤を作るSkill。
+色、余白、書体、角丸、影のような繰り返し使う値を先に定義し、`shadcn/ui` の再利用可能なコンポーネントを導入します。`AppShell` でサイドバーとヘッダーの共通レイアウトを整え、個別の色コードやピクセル値の直接指定を減らします。直接指定を残す箇所は、理由と代替のトークンを記録します。
 
-`/ui-design` がコンポーネントの構造分類 (Atom / Molecule / Organism) を扱うのに対し、`/design-system` は「見た目の値そのもの」と「アプリ全体の layout 骨組み」を扱う。通常は `/ui-design` の後、`/tdd` や後続の `/implement` の前に呼ぶ。
+`/ui-design` がコンポーネントの構造分類（Atom / Molecule / Organism）を扱うのに対し、`/design-system` は見た目の値とアプリ全体のレイアウトを扱う。通常は `/ui-design` の後、`/tdd` や後続の `/implement` の前に呼ぶ。
 
 ## トリガー条件
 
@@ -229,25 +229,14 @@ type Props = {
    `app/**/*.tsx` と `components/**/*.tsx` を検索し、色コード直書き (`#[0-9a-fA-F]{3,6}` / `bg-black` / `text-white` / `bg-blue-*` / `text-gray-*` 等) と px 直書き (`p-[8px]` などの arbitrary value) を検出する。
    トークン参照 (`bg-[var(--brand-primary-500)]` / `text-[var(--brand-neutral-900)]` / `bg-primary` 等) と shadcn component (`Button` / `Card` / `Input` / `Avatar` / `Badge` 等) に置換する。
    独自 modal を shadcn の `Dialog` に置き換える場合、`DialogFooter` (削除 / 保存 / 閉じるなどの操作ボタン) は body の全内容 (説明文 / 担当者 / コメント等) の**後**に置き、ダイアログ最下部に配置する。既存実装がボタンを body の途中に置いていても、Dialog 化のタイミングで最下部へ移動する (操作ボタンが本文の間に挟まる崩れを防ぐ)。
-   置換対象の 15 component に含まれない native 要素 (`<select>` など) が残る場合は、無理に別 component へ寄せず、`border-input` / `focus-visible:ring-ring/50` 等の token 由来 class を当てて見た目だけ統一し、残存箇所として手順 12 で報告する。
-   置換時に以下 2 つを必ず適用する (どちらもスクリーンショットの見た目を決めるため、実行ごとにブレさせない)。
-   - 編集 / 削除の操作は、テキストラベル付きボタンではなく `lucide-react` のアイコンボタンにする。ボード名の編集は `Pencil`、ボード削除とリスト削除は `Trash2` を使い、`Button variant="ghost" size="icon"` で表示する (`名称編集` / `削除` のような文字ラベルは付けない)。対象はボード詳細ヘッダーのボード操作と、各リスト列ヘッダーのリスト削除。
-   - `order {N}` / `order=N` のような内部の並び順デバッグ表示は、置換時にすべて削除する。ボードカード、リスト、カード行のいずれに出ていても機能に不要な内部値なので画面から取り除く。
+   置換対象に含まれないネイティブ要素（`<select>` など）が残る場合は、無理に別コンポーネントへ寄せず、`border-input` / `focus-visible:ring-ring/50` などのトークン由来classを当てて見た目を統一し、残存箇所として手順11で報告する。
+   操作ボタン、デバッグ表示、補助情報の具体的な見せ方は、対象機能の仕様とUI設計に従う。画面例を再現する追加指示がある場合だけ、その指示を適用する。
 
-10. rich meta 要素の追加
-    ダイアログで rich meta を追加するか確認する。追加する場合、要素ごとに「どのコンポーネントの・どの位置に・どの mock 形状で」を以下のとおり固定する。配置をブレさせるとスクリーンショットが再現しないため、グローバルな統計タイルのような別レイアウトに流さない。
-    - stats badge: 画面上部にまとめた統計タイルを作らず、**各ボードカード内**に `カード {総数}` と `完了 {完了数}` の 2 バッジを並べる。mock はボードごとに値を持つ形 (`fakeBoardStats[boardId] = { total, done }`) にする。
-    - member avatar stack: **各ボードカードのフッター左**に、担当メンバーを最大 3 名のアバター + `+N` で重ねて表示する。`AppShell` ヘッダーには置かない (ヘッダーは通知ベルと自分のアバターのみ)。
-    - relative time: **各ボードカードのフッター右**に `先週` / `1時間前` のような相対時刻を出す。mock は `fakeBoardStats` に `updatedLabel` フィールドとして持たせる。
-    - status dot: **各リスト列ヘッダー**のリスト名の左に `size-2 rounded-full` のドットを置き、リストの状態を色で示す (backlog = neutral / in-progress = warning / done = success)。メンバーの稼働状態用のドットとは別物なので混同しない。
-    - breadcrumb / dropdown menu: `AppShell` ヘッダーの breadcrumb と、user footer の dropdown menu に配置する。
-    本書の画面例ではmockを使い、本番運用では実データ取得に置き換える方針を注釈で残す。
-
-11. 動作確認
+10. 動作確認
     `npm run build` で型とTailwind生成が通ることを確認する。画面確認は、既存の開発サーバーを停止したあとに別Terminalで `npm run start` を起動して行う。確認後は `Ctrl+C` で停止する。この時点で存在するview（boards / board detail / card modal）だけを確認する。後続で作るlogin / signup / members / invite / not-foundは、作成後に同じ確認を行う。
 
-12. ファイル一覧の提示
-    生成・更新したファイル一覧、置換した箇所の件数、置換しなかった残存箇所、追加した rich meta 要素をユーザーに提示する。
+11. ファイル一覧の提示
+    生成・更新したファイル一覧、置換した箇所の件数、置換しなかった残存箇所と理由をユーザーに提示する。
 
 ## 注意事項
 
@@ -256,8 +245,7 @@ type Props = {
 - パレット、書体、角丸、余白の具体値はスキル内に固定しない。ブランド方針の対話で決めた値を使う
 - shadcn/uiは更新による生成差分が起きやすい。実行時のCLIバージョンと、`package.json`に解決された依存パッケージのバージョンを最後の報告へ残す
 - 既存 UI に色コード直書きが多数残っている場合は、優先順位を対話で決めてから置換する
-- rich meta 要素 (mock avatar / stats) はデモ用として book 完成イメージに載せるためのもので、本番運用時は real data 取得に置き換える方針
 - ダークモード方針は手順 2 のトーン決定と紐付けて 1 つに決める。常時ライトのトーン (Height の warm cream など) を選んだ場合は、`app/tokens.css` の `@media (prefers-color-scheme: dark)` ブロックと `app/globals.css` の `@custom-variant dark` 再定義を省略し、init が生成した class 方式の dark 定義も残さず削除する (中途半端に残すとダークが半分だけ効いて崩れる)。OS のダーク設定に追従するトーンを選んだ場合のみ、テンプレートどおり media query に一本化する。本文の動作確認でダーク反転を確認する項目は、後者を選んだ場合だけ実施する
 - `AppShell` の sidebar が不要な場合 (single page app、CLI ラッパー) はダイアログで確認して省略可
-- 過去 phase の完全 snapshot や後続章向けの完成形が repo 内にあると、root の `tsconfig.json` が `**/*.tsx` で拾い、型変更が snapshot 側に波及して build が落ちる。まず不要なsnapshotをプロジェクト外へ移すか削除する。保存目的で同居させる必要があり、実行対象ではないと確認できる場合にだけ、理由と対象を記録して `tsconfig.json` の `exclude` に追加する。ビルドを通すために実装中のソースを除外しない
+- 過去のsnapshotや完成形がrepo内にあると、rootの`tsconfig.json`が対象に含めてbuildが失敗することがある。まず対象の用途、所有者、`tsconfig.json`のinclude/excludeを確認する。移動や削除は、対象と影響を示して承認を得た場合だけ行う。実行対象ではないことを確認できる場合は、理由と対象を記録して`tsconfig.json`の`exclude`に追加する。ビルドを通すために実装中のソースを除外しない
 - 図が必要な場合は ASCII 図ではなく、表または画像化できる図として出す
