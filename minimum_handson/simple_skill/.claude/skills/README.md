@@ -29,7 +29,7 @@
 このディレクトリ配下のスキルを、自分のClaude Codeのskillsディレクトリにコピーします。
 
 ```bash
-# プロジェクトルートで実行（プロジェクト単位で使う場合）
+# 作業ディレクトリで実行（プロジェクト単位で使う場合）
 mkdir -p .claude/skills
 cp -r chapters/02_minimum_handson/skills/{constitution,spec,design,implement} .claude/skills/
 
