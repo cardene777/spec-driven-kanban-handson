@@ -184,7 +184,7 @@ type Props = {
 
 2. ブランド方針の対話決定
    トーン / アクセント色 / 書体 / 角丸・余白 / layout preference をユーザーとの対話で確定する。
-   トーンは「Linear」「Notion」「Vercel」「Attio」「Height」「Trello Modern」等の参照例で合意し、パレットと書体は参照例からデフォルト値を提示する。
+   トーンは「Linear」、「Notion」、「Vercel」、「Attio」、「Height」、「Trello Modern」等の参照例で合意し、パレットと書体は参照例からデフォルト値を提示する。
    例: Height tone → warm cream bg + terracotta accent + serif heading。
 
 3. shadcn/ui の install
