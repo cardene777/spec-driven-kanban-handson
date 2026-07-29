@@ -22,7 +22,7 @@ description: `spec/*.md` を読み、曖昧表現・抜け漏れ・矛盾・テ�
 
 ## 出力
 
-`spec/{機能ID}_{機能名}_review.md` を生成する。
+`review/{機能ID}_{機能名}_spec_review.md` を生成する。
 
 ```markdown
 # {機能名} 仕様レビュー

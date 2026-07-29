@@ -31,8 +31,6 @@ export default function CardDetailModal({ cardId }: { cardId: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
     apiFetch(`/api/cards/${cardId}`)
       .then(async (res) => {
         if (cancelled) return;

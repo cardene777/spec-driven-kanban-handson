@@ -7,7 +7,6 @@ import { hashPassword } from "@/lib/auth/passwordHash";
 import {
   buildSessionCookie,
   createSession,
-  sessionIdPrefix,
 } from "@/lib/auth/session";
 import { ConflictError } from "@/lib/http/errors";
 

@@ -114,7 +114,7 @@ export default async function BoardDetailPage({ params, searchParams }: PageProp
         </section>
       </main>
 
-      {cardParam ? <CardDetailModal cardId={cardParam} /> : null}
+      {cardParam ? <CardDetailModal key={cardParam} cardId={cardParam} /> : null}
     </div>
   );
 }
