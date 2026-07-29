@@ -130,7 +130,7 @@ export async function checkCardAccess(cardId: string, minRole: BoardRole): Promi
 
 ### 性能
 
-- 権限判定は `@@unique([boardId, userId])` による 1 件検索。ボード一覧は membership 経由の 1 クエリ。P95 一覧 200ms / 書き込み 300ms 以内。
+- 権限判定は `@@unique([boardId, userId])` で1件を検索する。ボード一覧はmembershipを経由する1つのクエリで取得する。一覧の応答時間は200ms以内、書き込みの応答時間は300ms以内。
 - 判定は各リクエストで実行する（キャッシュしない。ロール変更の即時反映を優先）。
 
 ### セキュリティ

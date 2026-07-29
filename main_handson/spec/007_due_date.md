@@ -81,7 +81,7 @@
 
 ## 非機能要件
 
-- 期限更新（PATCH）の P95 は 300ms 以内（constitution.md § 性能）。
+- 期限更新（PATCH）の応答時間は300ms以内（constitution.md § 性能）。
 - 期限の設定・変更・解除は操作ログにリクエスト ID 付きで記録する（spec/000_shared_rules.md）。
 
 ## 使用する用語

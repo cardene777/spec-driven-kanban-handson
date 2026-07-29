@@ -104,8 +104,8 @@
 
 ## 非機能要件
 
-- 一覧取得 API の P95 は 200ms 以内（constitution.md § 性能）。
-- 書き込み API の P95 は 300ms 以内（constitution.md § 性能）。
+- 一覧取得APIの応答時間は200ms以内（constitution.md § 性能）。
+- 書き込みAPIの応答時間は300ms以内（constitution.md § 性能）。
 - 操作ログ・エラーログにリクエスト ID を付与する（spec/000_shared_rules.md § ログ方針）。
 
 ## 使用する用語

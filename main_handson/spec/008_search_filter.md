@@ -85,7 +85,7 @@
 
 ## 非機能要件
 
-- 検索の P95 は 200ms 以内（constitution.md § 性能。ローカル SQLite・少量データ前提）。
+- 検索の応答時間は200ms以内（constitution.md § 性能。ローカルSQLite・少量データ前提）。
 - 検索はエラーをリクエスト ID 付きで記録する（spec/000_shared_rules.md）。
 
 ## 使用する用語
