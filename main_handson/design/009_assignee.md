@@ -100,7 +100,7 @@ export function canAddAssignee(currentCount: number): boolean;
 
 ### 性能
 
-- 純粋関数は O(1)。統合の一覧は `where cardId` 単一クエリ（`@@index([cardId])`）。P95 一覧 200ms / 追加・削除 300ms 以内。
+- 純粋関数はO(1)。統合の一覧は `where cardId` の単一クエリ（`@@index([cardId])`）。一覧の応答時間は200ms以内、追加と削除の応答時間は300ms以内。
 
 ### セキュリティ
 

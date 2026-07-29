@@ -93,8 +93,8 @@ model List {
 
 ### 性能
 
-- 一覧は `where boardId` + `orderBy order` の単一クエリ。`@@index([boardId])` で引く。P95 200ms 以内。
-- 書き込みは単一トランザクション。P95 300ms 以内。
+- 一覧は `where boardId` + `orderBy order` の単一クエリ。`@@index([boardId])` で取得する。応答時間は200ms以内。
+- 書き込みは単一トランザクション。応答時間は300ms以内。
 
 ### セキュリティ
 

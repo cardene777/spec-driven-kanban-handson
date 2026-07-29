@@ -100,7 +100,7 @@ model CardLabel {
 
 ### 性能
 
-- 一覧は `where boardId` 単一クエリ（`@@index([boardId])`）。付与/解除は 1 件更新。P95 一覧 200ms / 書き込み 300ms 以内。
+- 一覧は `where boardId` の単一クエリ（`@@index([boardId])`）。付与と解除は1件ずつ更新する。一覧の応答時間は200ms以内、書き込みの応答時間は300ms以内。
 
 ### セキュリティ
 
