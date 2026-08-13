@@ -67,7 +67,7 @@ Simple Kanban の認証（サインアップ／ログイン／ログアウト／
 | `name` | string | ✅ | 1〜50 文字（前後の空白を除去して判定） |
 
 ```json
-{ "email": "user@example.com", "password": "Password1!", "name": "Aoi Tanaka" }
+{ "email": "user@example.com", "password": "<英字・数字・記号を含む8〜200文字>", "name": "Aoi Tanaka" }
 ```
 
 > パスワード条件は教材用の簡略仕様であり、実運用の認証方針を示すものではない（`spec/011_auth.md`）。

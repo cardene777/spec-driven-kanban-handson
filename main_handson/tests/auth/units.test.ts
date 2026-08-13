@@ -76,7 +76,7 @@ describe("email validation — 正常系・異常系・境界条件", () => {
 describe("password validation — 境界条件", () => {
   it("7文字は不正、8文字は妥当（下限）", () => {
     expect(isValidPassword("passwd1")).toBe(false);
-    expect(isValidPassword("Passw1!!")).toBe(true);
+    expect(isValidPassword("A1!" + "a".repeat(5))).toBe(true);
   });
 
   it("200文字は妥当、201文字は不正（上限）", () => {

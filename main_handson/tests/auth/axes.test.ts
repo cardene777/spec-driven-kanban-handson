@@ -84,13 +84,14 @@ const inviteCtx = (inviteId: string) => ({ params: Promise.resolve({ inviteId })
 const tokenCtx = (token: string) => ({ params: Promise.resolve({ token }) }) as never;
 
 type U = { id: string; email: string; name: string };
+const VALID_PASSWORD = "A1!" + "a".repeat(5);
 const loginAs = (u: U | null) => {
   currentUser = u;
 };
 
 async function signup(email: string, name = "User"): Promise<U> {
   const res = await signupPOST(
-    jsonReq("http://localhost/api/auth/signup", { email, password: "Password1!", name }),
+    jsonReq("http://localhost/api/auth/signup", { email, password: VALID_PASSWORD, name }),
   );
   return (await res.json()).user as U;
 }
@@ -135,7 +136,7 @@ describe("正常系: 認証・招待・権限の主経路", () => {
     const one = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
         email: "one@b.co",
-        password: "Password1!",
+        password: VALID_PASSWORD,
         name: "a",
       }),
     );
@@ -144,7 +145,7 @@ describe("正常系: 認証・招待・権限の主経路", () => {
     const fifty = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
         email: "fifty@b.co",
-        password: "Password1!",
+        password: VALID_PASSWORD,
         name: "a".repeat(50),
       }),
     );
@@ -446,7 +447,7 @@ describe("境界条件", () => {
       const res = await signupPOST(
         jsonReq("http://localhost/api/auth/signup", {
           email: `n${name.length}@b.co`,
-          password: "Password1!",
+          password: VALID_PASSWORD,
           name,
         }),
       );
