@@ -68,7 +68,7 @@ export default function SignupForm() {
           required
         />
         <p className="text-xs text-muted-foreground">
-          8〜72文字。英字と数字をそれぞれ1文字以上含めてください。
+          8〜200文字。英字、数字、記号をそれぞれ1文字以上含めてください。
         </p>
       </div>
       {error && <p className="text-xs text-destructive">{error}</p>}

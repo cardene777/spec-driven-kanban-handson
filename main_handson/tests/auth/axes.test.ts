@@ -90,7 +90,7 @@ const loginAs = (u: U | null) => {
 
 async function signup(email: string, name = "User"): Promise<U> {
   const res = await signupPOST(
-    jsonReq("http://localhost/api/auth/signup", { email, password: "password1", name }),
+    jsonReq("http://localhost/api/auth/signup", { email, password: "Password1!", name }),
   );
   return (await res.json()).user as U;
 }
@@ -135,7 +135,7 @@ describe("正常系: 認証・招待・権限の主経路", () => {
     const one = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
         email: "one@b.co",
-        password: "password1",
+        password: "Password1!",
         name: "a",
       }),
     );
@@ -144,7 +144,7 @@ describe("正常系: 認証・招待・権限の主経路", () => {
     const fifty = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
         email: "fifty@b.co",
-        password: "password1",
+        password: "Password1!",
         name: "a".repeat(50),
       }),
     );
@@ -420,12 +420,12 @@ describe("異常系（ロール変更失敗）: 409 / 422 / 404", () => {
 
 // ============ 境界条件 ============
 describe("境界条件", () => {
-  it("password 72文字は成功、73文字は 422（上限）", async () => {
-    const pw = (n: number) => "a".repeat(n - 1) + "1";
+  it("password 200文字は成功、201文字は 422（上限）", async () => {
+    const pw = (n: number) => "A1!".repeat(Math.floor(n / 3)) + "a".repeat(n % 3);
     const ok = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
-        email: "p72@b.co",
-        password: pw(72),
+        email: "p200@b.co",
+        password: pw(200),
         name: "x",
       }),
     );
@@ -433,8 +433,8 @@ describe("境界条件", () => {
 
     const ng = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
-        email: "p73@b.co",
-        password: pw(73),
+        email: "p201@b.co",
+        password: pw(201),
         name: "x",
       }),
     );
@@ -446,7 +446,7 @@ describe("境界条件", () => {
       const res = await signupPOST(
         jsonReq("http://localhost/api/auth/signup", {
           email: `n${name.length}@b.co`,
-          password: "password1",
+          password: "Password1!",
           name,
         }),
       );

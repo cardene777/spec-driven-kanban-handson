@@ -63,11 +63,11 @@ Simple Kanban の認証（サインアップ／ログイン／ログアウト／
 | フィールド | 型 | 必須 | 制約 |
 |---|---|---|---|
 | `email` | string | ✅ | `^[^\s@]+@[^\s@]+\.[^\s@]+$`（教材用の簡易判定） |
-| `password` | string | ✅ | 8〜72 文字。英字（a-zA-Z）1 文字以上 + 数字（0-9）1 文字以上。記号は任意 |
+| `password` | string | ✅ | 8〜200 文字。英字（a-zA-Z）、数字（0-9）、記号をそれぞれ 1 文字以上 |
 | `name` | string | ✅ | 1〜50 文字（前後の空白を除去して判定） |
 
 ```json
-{ "email": "user@example.com", "password": "password1", "name": "Aoi Tanaka" }
+{ "email": "user@example.com", "password": "Password1!", "name": "Aoi Tanaka" }
 ```
 
 > パスワード条件は教材用の簡略仕様であり、実運用の認証方針を示すものではない（`spec/011_auth.md`）。
@@ -92,8 +92,8 @@ Simple Kanban の認証（サインアップ／ログイン／ログアウト／
 
 ### 関連テスト
 
-- `tests/auth/auth.test.ts` — 201 と user 返却、`passwordHash` 非包含、email 重複 409、形式不正 422、password 7 文字/英字のみ/数字のみ 422
-- `tests/auth/axes.test.ts` — name 1/50 文字成功、name 0/51 文字 422、password 72 成功 / 73 → 422
+- `tests/auth/auth.test.ts` — 201 と user 返却、`passwordHash` 非包含、email 重複 409、形式不正 422、password 7 文字/文字種不足 422
+- `tests/auth/axes.test.ts` — name 1/50 文字成功、name 0/51 文字 422、password 200 成功 / 201 → 422
 - `tests/auth/units.test.ts` — `isValidEmail` / `isValidPassword` / `isValidName` の境界
 
 ---
