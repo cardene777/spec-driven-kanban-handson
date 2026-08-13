@@ -184,6 +184,7 @@ FR ごとの完了条件は `§ 機能要件` の各 FR に記載する。以下
 | `password` 未指定または空文字 | `422` | `password` | `required` |
 | `password` が文字列型でない | `422` | `password` | `invalid_type` |
 | `password` が 8 文字未満 | `422` | `password` | `too_short` |
+| `password` が 201 文字以上 | `422` | `password` | `too_long` |
 | `password` が英字 / 数字 / 記号のうちいずれかを含まない | `422` | `password` | `weak` |
 | `name` 未指定または空文字 (トリム後 0 文字) | `422` | `name` | `required` |
 | `name` が文字列型でない | `422` | `name` | `invalid_type` |
