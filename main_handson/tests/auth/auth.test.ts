@@ -88,8 +88,9 @@ const memberCtx = (boardId: string, userId: string) =>
 const inviteCtx = (inviteId: string) =>
   ({ params: Promise.resolve({ inviteId }) }) as never;
 const tokenCtx = (token: string) => ({ params: Promise.resolve({ token }) }) as never;
+const VALID_PASSWORD = "A1!" + "a".repeat(5);
 
-async function signup(email: string, name = "Test User", password = "Password1!") {
+async function signup(email: string, name = "Test User", password = VALID_PASSWORD) {
   const res = await signupPOST(
     jsonReq("http://localhost/api/auth/signup", { email, password, name }),
   );
@@ -121,7 +122,7 @@ describe("auth: signup / login / logout / session", () => {
     await signup("a@b.co");
     await signup("c@d.co");
     const hashes = db.user.map((u) => u.passwordHash as string);
-    expect(hashes[0]).not.toBe("Password1!");
+    expect(hashes[0]).not.toBe(VALID_PASSWORD);
     expect(hashes[0]).not.toBe(hashes[1]);
   });
 
@@ -130,7 +131,7 @@ describe("auth: signup / login / logout / session", () => {
     const dup = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
         email: "a@b.co",
-        password: "Password1!",
+        password: VALID_PASSWORD,
         name: "x",
       }),
     );
@@ -140,7 +141,7 @@ describe("auth: signup / login / logout / session", () => {
     const bad = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
         email: "a@b",
-        password: "Password1!",
+        password: VALID_PASSWORD,
         name: "x",
       }),
     );
@@ -161,7 +162,7 @@ describe("auth: signup / login / logout / session", () => {
     const ok = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
         email: "ok@b.co",
-        password: "Passw1!!",
+        password: VALID_PASSWORD,
         name: "x",
       }),
     );
@@ -173,13 +174,13 @@ describe("auth: signup / login / logout / session", () => {
     setCurrentUser(null);
 
     const ok = await loginPOST(
-      jsonReq("http://localhost/api/auth/login", { email: "a@b.co", password: "Password1!" }),
+      jsonReq("http://localhost/api/auth/login", { email: "a@b.co", password: VALID_PASSWORD }),
     );
     expect(ok.status).toBe(200);
 
     setCurrentUser(null);
     const noUser = await loginPOST(
-      jsonReq("http://localhost/api/auth/login", { email: "none@b.co", password: "Password1!" }),
+      jsonReq("http://localhost/api/auth/login", { email: "none@b.co", password: VALID_PASSWORD }),
     );
     const badPw = await loginPOST(
       jsonReq("http://localhost/api/auth/login", { email: "a@b.co", password: "wrongpass1" }),
