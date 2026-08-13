@@ -1,5 +1,5 @@
 // design/011_auth.md § 実装方針 (パスワードハッシュ)
-// 依存追加を避けるため Node 組み込みの crypto.scryptSync を使う (bcrypt / bcryptjs 相当の適応型ハッシュ)。
+// 依存追加を避けるため、Node.js 組み込みの crypto.scryptSync とランダムなソルトを使う。
 // フォーマット = "s2$<N>$<r>$<p>$<salt-hex>$<hash-hex>"
 import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
 
