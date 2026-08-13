@@ -268,7 +268,7 @@ Card (担当者一覧の観点)。
 | 対象 | チェック内容 | 失敗時 |
 |---|---|---|
 | `GET /api/cards/{cardId}/assignees` | `requireCurrentUser` → `resolveBoardFromCard` → `assertBoardAccess(actorId, boardId, "viewer")` | 未認証 `401`、未存在 / 閲覧不可 `404` |
-| `POST /api/cards/{cardId}/assignees` | `requireCurrentUser` → `resolveBoardFromCard` → `assertBoardAccess(actorId, boardId, "member")` → body 検証 → `userId` 存在 → `userId` のボード所属 → 上限 → create | 未認証 `401`、未存在 / 閲覧不可 `404`、`viewer` は `403`、重複は `409`、その他検証失敗 `422` |
+| `POST /api/cards/{cardId}/assignees` | `requireCurrentUser` → `resolveBoardFromCard` → `assertBoardAccess(actorId, boardId, "member")` → body 検証 → `userId` 存在 → `userId` のボード所属 → 重複確認 → 上限 → create | 未認証 `401`、未存在 / 閲覧不可 `404`、`viewer` は `403`、重複は `409`、その他検証失敗 `422` |
 | `DELETE /api/cards/{cardId}/assignees/{userId}` | `requireCurrentUser` → `resolveBoardFromCard` → `assertBoardAccess(actorId, boardId, "member")` → 割当関係存在確認 → delete | 未認証 `401`、未存在 / 閲覧不可 `404`、`viewer` は `403`、割当未存在 `404` |
 
 - `assertBoardAccess` の判定単位は「操作者 (`actorId`) が所属するボードでの role」。担当対象ユーザー (`userId`) の権限判定は `boardMembership.findUnique` を独立に呼んで確認する (`viewer` 以上を許容する)。
@@ -320,7 +320,7 @@ Card (担当者一覧の観点)。
 - 上限判定は pure 関数 `lib/assignees/limit.ts` に切り出し、単体テストで境界 (10 / 11 名) を網羅する。
 - 削除は物理削除 (`spec/009_assignee.md § FR-02`)、soft delete しない。
 - 候補ユーザー取得 API (`GET /api/boards/{boardId}/members`) は本 spec 対象外。既存経路 (`BoardMembership` からサーバーコンポーネントで取得) を継承する。
-- 追加 API の重複判定は「アプリ層で count → create」 ではなく「create 直後の `P2002` 捕捉」 を主とし、事前 count はあくまで 10 名上限判定用のみに使う (競合状態でも `409` に集約される)。
+- 追加 API は既存の割当を先に確認し、重複なら `409 Conflict` を返す。その後に上限を確認してから作成する。`P2002` の捕捉は、確認後の同時追加による競合を `409 Conflict` に集約するための補完として使う。
 
 ## 実装順序
 
@@ -335,7 +335,7 @@ Card (担当者一覧の観点)。
    - `lib/schemas/assignees.ts` を新設し `parseAssigneeCreate(body)` を実装 (`userId` 型 / 必須検証)。
    - `lib/assignees/limit.ts` を新設し `assertBelowLimit(count: number)` を pure 関数で実装 (10 名超過で `ValidationError` を throw)。
 4. **Route Handler 実装**
-   `app/api/cards/[cardId]/assignees/route.ts` の `GET` / `POST` → `app/api/cards/[cardId]/assignees/[userId]/route.ts` の `DELETE` の順で実装する。POST では zod → user 存在 → BoardMembership 存在 → 上限 → create の順を守る。
+   `app/api/cards/[cardId]/assignees/route.ts` の `GET` / `POST` → `app/api/cards/[cardId]/assignees/[userId]/route.ts` の `DELETE` の順で実装する。POST では zod → user 存在 → BoardMembership 存在 → 重複確認 → 上限 → create の順を守る。
 5. **UI コンポーネント接続**
    `CardAssigneesField` を `CardDetailModal` の担当者領域に配置 → `CardAssigneeAddForm` / `CardAssigneeBadge` を接続 → 候補は Context 経由で受ける。ロール別の導線表示分岐を実装する。
 6. **テスト整備**

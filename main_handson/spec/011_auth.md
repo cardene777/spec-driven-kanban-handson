@@ -236,7 +236,7 @@ FR ごとの完了条件は `§ 機能要件` の各 FR に記載する。以下
 | フィールド | ルール |
 |---|---|
 | `email` (`POST` body) | 文字列 (`invalid_type` 判定を先に行う)。空文字は `required`。RFC 5322 準拠は求めず「1 個以上の `@` を含み、`@` の前後にそれぞれ 1 文字以上ある」 の簡易チェック。詳細は `design/011_auth.md`。 |
-| `password` (`POST` body) | 文字列 (`invalid_type` 判定を先に行う)。空文字は `required`。8 文字以上 (`too_short`)。英字 (a-zA-Z) / 数字 (0-9) / 記号 (`!-/:-@[-`{-~` の ASCII 印字可能記号) のうち 3 種を全て含む (`weak`)。|
+| `password` (`POST` body) | 文字列 (`invalid_type` 判定を先に行う)。空文字は `required`。8〜200 文字（7文字以下は `too_short`、201文字以上は `too_long`）。英字 (a-zA-Z) / 数字 (0-9) / 記号 (`!-/:-@[-`{-~` の ASCII 印字可能記号) のうち 3 種を全て含む (`weak`)。|
 | `name` (`POST` body、サインアップのみ) | 文字列 (`invalid_type` 判定を先に行う)。トリム後 1〜100 文字。トリム後 0 文字は `required`、101 文字以上は `too_long`。 |
 
 - `POST /api/auth/signup` / `POST /api/auth/login` では `id` / `passwordHash` / `createdAt` / `updatedAt` はクライアントから受け取らない。
@@ -263,13 +263,13 @@ FR ごとの完了条件は `§ 機能要件` の各 FR に記載する。以下
 
 ### 性能
 
-- サインアップ / ログイン API は書き込み API として P95 300ms 以内 (パスワードハッシュ計算コストは cost=10〜12 程度で目安 100ms 前後)。
+- サインアップ / ログイン API は書き込み API として P95 300ms 以内。
 - 現在ユーザー取得 API は一覧 API と同等に P95 200ms 以内。
 
 ### セキュリティ
 
 - パスワードは必ずハッシュ化して DB に保存する (`passwordHash`)。生パスワードを DB / ログに残さない。
-- パスワードハッシュのアルゴリズムは適応型 (`bcrypt` / `scrypt` / `argon2` 等) を採用する。詳細は `design/011_auth.md`。
+- パスワードは Node.js の `crypto.scrypt` でハッシュ化する。パラメータは `design/011_auth.md` に従う。
 - 認証失敗時に「メールアドレスが存在しない」 / 「パスワードが違う」 を区別しない (`invalid_credentials` の統一メッセージで返す)。
 - 認証失敗ログには `email` を残さない (`actorId` は `null`、`context` から `email` を除外)。
 - Cookie は HttpOnly 属性を必須とし、JavaScript から読めない。SameSite / Secure 属性の詳細は `design/011_auth.md`。
@@ -313,7 +313,7 @@ FR ごとの完了条件は `§ 機能要件` の各 FR に記載する。以下
 - OAuth / OIDC 経由のソーシャルログイン (Google / GitHub 等) は本 spec の対象外。
 - ユーザー情報の更新 (`name` / `email` / `password` 変更) は本 spec の対象外。
 - ユーザーの物理削除 / 論理削除は本 spec の対象外。
-- パスワードハッシュ方式 (`bcrypt` / `scrypt` / `argon2`) と cost 値、Cookie の `SameSite` / `Secure` 属性、Session の絶対 / 相対有効期限は設計工程 (`design/011_auth.md`) で決める。
+- Cookie の `SameSite` / `Secure` 属性と、Session の絶対 / 相対有効期限は設計工程 (`design/011_auth.md`) で決める。
 - Session を Cookie ベースに固定するか、JWT に置き換えるかは設計工程で決める (本 spec は「Cookie ベースの Session テーブル」 を前提としている)。
 
 ## 作成または更新したファイル
