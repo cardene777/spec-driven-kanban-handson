@@ -129,9 +129,10 @@ model Card {
   3. body を zod 検証。
   4. `user = tx.user.findUnique({ where: { id: userId } })`、未存在なら `422 { userId: "assignee_not_found" }`。
   5. `role = tx.boardMembership.findUnique({ where: { boardId_userId: { boardId, userId } }, select: { role: true } })`、`null` なら `422 { userId: "assignee_not_in_board" }` (`viewer` / `member` / `owner` はいずれも受理)。
-  6. `count = tx.cardAssignee.count({ where: { cardId } })`、`count >= 10` なら `422 { userId: "assignees_limit_exceeded" }`。
-  7. `tx.cardAssignee.create({ data: { cardId, userId } })` を実行。Prisma 制約違反 (`P2002`) を捕捉した場合は `409 { userId: "already_assigned" }` (`ConflictError`) に変換する。
-  8. `tx.card.update({ where: { id: cardId }, data: {} })` で Card の `updatedAt` を明示更新する (Prisma の `@updatedAt` は `update` 呼出時に更新されるため、空データ更新で強制する)。
+  6. `existing = tx.cardAssignee.findUnique({ where: { cardId_userId: { cardId, userId } } })`。存在する場合は `409 { userId: "already_assigned" }` を返す。
+  7. `count = tx.cardAssignee.count({ where: { cardId } })`。`count >= 10` なら `422 { userId: "assignees_limit_exceeded" }` を返す。
+  8. `tx.cardAssignee.create({ data: { cardId, userId } })` を実行する。手順6から手順8の間に同じ担当者が追加されて `P2002` が発生した場合も、`409 { userId: "already_assigned" }` (`ConflictError`) に変換する。
+  9. `tx.card.update({ where: { id: cardId }, data: {} })` で Card の `updatedAt` を明示更新する (Prisma の `@updatedAt` は `update` 呼出時に更新されるため、空データ更新で強制する)。
 - 出力 = `201 CardAssignee`。
 - ステータス = `201` / `401` / `403` / `404` / `409` / `422`。
 - ログ = `event=card.assignee.add`、`targetType=card`、`targetId=cardId`、`context={ boardId, userId }`。

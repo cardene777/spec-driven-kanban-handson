@@ -42,7 +42,7 @@ model User {
 ```
 
 - `email` に `@unique` を付与し、DB 制約で一意性を担保する (`spec/011_auth.md § 対象データ`)。SQLite は大文字小文字を区別する `@unique` のため、アプリ層で常に小文字化して保存 / 検索する (`§ サインアップの実装` / `§ ログインの実装`)。
-- `passwordHash` は `bcryptjs` (Node.js 依存不要な JS 実装、SQLite / Vitest との相性が良い) で生成する。cost = 10 (`design/013_permissions.md` と共有)。
+- `passwordHash` は Node.js 組み込みの `crypto.scrypt` で生成する。ランダムなソルトとハッシュ値を保存し、ログイン時に同じソルトで照合する。
 - `passwordHash` は API レスポンスで返さない (Route Handler で明示的に `select` する)。
 
 ### Session モデル (新設)
@@ -119,7 +119,7 @@ Cookie 名は `sid` に固定する。
   1. body を zod 検証。
   2. `emailLower = email.toLowerCase()`。
   3. `prisma.user.findUnique({ where: { email: emailLower } })` で重複判定、存在すれば `ConflictError({ email: "already_registered" })`。
-  4. `passwordHash = await bcrypt.hash(password, 10)`。
+  4. `passwordHash = hashPassword(password)`。`hashPassword` はランダムなソルトと `crypto.scrypt` でハッシュを作る。
   5. `user = prisma.user.create({ data: { email: emailLower, passwordHash, name: name.trim() } })`。
   6. `session = createSession(user.id)` (`§ session ユーティリティ`)。
   7. `NextResponse.json({ user: { id, email, name } }, { status: 201 })` + `Set-Cookie` header で Cookie を設定。
@@ -136,7 +136,7 @@ Cookie 名は `sid` に固定する。
   1. body を zod 検証。invalid_type / required は `422` に返す (認証失敗経路とは別)。
   2. `emailLower = email.toLowerCase()`。
   3. `user = prisma.user.findUnique({ where: { email: emailLower } })`、存在しない場合 (`§ セキュリティ § invalid_credentials`) の分岐に進む。
-  4. `user` が存在すれば `await bcrypt.compare(password, user.passwordHash)`。
+  4. `user` が存在すれば `verifyPassword(password, user.passwordHash)`。
   5. `user` が存在しない or password 不一致の場合、`InvalidCredentialsError` (下記参照) を throw。
   6. 一致すれば `session = createSession(user.id)`。
   7. `NextResponse.json({ user: { id, email, name } })` + `Set-Cookie`。
@@ -410,19 +410,19 @@ Header の LogoutButton → 送信 → success → router.push("/login") → /lo
 
 ### 性能
 
-- サインアップ / ログイン API は bcrypt のハッシュ生成 / 比較を含むため P95 300ms 以内は cost=10 での目安 100ms 前後で余裕。
+- サインアップ / ログイン API は `crypto.scrypt` によるハッシュ生成 / 照合を含む。ローカルSQLite・少量データを前提に、P95 300ms以内を設計目標とする。
 - `getCurrentUser` は Session を 1 件 SELECT する 1 クエリのみ。`@@index([userId])` は future の直接 userId 引きに使う (本 spec では未使用、`design/013_permissions.md` で使う)。
 - Cookie ベースのため、Client Component 側で余分な header 付与不要。
 
 ### セキュリティ
 
-- パスワードは `bcryptjs` (cost=10) でハッシュ化する。ハッシュ結果を DB 保存、生パスワードはメモリ / ログ / DB のいずれにも残さない。
+- パスワードは `crypto.scrypt` とランダムなソルトでハッシュ化する。ハッシュ結果を DB 保存し、生パスワードをログまたはDBに残さない。
 - 認証失敗時に「メールアドレス未登録」 と「パスワード不一致」 の区別を返さない。両者とも `401 invalid_credentials` を返す (`spec/011_auth.md § 非機能要件`)。
 - `email` は保存時 / 検索時ともに小文字化する。UI 表示は入力時のケースを保持しない (常に小文字で扱う)。
 - Cookie は `HttpOnly` + `SameSite=Lax` を default とする。本番環境では `Secure` を追加する。
 - Cookie の `sid` 値は 32 byte 相当の crypto ランダム (`crypto.randomBytes`)、43 文字前後の URL-safe 文字列。予測困難。
 - 認証失敗ログには `email` を残さない。`actorId=null` で warn 記録。
-- パスワードの上限は 200 文字 (bcrypt の 72 byte 制約対策で、実質 72 byte を超える部分は bcrypt が truncate するが、明示上限で切る)。
+- パスワードは8〜200文字とし、201文字以上を `422 too_long` で拒否する。
 - 認証 API の全レスポンスに `Cache-Control: no-store` を付ける (`next.config.ts` レベルではなく Route Handler ごとに header 付与)。
 
 ### 運用 (操作ログ)
@@ -437,7 +437,7 @@ Header の LogoutButton → 送信 → success → router.push("/login") → /lo
 | 対象 | チェック内容 | 失敗時 |
 |---|---|---|
 | `POST /api/auth/signup` | zod → email 重複 → hash → user.create → session.create | `422` / `409` |
-| `POST /api/auth/login` | zod → user.findUnique → bcrypt.compare → session.create | `422` / `401 invalid_credentials` |
+| `POST /api/auth/login` | zod → user.findUnique → `verifyPassword` → session.create | `422` / `401 invalid_credentials` |
 | `POST /api/auth/logout` | (認証チェックなし、冪等) | 常に `204` |
 | `GET /api/auth/me` | `requireCurrentUser` | `401 unauthorized` |
 | `POST /api/auth/refresh` | `requireCurrentUser` → session.delete + session.create | `401 unauthorized` |
@@ -489,7 +489,7 @@ Header の LogoutButton → 送信 → success → router.push("/login") → /lo
 
 ## 実装方針 (本設計で固定する判断)
 
-- パスワードハッシュは `bcryptjs` (cost=10) を採用する。`bcrypt` (native) は node-gyp / OS 依存で環境差が出るためハンズオンでは避ける。
+- パスワードハッシュは Node.js 組み込みの `crypto.scrypt` を採用する。追加パッケージやネイティブビルドを必要とせず、ランダムなソルトとハッシュ値を保存して照合する。
 - Session は Cookie ベース (DB Session テーブル、`sid` を Cookie で送る) に固定する。JWT は不採用 (revoke 経路の複雑化を避ける、リフレッシュ経路が明確になる)。
 - Session の有効期限は 7 日 default、絶対期限とし、相対 (アクセスごとに延長) は本 spec 対象外。延長は `POST /api/auth/refresh` の明示呼出のみ。
 - Cookie 属性は `HttpOnly` + `SameSite=Lax` + `Secure` (本番のみ) の 3 種を default。
