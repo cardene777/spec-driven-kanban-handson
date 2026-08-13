@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
     if (!isValidPassword(body.password)) {
       return validationError(
-        "パスワードは8〜72文字で、英字と数字をそれぞれ1文字以上含めてください",
+        "パスワードは8〜200文字で、英字、数字、記号をそれぞれ1文字以上含めてください",
         { password: "invalid" },
       );
     }

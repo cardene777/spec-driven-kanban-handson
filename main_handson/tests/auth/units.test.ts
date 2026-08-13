@@ -76,23 +76,24 @@ describe("email validation — 正常系・異常系・境界条件", () => {
 describe("password validation — 境界条件", () => {
   it("7文字は不正、8文字は妥当（下限）", () => {
     expect(isValidPassword("passwd1")).toBe(false);
-    expect(isValidPassword("passwor1")).toBe(true);
+    expect(isValidPassword("Passw1!!")).toBe(true);
   });
 
-  it("72文字は妥当、73文字は不正（上限）", () => {
-    const base = (n: number) => "a".repeat(n - 1) + "1";
-    expect(isValidPassword(base(72))).toBe(true);
-    expect(isValidPassword(base(73))).toBe(false);
+  it("200文字は妥当、201文字は不正（上限）", () => {
+    const base = (n: number) => "A1!".repeat(Math.floor(n / 3)) + "a".repeat(n % 3);
+    expect(isValidPassword(base(200))).toBe(true);
+    expect(isValidPassword(base(201))).toBe(false);
   });
 
-  it("英字のみ・数字のみ・記号のみは不正（文字種）", () => {
+  it("英字・数字・記号のいずれかを欠くと不正（文字種）", () => {
     expect(isValidPassword("abcdefgh")).toBe(false);
     expect(isValidPassword("12345678")).toBe(false);
     expect(isValidPassword("!@#$%^&*")).toBe(false);
+    expect(isValidPassword("Password1")).toBe(false);
   });
 
-  it("記号を含んでも英字と数字があれば妥当", () => {
-    expect(isValidPassword("pass!word1")).toBe(true);
+  it("英字・数字・記号を含むと妥当", () => {
+    expect(isValidPassword("Pass!word1")).toBe(true);
   });
 
   it("非文字列は不正", () => {

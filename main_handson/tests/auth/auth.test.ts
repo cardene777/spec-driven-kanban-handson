@@ -89,7 +89,7 @@ const inviteCtx = (inviteId: string) =>
   ({ params: Promise.resolve({ inviteId }) }) as never;
 const tokenCtx = (token: string) => ({ params: Promise.resolve({ token }) }) as never;
 
-async function signup(email: string, name = "Test User", password = "password1") {
+async function signup(email: string, name = "Test User", password = "Password1!") {
   const res = await signupPOST(
     jsonReq("http://localhost/api/auth/signup", { email, password, name }),
   );
@@ -121,7 +121,7 @@ describe("auth: signup / login / logout / session", () => {
     await signup("a@b.co");
     await signup("c@d.co");
     const hashes = db.user.map((u) => u.passwordHash as string);
-    expect(hashes[0]).not.toBe("password1");
+    expect(hashes[0]).not.toBe("Password1!");
     expect(hashes[0]).not.toBe(hashes[1]);
   });
 
@@ -130,7 +130,7 @@ describe("auth: signup / login / logout / session", () => {
     const dup = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
         email: "a@b.co",
-        password: "password1",
+        password: "Password1!",
         name: "x",
       }),
     );
@@ -140,15 +140,15 @@ describe("auth: signup / login / logout / session", () => {
     const bad = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
         email: "a@b",
-        password: "password1",
+        password: "Password1!",
         name: "x",
       }),
     );
     expect(bad.status).toBe(422);
   });
 
-  it("パスワードの境界（7文字/英字のみ/数字のみは 422、8文字は成功）", async () => {
-    for (const pw of ["passwd1", "passwordonly", "12345678"]) {
+  it("パスワードの境界（7文字/文字種不足は 422、8文字は成功）", async () => {
+    for (const pw of ["passwd1", "passwordonly", "12345678", "Password1"]) {
       const res = await signupPOST(
         jsonReq("http://localhost/api/auth/signup", {
           email: `x${pw}@b.co`,
@@ -161,7 +161,7 @@ describe("auth: signup / login / logout / session", () => {
     const ok = await signupPOST(
       jsonReq("http://localhost/api/auth/signup", {
         email: "ok@b.co",
-        password: "passwor1",
+        password: "Passw1!!",
         name: "x",
       }),
     );
@@ -173,13 +173,13 @@ describe("auth: signup / login / logout / session", () => {
     setCurrentUser(null);
 
     const ok = await loginPOST(
-      jsonReq("http://localhost/api/auth/login", { email: "a@b.co", password: "password1" }),
+      jsonReq("http://localhost/api/auth/login", { email: "a@b.co", password: "Password1!" }),
     );
     expect(ok.status).toBe(200);
 
     setCurrentUser(null);
     const noUser = await loginPOST(
-      jsonReq("http://localhost/api/auth/login", { email: "none@b.co", password: "password1" }),
+      jsonReq("http://localhost/api/auth/login", { email: "none@b.co", password: "Password1!" }),
     );
     const badPw = await loginPOST(
       jsonReq("http://localhost/api/auth/login", { email: "a@b.co", password: "wrongpass1" }),

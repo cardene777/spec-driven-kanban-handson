@@ -57,7 +57,7 @@ model Session {
 ### POST /api/auth/signup
 
 - 入力: `{ email, password, name }`。
-- 検証（422）: email 形式（`^[^\s@]+@[^\s@]+\.[^\s@]+$`）／password 8〜72 かつ英字1以上・数字1以上／name 1〜50（trim 後）。
+- 検証（422）: email 形式（`^[^\s@]+@[^\s@]+\.[^\s@]+$`）／password 8〜200 かつ英字・数字・記号を各1以上／name 1〜50（trim 後）。
 - 重複（409）: 同一 email の User が存在。
 - 処理: `hashPassword(password)` → User 作成 → セッション発行 → Set-Cookie。
 - 出力: `{ user: { id, email, name } }` / **201**。`passwordHash` は含めない。
@@ -175,7 +175,7 @@ model Session {
 - ケース:
   - password: ハッシュが平文と異なる／同一パスワードでも 2 回のハッシュが異なる（ソルト）／`verifyPassword` が正誤を判定。
   - token: 長さ 32 文字以上／2 回発行で不一致。
-  - validation: email 形式（`a@b`→不正 / `a@b.co`→妥当）、password 7/8/72/73・英字のみ・数字のみ、name 0/1/50/51。
+  - validation: email 形式（`a@b`→不正 / `a@b.co`→妥当）、password 7/8/200/201・英字のみ・数字のみ・記号なし、name 0/1/50/51。
   - API: signup 201・重複 409・422 各種／login 200・不存在 401・誤パスワード 401・**両者の応答が同一**／logout 200 と以後 401・他セッションは有効／session 200 / 401 / 期限切れ 401。
   - Cookie: Set-Cookie に HttpOnly・SameSite=Lax・Path=/ が含まれる。
 
