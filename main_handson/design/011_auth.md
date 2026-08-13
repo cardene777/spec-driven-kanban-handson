@@ -113,7 +113,7 @@ Cookie 名は `sid` に固定する。
 - 権限 = 認証不要。
 - バリデーション (zod、`lib/schemas/auth.ts` の `parseSignup`)。
   - `email` = 文字列 (invalid_type)、空文字は required、`§ email バリデーション` で invalid_format 判定。
-  - `password` = 文字列 (invalid_type)、空文字は required、8 文字未満は too_short、英字 / 数字 / 記号を含まない場合 weak。
+  - `password` = 文字列 (invalid_type)、空文字は required、8 文字未満は too_short、201 文字以上は too_long、英字 / 数字 / 記号を含まない場合 weak。
   - `name` = 文字列 (invalid_type)、トリム後 0 文字は required、101 文字以上は too_long。
 - 処理。
   1. body を zod 検証。
@@ -416,7 +416,7 @@ Header の LogoutButton → 送信 → success → router.push("/login") → /lo
 
 ### セキュリティ
 
-- パスワードは `crypto.scrypt` とランダムなソルトでハッシュ化する。ハッシュ結果を DB 保存し、生パスワードをログまたはDBに残さない。
+- パスワードは `crypto.scrypt` とランダムな16 byteのソルトでハッシュ化する。`N=16384`、`r=8`、`p=1`、鍵長64 byteを使い、`s2$<N>$<r>$<p>$<salt-hex>$<hash-hex>` の形式でDBへ保存する。生パスワードをログまたはDBに残さない。
 - 認証失敗時に「メールアドレス未登録」 と「パスワード不一致」 の区別を返さない。両者とも `401 invalid_credentials` を返す (`spec/011_auth.md § 非機能要件`)。
 - `email` は保存時 / 検索時ともに小文字化する。UI 表示は入力時のケースを保持しない (常に小文字で扱う)。
 - Cookie は `HttpOnly` + `SameSite=Lax` を default とする。本番環境では `Secure` を追加する。
@@ -473,8 +473,8 @@ Header の LogoutButton → 送信 → success → router.push("/login") → /lo
 | 種別 | ケース例 | 対応 spec 節 |
 |---|---|---|
 | 正常系 (schema) | `{ email: "u@e.com", password: "Abc123!!", name: "N" }` → 受理 | § FR-01 / § バリデーション |
-| バリデーション (schema) | `{}` → `422 required` (3 field) / `{ password: "abc" }` → `too_short` / `{ password: "abcdefgh" }` → `weak` / `{ email: "not-mail" }` → `invalid_format` / `{ name: "a".repeat(101) }` → `too_long` | § バリデーション |
-| 境界 (schema) | `{ password: "Abc123!!" }` (8 文字下限) / `{ name: "a" }` (1 文字下限) / `{ name: "a".repeat(100) }` (100 文字上限) | § 境界条件 |
+| バリデーション (schema) | `{}` → `422 required` (3 field) / `{ password: "abc" }` → `too_short` / `{ password: "abcdefgh" }` → `weak` / `{ password: "A1!".repeat(67) }` → `too_long` / `{ email: "not-mail" }` → `invalid_format` / `{ name: "a".repeat(101) }` → `too_long` | § バリデーション |
+| 境界 (schema) | `{ password: "A1!".repeat(2) + "Ab" }` (8 文字下限) / `{ password: "A1!".repeat(66) + "Ab" }` (200 文字上限) / `{ name: "a" }` (1 文字下限) / `{ name: "a".repeat(100) }` (100 文字上限) | § 境界条件 |
 | パスワード強度 (pure) | `Abc12345` (英+数、記号なし) → weak / `Abc!!!!!` (英+記号、数字なし) → weak / `12345!!!` (数+記号、英なし) → weak / `Abc123!!` (3 種含む) → OK | § 境界条件 |
 | Cookie 生成 (pure) | prod で `Secure` 付き、dev で `Secure` なし、logout Cookie は `Max-Age=0` を含む | § 共通の Cookie 属性 |
 | 正常系 (Route Handler、後続) | signup → me → 200、login → me → 200、logout → me → 401、refresh 後の旧 Cookie で me → 401 | § FR-01 - FR-06 |

@@ -52,6 +52,24 @@ describe("parseSignup", () => {
     );
   });
 
+  it("password 200 文字 → 受理", () => {
+    const password = "A1!".repeat(66) + "Ab";
+    expect(password).toHaveLength(200);
+    expect(
+      parseSignup({ email: "u@e.com", password, name: "U" }),
+    ).toMatchObject({ password });
+  });
+
+  it("password 201 文字 → too_long", () => {
+    const password = "A1!".repeat(67);
+    expect(password).toHaveLength(201);
+    expectFieldError(
+      () => parseSignup({ email: "u@e.com", password, name: "U" }),
+      "password",
+      "too_long",
+    );
+  });
+
   it("password 3 種混在なし → weak", () => {
     expectFieldError(
       () => parseSignup({ email: "u@e.com", password: "abcdefgh", name: "U" }),
