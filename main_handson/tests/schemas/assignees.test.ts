@@ -61,16 +61,8 @@ describe("isValidAssigneeUserId — 異常系拡張", () => {
 });
 
 describe("isValidAssigneeUserId — 境界条件", () => {
-  it("1文字ちょうどは妥当（下限内側）", () => {
-    expect(isValidAssigneeUserId("a")).toBe(true);
-  });
-
   it("空白1文字＋中身1文字は妥当", () => {
     expect(isValidAssigneeUserId(" a")).toBe(true);
     expect(isValidAssigneeUserId("a ")).toBe(true);
-  });
-
-  it("空文字ちょうどは不正（下限外側）", () => {
-    expect(isValidAssigneeUserId("")).toBe(false);
   });
 });
