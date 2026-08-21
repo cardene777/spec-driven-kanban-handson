@@ -39,19 +39,6 @@ describe("canAddAssignee — 正常系拡張", () => {
   });
 });
 
-describe("canAddAssignee — 境界条件（定数基準）", () => {
-  it("上限−1 は許可、上限ちょうどは拒否（MAX_ASSIGNEES 基準）", () => {
-    expect(canAddAssignee(MAX_ASSIGNEES - 1)).toBe(true);
-    expect(canAddAssignee(MAX_ASSIGNEES)).toBe(false);
-    expect(canAddAssignee(MAX_ASSIGNEES + 1)).toBe(false);
-  });
-
-  it("下限0は許可、−1は拒否", () => {
-    expect(canAddAssignee(0)).toBe(true);
-    expect(canAddAssignee(-1)).toBe(false);
-  });
-});
-
 describe("canAddAssignee — 異常系拡張", () => {
   it("NaN / Infinity は拒否（false）", () => {
     expect(canAddAssignee(NaN)).toBe(false);

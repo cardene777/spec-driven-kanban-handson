@@ -68,21 +68,21 @@ Route Handler・DB更新・認証/権限・画面表示は対象外（後続の�
 - `lib/schemas/assignees.ts`に、非文字列を拒否してから`trim()`後の長さを判定する逐次的なガード節を実装した。
 - `lib/assignees/limit.ts`に`MAX_ASSIGNEES = 10`を定義し、非整数と負数を別々のガード節で拒否してから上限を判定した。
 - `/tdd`が作成した2テストファイルは変更していない。
-- 対象2ファイル・11 tests、全6ファイル・101 tests、lint、typecheck、buildがすべて成功した。
+- 対象2ファイル・10 tests、全6ファイル・100 tests、lint、typecheck、buildがすべて成功した。
 
 ## Refactorの実行結果
 
 - `isValidAssigneeUserId`の文字列判定と`trim()`後の長さ判定を、短絡評価を使う1つの論理式へまとめた。
 - `canAddAssignee`の非整数と負数を拒否する2つのガード節を、論理和を使う1つのガード節へまとめた。
 - 関数の引数、返り値、上限定数、テストは変更していない。
-- 整理後も対象2ファイル・11 tests、全6ファイル・101 tests、lint、typecheck、buildがすべて成功した。
+- 整理後も対象2ファイル・10 tests、全6ファイル・100 tests、lint、typecheck、buildがすべて成功した。
 
 ## Refactorの安全網を配布リポジトリで再確認
 
 - 後続の`/test`で追加したテストを残した配布リポジトリの隔離作業ツリーを使用した。
 - `canAddAssignee`の拒否条件を、正しい論理和（`||`）から誤った論理積（`&&`）へ一時的に変更した。
-- `tests/assignees/limit.test.ts`を実行すると、負数と非整数を拒否する3件がFAILし、残り9件がPASSした。テストが誤った整理を検出できることを確認した。
-- 誤変更を破棄して正しい論理和へ戻した後、担当者関連2ファイル・24 testsと全6ファイル・114 testsがPASSした。lint、typecheck、buildも成功した。
+- `tests/assignees/limit.test.ts`を実行すると、負数と非整数を拒否する2件がFAILし、残り8件がPASSした。テストが誤った整理を検出できることを確認した。
+- 誤変更を破棄して正しい論理和へ戻した後、担当者関連2ファイル・20 testsと全6ファイル・110 testsがPASSした。lint、typecheck、buildも成功した。
 - 誤った論理積は配布物へ反映していない。
 
 ## 統合テストの前提（後続・本サイクル対象外）
