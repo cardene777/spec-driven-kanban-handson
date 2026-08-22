@@ -8,7 +8,7 @@ export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7日
 
 export type SessionUser = { id: string; email: string; name: string };
 
-function cookieOptions(maxAgeSeconds: number) {
+export function sessionCookieOptions(maxAgeSeconds: number) {
   return {
     httpOnly: true,
     sameSite: "lax" as const,
@@ -18,12 +18,28 @@ function cookieOptions(maxAgeSeconds: number) {
   };
 }
 
-export async function createSession(userId: string): Promise<string> {
+type SessionClient = {
+  session: {
+    create(args: {
+      data: { userId: string; token: string; expiresAt: Date };
+    }): Promise<unknown>;
+  };
+};
+
+export async function createSessionRecord(
+  userId: string,
+  client: SessionClient = prisma,
+): Promise<string> {
   const token = generateToken();
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
-  await prisma.session.create({ data: { userId, token, expiresAt } });
+  await client.session.create({ data: { userId, token, expiresAt } });
+  return token;
+}
+
+export async function createSession(userId: string): Promise<string> {
+  const token = await createSessionRecord(userId);
   const store = await cookies();
-  store.set(SESSION_COOKIE, token, cookieOptions(SESSION_TTL_MS / 1000));
+  store.set(SESSION_COOKIE, token, sessionCookieOptions(SESSION_TTL_MS / 1000));
   return token;
 }
 
@@ -55,5 +71,5 @@ export async function destroySession(): Promise<void> {
   if (token) {
     await prisma.session.deleteMany({ where: { token } });
   }
-  store.set(SESSION_COOKIE, "", cookieOptions(0));
+  store.set(SESSION_COOKIE, "", sessionCookieOptions(0));
 }

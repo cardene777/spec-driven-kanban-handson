@@ -216,7 +216,19 @@ export function makePrisma() {
     session: sessionTable,
     boardMembership: membershipTable,
     invite: inviteTable,
-    $transaction: async <T>(fn: (tx: unknown) => Promise<T>) => fn(prisma),
+    $transaction: async <T>(fn: (tx: unknown) => Promise<T>) => {
+      const snapshot = Object.fromEntries(
+        Object.entries(db).map(([key, rows]) => [key, rows.map((row) => ({ ...row }))]),
+      ) as Record<keyof typeof db, Row[]>;
+      try {
+        return await fn(prisma);
+      } catch (error) {
+        for (const key of Object.keys(db) as Array<keyof typeof db>) {
+          db[key].splice(0, db[key].length, ...snapshot[key]);
+        }
+        throw error;
+      }
+    },
   };
   return prisma;
 }
