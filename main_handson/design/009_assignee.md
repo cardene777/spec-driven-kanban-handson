@@ -52,7 +52,7 @@ model CardAssignee {
   3. userId が対象ボードのメンバーか → 非メンバーは 422。
   4. 既に担当者か（重複）→ 409。
   5. 現在の担当者数 < 10 か（`canAddAssignee`）→ 上限超過は 422。
-- 担当者数の取得と追加は、Prismaのinteractive transactionを`Serializable`で実行する。書き込み競合（P2034）は3回まで再試行し、再取得後に10人へ達していれば422を返す。
+- 担当者数の取得と追加は、Prismaのinteractive transactionを`Serializable`で実行する。書き込み競合（P2034）は3回まで再試行し、再取得後に10人へ達していれば422を返す。3回ともP2034になった場合は503（`SERVICE_UNAVAILABLE`）を返し、requestId、cardId、再試行回数、最後のエラーをerrorログへ記録する。
 - 追加 / 201。ログ `assignee.add`。
 
 ### DELETE /api/cards/[cardId]/assignees/[userId]
@@ -142,6 +142,7 @@ export function canAddAssignee(currentCount: number): boolean;
   - `tests/assignees/limit.test.ts`: `canAddAssignee` の 0→true、9→true、10→false、11→false。FR-005。
 - 統合テスト（後続）の前提: 実 DB（Prisma）＋ 認証モック（currentUser）＋ ボードメンバー判定。既存 `tests/api/kanban.test.ts` の in-memory prisma mock を拡張して 409/422/401/403・存在確認・一覧を検証する。
 - 9人が割り当て済みのカードへ異なる2人を同時に追加し、片方だけが201、もう片方が422となり、保存件数が10件であることを実DBで確認する。
+- P2034を3回連続で発生させ、503（`SERVICE_UNAVAILABLE`）と再試行回数を含むerrorログが記録されることを確認する。
 
 ## Red-Green-Refactor で扱う FR の順番
 
