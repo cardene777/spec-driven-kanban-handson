@@ -148,6 +148,28 @@ describe("auth: signup / login / logout / session", () => {
     expect(bad.status).toBe(422);
   });
 
+  it("同じemailの同時サインアップは片方だけ201、もう片方409になる", async () => {
+    const responses = await Promise.all([
+      signupPOST(
+        jsonReq("http://localhost/api/auth/signup", {
+          email: "race@b.co",
+          password: VALID_PASSWORD,
+          name: "first",
+        }),
+      ),
+      signupPOST(
+        jsonReq("http://localhost/api/auth/signup", {
+          email: "race@b.co",
+          password: VALID_PASSWORD,
+          name: "second",
+        }),
+      ),
+    ]);
+
+    expect(responses.map((response) => response.status).sort()).toEqual([201, 409]);
+    expect(db.user.filter((user) => user.email === "race@b.co")).toHaveLength(1);
+  });
+
   it("パスワードの境界（7文字/文字種不足は 422、8文字は成功）", async () => {
     for (const pw of ["passwd1", "passwordonly", "12345678", "Password1"]) {
       const res = await signupPOST(

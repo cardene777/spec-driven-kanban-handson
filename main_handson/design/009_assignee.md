@@ -33,7 +33,7 @@ model CardAssignee {
 ```
 
 - Card 側に `cardAssignees CardAssignee[]`（`onDelete: Cascade`）を追加する。
-- 1カードあたり最大10件（上限判定は純粋関数 `canAddAssignee` で担保し、API 層で 422 を返す）。
+- 1カードあたり最大10件。`canAddAssignee`は単体テストする事前判定に使い、統合時は担当者数の取得と追加を直列化して上限を保証する。
 
 ## API設計
 
@@ -52,6 +52,7 @@ model CardAssignee {
   3. userId が対象ボードのメンバーか → 非メンバーは 422。
   4. 既に担当者か（重複）→ 409。
   5. 現在の担当者数 < 10 か（`canAddAssignee`）→ 上限超過は 422。
+- 担当者数の取得と追加は、Prismaのinteractive transactionを`Serializable`で実行する。書き込み競合（P2034）は3回まで再試行し、再取得後に10人へ達していれば422を返す。
 - 追加 / 201。ログ `assignee.add`。
 
 ### DELETE /api/cards/[cardId]/assignees/[userId]
@@ -130,7 +131,7 @@ export function canAddAssignee(currentCount: number): boolean;
 
 ## 実装方針
 
-- 上限は `MAX_ASSIGNEES = 10` を `lib/assignees/limit.ts` に定数化し、API 層とUI の抑止で共有（数値のハードコードを散らさない）。
+- 上限は `MAX_ASSIGNEES = 10` を `lib/assignees/limit.ts` に定数化し、API 層とUI の抑止で共有（数値のハードコードを散らさない）。API層では、Serializable transaction内で担当者数を取得して追加し、同時リクエストでも上限を超えないようにする。
 - 入力検証と上限判定は副作用のない純粋関数に切り出し、単体テスト可能にする（TDD 対象）。統合の 409/422/401/403・存在確認・メンバー判定は Route Handler + 実 DB + 認証で実装する（本章対象外）。
 - `isValidAssigneeUserId` は trim 後の長さで判定（空白のみを不正扱い）。既存 `lib/validation/text.ts` の trim 方針と整合させる。
 
@@ -140,6 +141,7 @@ export function canAddAssignee(currentCount: number): boolean;
   - `tests/schemas/assignees.test.ts`: `isValidAssigneeUserId` の妥当/不正（空文字・空白・非文字列・正常文字列）。FR-004。
   - `tests/assignees/limit.test.ts`: `canAddAssignee` の 0→true、9→true、10→false、11→false。FR-005。
 - 統合テスト（後続）の前提: 実 DB（Prisma）＋ 認証モック（currentUser）＋ ボードメンバー判定。既存 `tests/api/kanban.test.ts` の in-memory prisma mock を拡張して 409/422/401/403・存在確認・一覧を検証する。
+- 9人が割り当て済みのカードへ異なる2人を同時に追加し、片方だけが201、もう片方が422となり、保存件数が10件であることを実DBで確認する。
 
 ## Red-Green-Refactor で扱う FR の順番
 
