@@ -34,22 +34,27 @@ export async function POST(req: NextRequest) {
     }
 
     const email = body.email as string;
-    const user = await prisma.user.create({
-      data: {
-        email,
-        passwordHash: hashPassword(body.password as string),
-        name: normalizeName(body.name),
-      },
-      select: { id: true, email: true, name: true },
-    });
+    let user: { id: string; email: string; name: string };
+    try {
+      user = await prisma.user.create({
+        data: {
+          email,
+          passwordHash: hashPassword(body.password as string),
+          name: normalizeName(body.name),
+        },
+        select: { id: true, email: true, name: true },
+      });
+    } catch (e) {
+      if (isUniqueConstraintError(e)) {
+        return conflict("このメールアドレスは既に登録されています", { email: "duplicate" });
+      }
+      throw e;
+    }
 
     await createSession(user.id);
     auditLog(requestId, "auth.signup", { userId: user.id });
     return NextResponse.json({ user }, { status: 201 });
   } catch (e) {
-    if (isUniqueConstraintError(e)) {
-      return conflict("このメールアドレスは既に登録されています", { email: "duplicate" });
-    }
     errorLog(requestId, e, 500);
     return internalError();
   }

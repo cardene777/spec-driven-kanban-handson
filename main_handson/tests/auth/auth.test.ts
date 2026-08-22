@@ -12,6 +12,7 @@ import {
 
 // --- セッション差し替え ---
 let currentUser: { id: string; email: string; name: string } | null = null;
+const sessionMockState = vi.hoisted(() => ({ createError: null as unknown }));
 const setCurrentUser = (u: typeof currentUser) => {
   currentUser = u;
 };
@@ -27,6 +28,7 @@ vi.mock("@/lib/auth/session", async () => {
     SESSION_COOKIE: "session",
     getSessionUser: async () => currentUser,
     createSession: async (userId: string) => {
+      if (sessionMockState.createError) throw sessionMockState.createError;
       const u = actual.db.user.find((x) => x.id === userId);
       if (u) currentUser = { id: u.id as string, email: u.email as string, name: u.name as string };
       return "test-token";
@@ -80,6 +82,7 @@ beforeAll(async () => {
 afterEach(() => {
   resetDb();
   currentUser = null;
+  sessionMockState.createError = null;
 });
 
 // --- ヘルパ ---
@@ -146,6 +149,23 @@ describe("auth: signup / login / logout / session", () => {
       }),
     );
     expect(bad.status).toBe(422);
+  });
+
+  it("セッショントークンの一意制約違反をemail重複409として扱わない", async () => {
+    sessionMockState.createError = Object.assign(new Error("duplicate session token"), {
+      code: "P2002",
+    });
+
+    const res = await signupPOST(
+      jsonReq("http://localhost/api/auth/signup", {
+        email: "sessionerror@b.co",
+        password: VALID_PASSWORD,
+        name: "x",
+      }),
+    );
+
+    expect(res.status).toBe(500);
+    expect((await res.json()).error.code).toBe("INTERNAL_ERROR");
   });
 
   it("同じemailの同時サインアップは片方だけ201、もう片方409になる", async () => {
