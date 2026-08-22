@@ -137,6 +137,16 @@ describe("auth: signup / login / logout / session", () => {
     expect((await s.json()).user.email).toBe("a@b.co");
   });
 
+  it("サインアップ成功時のCookieはHttpOnly・SameSite=Lax・Path=/を持つ", async () => {
+    const { res } = await signup("cookie@b.co");
+    const setCookie = res.headers.get("set-cookie");
+
+    expect(setCookie).toContain("session=test-token");
+    expect(setCookie).toContain("Path=/");
+    expect(setCookie).toContain("HttpOnly");
+    expect(setCookie).toContain("SameSite=lax");
+  });
+
   it("パスワードはソルト付きハッシュで保存される（平文と一致せず、同一パスワードでも異なる）", async () => {
     await signup("a@b.co");
     await signup("c@d.co");
