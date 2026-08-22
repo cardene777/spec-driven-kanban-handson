@@ -51,7 +51,16 @@ export async function POST(req: NextRequest) {
       throw e;
     }
 
-    await createSession(user.id);
+    try {
+      await createSession(user.id);
+    } catch (sessionError) {
+      try {
+        await prisma.user.delete({ where: { id: user.id } });
+      } catch (cleanupError) {
+        errorLog(requestId, { sessionError, cleanupError }, 500);
+      }
+      throw sessionError;
+    }
     auditLog(requestId, "auth.signup", { userId: user.id });
     return NextResponse.json({ user }, { status: 201 });
   } catch (e) {

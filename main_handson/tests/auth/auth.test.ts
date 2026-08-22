@@ -166,6 +166,8 @@ describe("auth: signup / login / logout / session", () => {
 
     expect(res.status).toBe(500);
     expect((await res.json()).error.code).toBe("INTERNAL_ERROR");
+    expect(db.user).toHaveLength(0);
+    expect(db.session).toHaveLength(0);
   });
 
   it("同じemailの同時サインアップは片方だけ201、もう片方409になる", async () => {
