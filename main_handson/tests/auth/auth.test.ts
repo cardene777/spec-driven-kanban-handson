@@ -26,6 +26,7 @@ vi.mock("@/lib/auth/session", async () => {
   const actual = await import("../helpers/db");
   return {
     SESSION_COOKIE: "session",
+    SESSION_TTL_MS: 7 * 24 * 60 * 60 * 1000,
     getSessionUser: async () => currentUser,
     createSession: async (userId: string) => {
       if (sessionMockState.createError) throw sessionMockState.createError;
@@ -33,6 +34,21 @@ vi.mock("@/lib/auth/session", async () => {
       if (u) currentUser = { id: u.id as string, email: u.email as string, name: u.name as string };
       return "test-token";
     },
+    createSessionRecord: async (userId: string) => {
+      if (sessionMockState.createError) throw sessionMockState.createError;
+      const token = "test-token";
+      actual.db.session.push({ id: `session-${userId}`, userId, token, expiresAt: new Date() });
+      const u = actual.db.user.find((x) => x.id === userId);
+      if (u) currentUser = { id: u.id as string, email: u.email as string, name: u.name as string };
+      return token;
+    },
+    sessionCookieOptions: (maxAge: number) => ({
+      httpOnly: true,
+      sameSite: "lax" as const,
+      path: "/",
+      secure: false,
+      maxAge,
+    }),
     destroySession: async () => {
       currentUser = null;
     },
