@@ -146,6 +146,14 @@ export function makePrisma() {
   const membershipTable = makeTable(db.boardMembership);
   const inviteTable = makeTable(db.invite, { status: "pending" });
 
+  const createUser = userTable.create;
+  userTable.create = async ({ data, select }: { data: Row; select?: Row }) => {
+    if (db.user.some((user) => user.email === data.email)) {
+      throw Object.assign(new Error("unique_constraint"), { code: "P2002" });
+    }
+    return createUser({ data, select });
+  };
+
   const dropCardLabels = (cardId: string) => {
     for (let i = db.cardLabel.length - 1; i >= 0; i--) {
       if (db.cardLabel[i].cardId === cardId) db.cardLabel.splice(i, 1);

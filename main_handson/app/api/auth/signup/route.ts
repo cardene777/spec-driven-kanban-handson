@@ -7,6 +7,10 @@ import { isValidEmail, isValidPassword, isValidName, normalizeName } from "@/lib
 import { auditLog, errorLog, newRequestId } from "@/lib/audit/log";
 import { conflict, validationError, internalError } from "@/lib/errors";
 
+function isUniqueConstraintError(error: unknown): boolean {
+  return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
+}
+
 export async function POST(req: NextRequest) {
   const requestId = newRequestId();
   try {
@@ -30,11 +34,6 @@ export async function POST(req: NextRequest) {
     }
 
     const email = body.email as string;
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      return conflict("このメールアドレスは既に登録されています", { email: "duplicate" });
-    }
-
     const user = await prisma.user.create({
       data: {
         email,
@@ -48,6 +47,9 @@ export async function POST(req: NextRequest) {
     auditLog(requestId, "auth.signup", { userId: user.id });
     return NextResponse.json({ user }, { status: 201 });
   } catch (e) {
+    if (isUniqueConstraintError(e)) {
+      return conflict("このメールアドレスは既に登録されています", { email: "duplicate" });
+    }
     errorLog(requestId, e, 500);
     return internalError();
   }
