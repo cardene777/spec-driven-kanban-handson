@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     const email = body.email as string;
     let result: {
       user: { id: string; email: string; name: string };
-      sessionToken: string;
+      response: NextResponse;
     };
     try {
       result = await prisma.$transaction(async (tx) => {
@@ -63,7 +63,13 @@ export async function POST(req: NextRequest) {
         }
 
         const sessionToken = await createSessionRecord(user.id, tx);
-        return { user, sessionToken };
+        const response = NextResponse.json({ user }, { status: 201 });
+        response.cookies.set(
+          SESSION_COOKIE,
+          sessionToken,
+          sessionCookieOptions(SESSION_TTL_MS / 1000),
+        );
+        return { user, response };
       });
     } catch (e) {
       if (e instanceof DuplicateEmailError) {
@@ -73,13 +79,7 @@ export async function POST(req: NextRequest) {
     }
 
     auditLog(requestId, "auth.signup", { userId: result.user.id });
-    const response = NextResponse.json({ user: result.user }, { status: 201 });
-    response.cookies.set(
-      SESSION_COOKIE,
-      result.sessionToken,
-      sessionCookieOptions(SESSION_TTL_MS / 1000),
-    );
-    return response;
+    return result.response;
   } catch (e) {
     errorLog(requestId, e, 500);
     return internalError();
