@@ -130,7 +130,7 @@ export default function ListColumn({
           <ul className="flex flex-col gap-2">
             {cards.map((card) => (
               <li key={card.id}>
-                <CardRow card={card} boardId={list.boardId} />
+                <CardRow card={card} />
               </li>
             ))}
           </ul>

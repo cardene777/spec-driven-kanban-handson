@@ -422,7 +422,7 @@ TDD (`/tdd` skill) で以下の順に Red-Green-Refactor を回す。前段で�
 1. **FR-01 (投稿) の schema バリデーション** (`parseCommentCreate`)
    - Red = 空 body / `body` 型不一致 / トリム後 0 文字 / 2001 文字が `ValidationError` を throw することを assert、正常値 (1 文字 / 2000 文字 / 先頭末尾空白保持) が受理されることを assert。
    - Green = `lib/schemas/comments.ts` を実装。
-   - Refactor = 既存 `parseCardCreate` / `parseAssigneeCreate` と同じ zod パターン (`runSchema` helper) に揃える。
+   - Refactor = 既存 `parseCardCreate` / `parseListCreate` と同じ zod パターン (`runSchema` helper) に揃える。
 2. **HTML エスケープ pure 関数** (`escapeHtml`)
    - Red = 5 対象文字 (`&` / `<` / `>` / `"` / `'`) の置換、対象外文字 (英数 / 絵文字) がそのまま返ること、`<script>` を含む文字列の完全置換、既にエスケープ済み文字列は二重エスケープされる (呼び出し側責務) ことを assert。
    - Green = `lib/comments/escape.ts` を実装。

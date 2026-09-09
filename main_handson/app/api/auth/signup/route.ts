@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withApiHandler } from "@/lib/http/withApiHandler";
+import { setAuditActorId } from "@/lib/log/context";
 import { parseSignup } from "@/lib/schemas/auth";
 import { hashPassword } from "@/lib/auth/passwordHash";
 import {
@@ -28,6 +29,7 @@ export async function POST(request: Request) {
       const user = await prisma.user.create({
         data: { email: emailLower, passwordHash, name },
       });
+      setAuditActorId(user.id);
       const session = await createSession(user.id);
       const res = NextResponse.json(
         { user: { id: user.id, email: user.email, name: user.name } },

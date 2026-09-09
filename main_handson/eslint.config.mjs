@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // 旧ハンズオンの保存用ディレクトリ。現行アプリの検証対象には含めない。
+    "8_document/**",
   ]),
 ]);
 

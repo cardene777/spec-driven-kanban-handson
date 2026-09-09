@@ -20,6 +20,10 @@ import {
   validationError,
 } from "@/lib/http/errors";
 import { logAudit, type AuditErrorCode, type AuditLevel, type TargetType } from "@/lib/log/audit";
+import {
+  getAuditActorId,
+  runWithAuditContext,
+} from "@/lib/log/context";
 
 type Options = {
   event: string;
@@ -33,22 +37,45 @@ export async function withApiHandler(
   fn: () => Promise<NextResponse>,
   options: Options,
 ): Promise<NextResponse> {
+  return runWithAuditContext(async () => {
+    try {
+      const res = await fn();
+      logAudit({
+        level: "info",
+        event: options.event,
+        actorId: options.actorId ?? getAuditActorId(),
+        targetType: options.targetType,
+        targetId: await resolveTargetId(res, options),
+        status: res.status,
+        errorCode: null,
+        context: options.context,
+      });
+      return res;
+    } catch (err) {
+      return handleError(err, options);
+    }
+  });
+}
+
+async function resolveTargetId(
+  response: NextResponse,
+  options: Options,
+): Promise<string | null> {
+  if (options.targetId) return options.targetId;
   try {
-    const res = await fn();
-    logAudit({
-      level: "info",
-      event: options.event,
-      actorId: options.actorId ?? null,
-      targetType: options.targetType,
-      targetId: options.targetId ?? null,
-      status: res.status,
-      errorCode: null,
-      context: options.context,
-    });
-    return res;
-  } catch (err) {
-    return handleError(err, options);
+    const body: unknown = await response.clone().json();
+    if (
+      typeof body === "object" &&
+      body !== null &&
+      "id" in body &&
+      typeof body.id === "string"
+    ) {
+      return body.id;
+    }
+  } catch {
+    // 空レスポンスやJSON以外のレスポンスでは、対象IDを記録しない。
   }
+  return null;
 }
 
 function handleError(err: unknown, options: Options): NextResponse {
@@ -106,7 +133,7 @@ function handleError(err: unknown, options: Options): NextResponse {
   logAudit({
     level,
     event: options.event,
-    actorId: options.actorId ?? null,
+    actorId: options.actorId ?? getAuditActorId(),
     targetType: options.targetType,
     targetId: options.targetId ?? null,
     status,

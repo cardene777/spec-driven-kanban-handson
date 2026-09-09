@@ -1,5 +1,6 @@
 // design/011_auth.md § session ユーティリティ
 import { randomBytes } from "crypto";
+import type { PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 日
@@ -9,10 +10,15 @@ export function generateSessionId(): string {
   return randomBytes(32).toString("base64url");
 }
 
-export async function createSession(userId: string) {
+type SessionWriter = Pick<PrismaClient, "session">;
+
+export async function createSession(
+  userId: string,
+  client: SessionWriter = prisma,
+) {
   const id = generateSessionId();
   const expiresAt = new Date(Date.now() + SESSION_MAX_AGE_SECONDS * 1000);
-  return prisma.session.create({ data: { id, userId, expiresAt } });
+  return client.session.create({ data: { id, userId, expiresAt } });
 }
 
 export function buildSessionCookie(

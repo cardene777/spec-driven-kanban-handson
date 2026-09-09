@@ -29,9 +29,7 @@ export async function POST(request: Request) {
         if (oldSid) {
           await tx.session.deleteMany({ where: { id: oldSid } });
         }
-        // createSession は prisma を直接使うが、Cookie 生成のため id を得たいので分割。
-        const newId = (await createSession(user.id)).id;
-        return { id: newId };
+        return createSession(user.id, tx);
       });
       const res = NextResponse.json({
         user: { id: user.id, email: user.email, name: user.name },

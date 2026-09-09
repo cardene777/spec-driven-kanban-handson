@@ -64,7 +64,7 @@
 
 ## 実装順序
 
-1. プロジェクト初期化（Next.js 16 `--webpack` + TS + Tailwind、Prisma 7 adapter 方式、Vitest 4）
+1. プロジェクト初期化（Next.js 15 + TypeScript + Tailwind、Prisma 6、Vitest 2）
 2. Prisma スキーマ（Board / List / Card）とマイグレーション、`lib/prisma.ts`
 3. バリデーション（`lib/validation/title.ts`）、エラー（`lib/errors.ts`）
 4. repository（`lib/repository/board.ts` / `list.ts` / `card.ts`）

@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withApiHandler } from "@/lib/http/withApiHandler";
+import { setAuditActorId } from "@/lib/log/context";
 import { parseLogin } from "@/lib/schemas/auth";
 import { verifyPassword } from "@/lib/auth/passwordHash";
 import { buildSessionCookie, createSession } from "@/lib/auth/session";
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
       if (!user || !ok) {
         throw new InvalidCredentialsError();
       }
+      setAuditActorId(user.id);
       const session = await createSession(user.id);
       const res = NextResponse.json({
         user: { id: user.id, email: user.email, name: user.name },

@@ -4,10 +4,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function CardRow({
   card,
-  boardId: _boardId,
 }: {
   card: { id: string; title: string; order: number };
-  boardId: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
