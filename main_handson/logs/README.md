@@ -1,6 +1,6 @@
-# 第5章の実行ログ
+# CHAPTER 05の実行ログ
 
-第5章をClaude CodeとClaude Opus 4.8で実行した、セクション別の対話ログです。thinkingとローカルパスは公開版から除いています。
+CHAPTER 05をClaude CodeとClaude Opus 4.8で実行した、セクション別の対話ログです。thinkingとローカルパスは公開版から除いています。
 
 ファイル名の先頭番号は本文のセクション番号に対応します。たとえば `2_1_constitution.raw.jsonl` から `2_4_implement.raw.jsonl` は、最初のカンバンアプリを作る工程の記録です。
 
