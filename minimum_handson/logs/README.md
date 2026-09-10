@@ -1,6 +1,6 @@
-# 第2章の正式ログ
+# CHAPTER 02の正式ログ
 
-第2章をClaude CodeとClaude Opus 4.8で実行した、2つの統合セッションログです。thinkingとローカルパスは公開版から除いています。
+CHAPTER 02をClaude CodeとClaude Opus 4.8で実行した、2つの統合セッションログです。thinkingとローカルパスは公開版から除いています。
 
 - `simple_prompt_session.raw.jsonl` は、スキルを使わず4ステップのプロンプトで進めた記録です。
 - `simple_skill_session.raw.jsonl` は、`/constitution`、`/spec`、`/design`、`/implement` を使った記録です。

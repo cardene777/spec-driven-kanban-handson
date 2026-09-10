@@ -1,6 +1,6 @@
 # spec-driven-kanban-handson
 
-本書の第2章・第5章で使う**配布ハンズオンリポジトリ**です。Next.js、Prisma、SQLiteでカンバンアプリを段階的に作るための、プロンプト駆動とスキル駆動の成果物を収録しています。
+本書のCHAPTER 02・CHAPTER 05で使う**配布ハンズオンリポジトリ**です。Next.js、Prisma、SQLiteでカンバンアプリを段階的に作るための、プロンプト駆動とスキル駆動の成果物を収録しています。
 
 > ルートに稼働アプリはありません。以下の各ハンズオンディレクトリへ移動して実行してください。
 
@@ -8,9 +8,9 @@
 
 | ディレクトリ | 内容 | スキル |
 | --- | --- | --- |
-| [`minimum_handson/simple_prompt/`](./minimum_handson/simple_prompt/) | 第2章。プロンプトだけで最小カンバンを作る版 | 使わない |
-| [`minimum_handson/simple_skill/`](./minimum_handson/simple_skill/) | 第2章。同じ題材を4つの汎用スキルで作る版 | `constitution`、`spec`、`design`、`implement` |
-| [`main_handson/`](./main_handson/) | 第5章。認証・権限・UI・テスト・文書化まで拡張する版 | 基本4 Skillと、第5章用の追加7 Skill（`design-system` を含む） |
+| [`minimum_handson/simple_prompt/`](./minimum_handson/simple_prompt/) | CHAPTER 02。プロンプトだけで最小カンバンを作る版 | 使わない |
+| [`minimum_handson/simple_skill/`](./minimum_handson/simple_skill/) | CHAPTER 02。同じ題材を4つの汎用スキルで作る版 | `constitution`、`spec`、`design`、`implement` |
+| [`main_handson/`](./main_handson/) | CHAPTER 05。認証・権限・UI・テスト・文書化まで拡張する版 | 基本4 Skillと、CHAPTER 05用の追加7 Skill（`design-system` を含む） |
 
 各末端ディレクトリの直下が最新の稼働アプリです。`simple_prompt/` 内の `1_...` から `4_...` は、各ステップ完了時点のスナップショットです。
 
@@ -51,8 +51,8 @@ npm run build
 
 本書で実行した対話ログを、再現手順の参考記録として収録しています。thinkingとローカルパスは公開版から除いています。ログ自体を完了判定には使わず、手元で生成した成果物と検証コマンドの結果を確認してください。
 
-- [第2章の正式ログ](./minimum_handson/logs/)
-- [第5章のセクション別ログ](./main_handson/logs/)
+- [CHAPTER 02の正式ログ](./minimum_handson/logs/)
+- [CHAPTER 05のセクション別ログ](./main_handson/logs/)
 
 ## Docker環境
 

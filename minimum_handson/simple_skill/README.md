@@ -1,8 +1,8 @@
 # simple_skill — スキルで最小カンバンを作る
 
-第2章のスキル版ハンズオンです。`simple_prompt` と同じ最小カンバンを、`/constitution`、`/spec`、`/design`、`/implement` の4スキルを順に使って作ります。
+CHAPTER 02のスキル版ハンズオンです。`simple_prompt` と同じ最小カンバンを、`/constitution`、`/spec`、`/design`、`/implement` の4スキルを順に使って作ります。
 
-このディレクトリの4スキルは、技術やドメインを固定しない汎用的なひな形です。このハンズオンでは、入力とプロンプトでカンバン、Next.js、Prisma 7、SQLite、Vitestを指定しています。第5章の `main_handson` は、同じ4つの役割を強化し、7つの追加スキルを加えた構成です。
+このディレクトリの4スキルは、技術やドメインを固定しない汎用的なひな形です。このハンズオンでは、入力とプロンプトでカンバン、Next.js、Prisma 7、SQLite、Vitestを指定しています。CHAPTER 05の `main_handson` は、同じ4つの役割を強化し、7つの追加スキルを加えた構成です。
 
 ## 技術スタック
 
@@ -43,7 +43,7 @@ npm run build
 
 ## スキル（`.claude/skills/`）
 
-第2章で使う4つの汎用スキルを含みます。導入方法と呼び出し順は[スキルのREADME](./.claude/skills/README.md)を参照してください。
+CHAPTER 02で使う4つの汎用スキルを含みます。導入方法と呼び出し順は[スキルのREADME](./.claude/skills/README.md)を参照してください。
 
 ## ステップと画面
 

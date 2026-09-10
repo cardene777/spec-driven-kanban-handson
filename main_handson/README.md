@@ -1,6 +1,6 @@
 # main_handson — スキル駆動カンバンの完成例
 
-第5章のメインハンズオンです。ボード・リスト・カードに加え、移動、アーカイブ、ラベル、期限、検索、認証、招待、権限を実装しています。
+CHAPTER 05のメインハンズオンです。ボード・リスト・カードに加え、移動、アーカイブ、ラベル、期限、検索、認証、招待、権限を実装しています。
 方針は [constitution.md](./constitution.md)、仕様は [spec/](./spec)、設計は [design/](./design) を参照。
 
 ## 技術スタック
@@ -33,5 +33,5 @@ npm run build      # Next.js production build
 - `lib/` … Prisma client・エラー整形・入力検証・監査ログなど共通処理
 - `prisma/` … スキーマとマイグレーション
 - `tests/` … API テスト
-- `.claude/skills/` … 基本4 Skillと、第5章用の追加7 Skill
+- `.claude/skills/` … 基本4 Skillと、CHAPTER 05用の追加7 Skill
 - `logs/` … Claude Opus 4.8で実行したセクション別の対話ログ
