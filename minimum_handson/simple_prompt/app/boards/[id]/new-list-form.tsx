@@ -7,14 +7,21 @@ export function NewListForm({ boardId }: { boardId: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await fetch(`/api/boards/${boardId}/lists`, {
+    const response = await fetch(`/api/boards/${boardId}/lists`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title }),
     });
+    if (!response.ok) {
+      const data = await response.json().catch(() => null);
+      setError(data?.error?.message ?? "作成に失敗しました");
+      return;
+    }
+    setError(null);
     setTitle("");
     setOpen(false);
     router.refresh();
@@ -40,6 +47,7 @@ export function NewListForm({ boardId }: { boardId: string }) {
         placeholder="リストのタイトル"
         className="mb-2 w-full rounded-md border border-gray-300 px-3 py-2"
       />
+      {error && <p className="mb-2 text-sm text-red-600">{error}</p>}
       <div className="flex gap-2">
         <button
           type="submit"
