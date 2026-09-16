@@ -1,14 +1,12 @@
 # simple_prompt — プロンプトだけでカンバンアプリを作る
 
-スキル（`/spec` 等）を使わず、現場のチケット程度の粒度のプロンプトだけで
-Claude Code がどこまで作れるかを示すハンズオン。各ステップのプロンプトに
-書かれていない要件（空文字の扱い・文字数上限・存在しない ID への 404 など）は
-あえて作り込んでいない。「プロンプトだけだと要件が抜ける」ことを見せるための章。
+スキル（`/spec`等）を使わず、4つのプロンプトだけで最小構成のカンバンアプリを作るハンズオン。各プロンプトに、タイトルの検証、存在しないIDへの404、JSONのエラー形式を条件として書き、生成したコードとテストで確認する。
 
 ## 技術スタック
 
 - Next.js 16（App Router）+ TypeScript + Tailwind CSS
-- Prisma 7（`@prisma/adapter-better-sqlite3` の adapter 方式）+ SQLite
+- Prisma 7（`@prisma/adapter-better-sqlite3`のadapter方式）+ SQLite
+- Vitest 4
 - Node.js 20.19 以上 / npm
 
 ## 起動手順
@@ -21,7 +19,7 @@ npx prisma generate
 npm run dev
 ```
 
-`http://localhost:3000` を開く。ビルド確認は `npm run build`。
+`http://localhost:3000`を開く。検証は`npm run lint`、`npm run typecheck`、`npm run test`、`npm run build`の順に実行する。
 
 ## ステップと画面
 
@@ -42,4 +40,4 @@ npm run dev
 - `3_card_create/`
 - `4_card_edit/`
 
-各スナップショットも上記「起動手順」の 4 コマンドで単体起動できる。
+各スナップショットは各ステップ直後の参考用ソースであり、最終版の入力検証、エラー処理、テストを含む完成アプリは`simple_prompt/`直下で確認する。
