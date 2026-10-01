@@ -34,4 +34,19 @@ npm run build      # Next.js production build
 - `prisma/` … スキーマとマイグレーション
 - `tests/` … API テスト
 - `.claude/skills/` … 基本4 Skillと、CHAPTER 05用の追加7 Skill
+- `inputs/` … Skillsへ渡す条件
+- `prompts/` … Claude Codeへコピーして実行する依頼文
 - `logs/` … Claude Opus 4.8で実行したセクション別の対話ログ
+
+## 実行プロンプト
+
+CHAPTER 05で使うプロンプトは、節ごとに次のディレクトリへ置いています。各ファイルを開き、内容をClaude Codeへコピーして実行してください。
+
+- [SECTION-028 初期実装](./prompts/028_initial_implementation/)
+- [SECTION-029 仕様レビュー](./prompts/029_specification_review/)
+- [SECTION-030 UI設計](./prompts/030_ui_design/)
+- [SECTION-031 デザインシステム](./prompts/031_design_system/)
+- [SECTION-032 テスト駆動開発](./prompts/032_tdd/)
+- [SECTION-033 仕様とテスト](./prompts/033_test/)
+- [SECTION-034 仕様と実装のレビュー](./prompts/034_review/)
+- [SECTION-035 ドキュメント生成](./prompts/035_document/)
