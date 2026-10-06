@@ -1,0 +1,34 @@
+{
+  "checks": [
+    {
+      "label": "empty board state",
+      "pass": true
+    },
+    {
+      "label": "board route includes id",
+      "pass": true
+    },
+    {
+      "label": "card dialog title",
+      "pass": true
+    },
+    {
+      "label": "description persisted",
+      "pass": true
+    },
+    {
+      "label": "escape closes",
+      "pass": true
+    },
+    {
+      "label": "focus restored",
+      "pass": true
+    },
+    {
+      "label": "no runtime errors",
+      "pass": true
+    }
+  ],
+  "url": "http://localhost:3105/boards/cmuwdr5vu00054qse8jdqew7h",
+  "errors": []
+}

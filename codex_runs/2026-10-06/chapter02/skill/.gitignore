@@ -1,0 +1,7 @@
+# FR-COM-001
+node_modules/
+.next/
+generated/
+prisma/*.db*
+.env*
+*.tsbuildinfo

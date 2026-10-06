@@ -1,0 +1,38 @@
+[
+  {
+    "name": "rename Board",
+    "pass": true
+  },
+  {
+    "name": "rename List",
+    "pass": true
+  },
+  {
+    "name": "add second List",
+    "pass": true
+  },
+  {
+    "name": "reorder Lists",
+    "pass": true
+  },
+  {
+    "name": "add second Card",
+    "pass": true
+  },
+  {
+    "name": "reorder Cards",
+    "pass": true
+  },
+  {
+    "name": "delete Cards",
+    "pass": true
+  },
+  {
+    "name": "delete Lists",
+    "pass": true
+  },
+  {
+    "name": "delete Board",
+    "pass": true
+  }
+]

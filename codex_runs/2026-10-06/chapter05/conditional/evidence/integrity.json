@@ -1,0 +1,11 @@
+{
+  "book_files_unchanged": 10,
+  "copied_fixed_input_skill_files_unchanged": 22,
+  "skills": 11,
+  "http_requests_verified": 36,
+  "browser_core_checks": 7,
+  "browser_crud_checks": 9,
+  "review_high": 4,
+  "review_middle": 2,
+  "stopped_before_spec005": true
+}

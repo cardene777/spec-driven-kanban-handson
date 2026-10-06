@@ -1,0 +1,17 @@
+Datasource "db": SQLite database "dev.db" at "file:./.verification/dev.db"
+
+SQLite database dev.db created at file:./.verification/dev.db
+
+Applying migration `20261006080058_initial`
+
+The following migration(s) have been created and applied from new schema changes:
+
+prisma/migrations/
+  └─ 20261006080058_initial/
+    └─ migration.sql
+
+Your database is now in sync with your schema.
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.

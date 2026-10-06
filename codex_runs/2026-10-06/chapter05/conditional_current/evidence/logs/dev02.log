@@ -1,0 +1,92 @@
+
+> simple-kanban@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3215
+
+▲ Next.js 16.3.8 (Turbopack)
+- Local:         http://127.0.0.1:3215
+- Network:       http://127.0.0.1:3215
+- Environments: .env
+✓ Ready in 564ms
+✓ Running next.config.ts took 19ms
+
+✓ Generated AGENTS.md and CLAUDE.md for AI agents. Set `agentRules: false` in next.config to disable.
+ GET / 200 in 3.5s (next.js: 3.1s, application-code: 342ms)
+{"requestId":"c32cfcfa-19c4-48be-b3e6-313c71cd0b22","kind":"boards","method":"POST","status":201}
+ POST /api/boards 201 in 562ms (next.js: 399ms, application-code: 163ms)
+{"requestId":"ffc75c2f-13e6-459a-a6c7-8202c5ed2e90","kind":"lists","method":"POST","status":201}
+ POST /api/boards/e1ff1e17-d3af-4cd0-b245-8b8bb6cea263/lists 201 in 623ms (next.js: 612ms, application-code: 11ms)
+{"requestId":"04f28991-57dd-4ff8-b058-302c0df40c33","kind":"cards","method":"POST","status":201}
+ POST /api/lists/feb3d537-852a-47f0-85f0-8e4c6cd5db94/cards 201 in 482ms (next.js: 474ms, application-code: 8ms)
+{"requestId":"c04ca0a5-9222-4f09-9743-28ed64752c8f","kind":"cards","method":"PATCH","status":422}
+ PATCH /api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88 422 in 503ms (next.js: 488ms, application-code: 15ms)
+{"requestId":"f79a501e-4c34-4c97-9426-a9cdc08e1c2e","kind":"cards","method":"PATCH","status":200}
+ PATCH /api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88 200 in 54ms (next.js: 19ms, application-code: 35ms)
+{"requestId":"80851fca-a813-49e7-a2b0-61c2ed664fd3","kind":"boards","method":"POST","status":422}
+ POST /api/boards 422 in 6ms (next.js: 2ms, application-code: 4ms)
+{"requestId":"1abb849f-2d1f-44f7-a095-c0a339fd6632","kind":"cards","method":"PATCH","status":404}
+ PATCH /api/cards/missing 404 in 4ms (next.js: 1.2ms, application-code: 3ms)
+{"requestId":"92840318-f815-4751-a673-bd4d826c6b2b","kind":"cards","method":"DELETE","status":204}
+ DELETE /api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88 204 in 7ms (next.js: 2ms, application-code: 5ms)
+{"requestId":"ba09d9d4-a0ea-428b-8b01-f55456afdc02","kind":"cards","method":"GET","status":404}
+ GET /api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88 404 in 6ms (next.js: 3ms, application-code: 3ms)
+{"requestId":"734d2798-e261-4b88-bdd5-13444b46c0bd","kind":"lists","method":"DELETE","status":204}
+ DELETE /api/lists/feb3d537-852a-47f0-85f0-8e4c6cd5db94 204 in 493ms (next.js: 488ms, application-code: 5ms)
+{"requestId":"8959467d-2a86-474f-8abe-e1568303cd9c","kind":"boards","method":"DELETE","status":204}
+ DELETE /api/boards/e1ff1e17-d3af-4cd0-b245-8b8bb6cea263 204 in 446ms (next.js: 441ms, application-code: 5ms)
+ GET / 200 in 44ms (next.js: 4ms, application-code: 40ms)
+{"requestId":"dd0b2bfe-1f36-4e73-891c-0a019502fd5c","kind":"boards","method":"GET","status":200}
+ GET /api/boards 200 in 8ms (next.js: 2ms, application-code: 6ms)
+{"requestId":"cae45e1a-e30b-4a43-b80e-7ea94ad2872a","kind":"boards","method":"GET","status":200}
+ GET /api/boards 200 in 4ms (next.js: 2ms, application-code: 2ms)
+{"requestId":"725e11b2-d80f-4803-ad0f-9685e56d979b","kind":"boards","method":"POST","status":201}
+ POST /api/boards 201 in 6ms (next.js: 1.8ms, application-code: 5ms)
+{"requestId":"799263d5-7ce5-434f-b6d8-1414182f2e85","kind":"boards","method":"GET","status":200}
+ GET /api/boards 200 in 4ms (next.js: 0.9ms, application-code: 3ms)
+ GET /boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d 200 in 1172ms (next.js: 1155ms, application-code: 17ms)
+{"requestId":"c18fe1cc-d28e-4d93-ac3e-5b5fc14e67fb","kind":"boards","method":"GET","status":200}
+ GET /api/boards 200 in 8ms (next.js: 3ms, application-code: 5ms)
+{"requestId":"04496b77-409c-438b-a3ff-50c573142f72","kind":"boards","method":"GET","status":200}
+ GET /api/boards 200 in 7ms (next.js: 4ms, application-code: 3ms)
+{"requestId":"8866f5e5-be24-46e2-adb6-607deb0f5546","kind":"boards","method":"GET","status":200}
+ GET /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d 200 in 32ms (next.js: 16ms, application-code: 15ms)
+{"requestId":"ddfcc2ae-ce67-4fba-a77c-e75e392b5163","kind":"lists","method":"GET","status":200}
+ GET /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d/lists 200 in 11ms (next.js: 6ms, application-code: 5ms)
+{"requestId":"3867f855-19c0-4c63-9090-903b0d69a7cd","kind":"boards","method":"GET","status":200}
+ GET /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d 200 in 15ms (next.js: 13ms, application-code: 2ms)
+{"requestId":"a623f9f0-dba2-437c-8cd6-e661f1af66fb","kind":"lists","method":"GET","status":200}
+ GET /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d/lists 200 in 18ms (next.js: 13ms, application-code: 5ms)
+{"requestId":"53159bdf-7a53-46d9-b395-5046aee69670","kind":"lists","method":"POST","status":201}
+ POST /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d/lists 201 in 8ms (next.js: 3ms, application-code: 5ms)
+{"requestId":"fd19b270-d91c-40fa-97c8-eb47898c7d2d","kind":"boards","method":"GET","status":200}
+ GET /api/boards 200 in 4ms (next.js: 1.0ms, application-code: 3ms)
+{"requestId":"c7799f51-7474-4179-b4e1-700bfc2413e0","kind":"boards","method":"GET","status":200}
+ GET /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d 200 in 7ms (next.js: 2ms, application-code: 5ms)
+{"requestId":"2f755453-bd5d-4cb0-9a22-4923fcabe731","kind":"lists","method":"GET","status":200}
+ GET /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d/lists 200 in 7ms (next.js: 2ms, application-code: 5ms)
+{"requestId":"fd4682f4-498a-44ac-92b5-0e8bd9d54596","kind":"cards","method":"GET","status":200}
+ GET /api/lists/428960f8-3def-4776-83ba-ab8f6d54e5c3/cards 200 in 35ms (next.js: 29ms, application-code: 6ms)
+{"requestId":"9df5c897-03e9-4d76-9468-d31172b1bb29","kind":"cards","method":"POST","status":201}
+ POST /api/lists/428960f8-3def-4776-83ba-ab8f6d54e5c3/cards 201 in 10ms (next.js: 5ms, application-code: 5ms)
+{"requestId":"dac5aff0-ca0d-4b61-9df9-6ed225151912","kind":"boards","method":"GET","status":200}
+ GET /api/boards 200 in 7ms (next.js: 3ms, application-code: 4ms)
+{"requestId":"cb289396-84b0-4e35-970a-c4ff3350c78a","kind":"boards","method":"GET","status":200}
+ GET /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d 200 in 6ms (next.js: 4ms, application-code: 2ms)
+{"requestId":"452ede04-db7b-4646-923a-94d11e41e47f","kind":"lists","method":"GET","status":200}
+ GET /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d/lists 200 in 6ms (next.js: 1.7ms, application-code: 5ms)
+{"requestId":"7651703b-4eeb-4674-b3e4-7fc7fa4713da","kind":"cards","method":"GET","status":200}
+ GET /api/lists/428960f8-3def-4776-83ba-ab8f6d54e5c3/cards 200 in 11ms (next.js: 1.4ms, application-code: 9ms)
+{"requestId":"c2ad07d1-0f3b-41b5-9d33-dee3a90a2fda","kind":"cards","method":"PATCH","status":200}
+ PATCH /api/cards/280cfd53-0248-463d-a1d7-5142d01ebb1d 200 in 9ms (next.js: 5ms, application-code: 4ms)
+{"requestId":"440307d6-7b9b-4c84-a46c-2ff2909cf14a","kind":"boards","method":"GET","status":200}
+ GET /api/boards 200 in 4ms (next.js: 1.6ms, application-code: 2ms)
+{"requestId":"0ca1687e-0464-4cfe-baeb-5bc970d931bf","kind":"boards","method":"GET","status":200}
+ GET /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d 200 in 3ms (next.js: 1.2ms, application-code: 2ms)
+{"requestId":"d9e20179-d4cc-4cbd-b7f4-aa7a03baceed","kind":"lists","method":"GET","status":200}
+ GET /api/boards/ea2c27eb-54ef-40a8-9a5f-bd823ee8199d/lists 200 in 3ms (next.js: 1.0ms, application-code: 2ms)
+{"requestId":"25f13c2a-9b09-43c8-a1be-f95feea78159","kind":"cards","method":"GET","status":200}
+ GET /api/lists/428960f8-3def-4776-83ba-ab8f6d54e5c3/cards 200 in 6ms (next.js: 1.2ms, application-code: 5ms)
+
+{"requestId":"c04ca0a5-9222-4f09-9743-28ed64752c8f","kind":"cards","method":"PATCH","status":422,"error":"validation_error"}
+{"requestId":"80851fca-a813-49e7-a2b0-61c2ed664fd3","kind":"boards","method":"POST","status":422,"error":"validation_error"}
+{"requestId":"1abb849f-2d1f-44f7-a095-c0a339fd6632","kind":"cards","method":"PATCH","status":404,"error":"not_found"}
+{"requestId":"ba09d9d4-a0ea-428b-8b01-f55456afdc02","kind":"cards","method":"GET","status":404,"error":"not_found"}

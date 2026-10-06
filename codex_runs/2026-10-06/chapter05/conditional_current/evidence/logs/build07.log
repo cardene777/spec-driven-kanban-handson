@@ -1,0 +1,14 @@
+
+> simple-kanban@0.1.0 build
+> next build --webpack
+
+▲ Next.js 16.3.8 (webpack)
+- Environments: .env
+✓ Running next.config.ts took 195ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 10.1s
+  Running TypeScript ...
+tests/schemas/assignees.test.ts(16,72): error TS2737: BigInt literals are not available when targeting lower than ES2020.
+Failed to type check.
+

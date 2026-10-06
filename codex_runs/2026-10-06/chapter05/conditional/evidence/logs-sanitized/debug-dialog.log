@@ -1,0 +1,21 @@
+info %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+log [HMR] connected
+Simple Kanban
+ボード一覧へ
+読者ボード
+名前編集削除
+新規リスト名
+作成
+未着手
+名前編集削除↑↓
+新規カード名
+作成
+編集済カード名前編集削除↑↓
+カード詳細
+題名
+説明
+保存閉じる
+dialog {
+  open: true,
+  html: '<form><h2 id="card-dialog-title">カード詳細</h2><label>題名<input required="" maxlength="200" value="編集済カード" name="title"></label><label>説明<textarea name="description" maxlength="2000">読者が説明を保存</textarea></label><button>保存</button><button type="button">閉じる</button></form>'
+}

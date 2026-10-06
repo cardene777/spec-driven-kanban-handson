@@ -1,0 +1,14 @@
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('button', { name: '編集済カード', exact: true }) to be visible[22m
+[2m    - waiting for "http://localhost:3105/boards/cmuwd9r2q00058wsexi6gfnw3" navigation to finish...[22m
+[2m    - navigated to "http://localhost:3105/boards/cmuwd9r2q00058wsexi6gfnw3"[22m
+
+    at <WORK>/.verification/browser-check.cjs:11:298 {
+  log: [
+    "  - waiting for getByRole('button', { name: '編集済カード', exact: true }) to be visible",
+    '    - waiting for "http://localhost:3105/boards/cmuwd9r2q00058wsexi6gfnw3" navigation to finish...',
+    '    - navigated to "http://localhost:3105/boards/cmuwd9r2q00058wsexi6gfnw3"'
+  ],
+  name: 'TimeoutError'
+}

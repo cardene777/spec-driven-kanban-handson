@@ -1,0 +1,11 @@
+[
+  "recent-board navigation same URL",
+  "Tab stays in dialog",
+  "Esc closes dialog",
+  {
+    "light": "rgb(250, 246, 238)",
+    "dark": "rgb(250, 246, 238)",
+    "h1Font": "Charter, \"Iowan Old Style\", \"Hiragino Mincho ProN\", \"Yu Mincho\", Georgia, serif"
+  },
+  "Board/List/Card create/edit/delete and card description persisted"
+]

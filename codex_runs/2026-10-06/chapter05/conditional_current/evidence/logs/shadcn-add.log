@@ -1,0 +1,10 @@
+  - components/ui/input.tsx
+  - components/ui/textarea.tsx
+  - components/ui/avatar.tsx
+  - components/ui/dialog.tsx
+  - components/ui/button.tsx
+- Checking registry.
+✔ Checking registry.
+- Updating files.
+✔ Created 4 files:
+ℹ Skipped 1 file: (files might be identical, use --overwrite to overwrite)

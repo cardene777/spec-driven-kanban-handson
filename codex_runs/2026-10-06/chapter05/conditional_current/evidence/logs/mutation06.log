@@ -1,0 +1,36 @@
+
+ RUN  v4.1.11 <WORK>
+
+ ❯ .verification/mutation/tests/assignees/limit.test.ts (5 tests | 1 failed) 5ms
+     × 異常: 負数と非整数を拒否 3ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  17:11:24
+   Duration  530ms (transform 47ms, setup 0ms, import 117ms, tests 5ms, environment 0ms)
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (.verification/mutation.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  .verification/mutation/tests/assignees/limit.test.ts > FR-005 count boundary > 異常: 負数と非整数を拒否
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ .verification/mutation/tests/assignees/limit.test.ts:8:53
+      6|  it('境界: 10人は拒否',()=>{expect(canAddAssignee(10)).toBe(false);});
+      7|  it('境界: 11人は拒否',()=>{expect(canAddAssignee(11)).toBe(false);});
+      8|  it('異常: 負数と非整数を拒否',()=>{expect(canAddAssignee(-1)).toBe(false);expect…
+       |                                                     ^
+      9| });
+     10|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

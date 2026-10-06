@@ -1,0 +1,64 @@
+
+> simple-kanban@0.1.0 start
+> next start --hostname 127.0.0.1 --port 3215
+
+▲ Next.js 16.3.8
+- Local:         http://127.0.0.1:3215
+- Network:       http://127.0.0.1:3215
+✓ Ready in 189ms
+✓ Running next.config.ts took 30ms
+{"requestId":"014fcd71-6ae1-4f5b-9595-a63ac9cb74cd","kind":"boards","method":"GET","status":200}
+{"requestId":"200feb9c-e8f7-45b4-99a8-908fc3b0c741","kind":"boards","method":"GET","status":200}
+{"requestId":"9805144f-b233-4f01-8e54-ce2d090c2beb","kind":"boards","method":"POST","status":201}
+{"requestId":"807fcdb8-befa-431d-9ead-edb798efbdf9","kind":"boards","method":"GET","status":200}
+{"requestId":"57c105e6-8297-4ee1-acb4-75f54d1c48a2","kind":"boards","method":"PATCH","status":200}
+{"requestId":"39737706-49e6-4594-8ebd-0323274b562f","kind":"boards","method":"GET","status":200}
+{"requestId":"137baa70-6c12-41a0-a0cd-9d50836623f7","kind":"boards","method":"GET","status":200}
+{"requestId":"6daf22d6-9004-4fd8-9da2-4a691ea4bbd8","kind":"boards","method":"GET","status":200}
+{"requestId":"0f416e4a-1d37-4dd5-8968-9e2510657430","kind":"boards","method":"GET","status":200}
+{"requestId":"240d0d35-2043-447b-9ac3-3c8bd4e36fe4","kind":"lists","method":"GET","status":200}
+{"requestId":"e903de84-d615-4192-9712-9d311c7bb938","kind":"boards","method":"GET","status":200}
+{"requestId":"ffe6f2a6-9bdd-42f9-a170-94f5874f8b7d","kind":"boards","method":"DELETE","status":204}
+{"requestId":"1ec109fa-828c-4c57-8bdd-782d4d2f959f","kind":"boards","method":"GET","status":200}
+{"requestId":"42ef9915-e40f-427e-ae01-9e5ac3ed3325","kind":"boards","method":"GET","status":200}
+{"requestId":"364296cf-d087-4a48-8778-34a3f4b4d9d1","kind":"boards","method":"POST","status":201}
+{"requestId":"9d7938ca-fc79-461c-b543-704a2d2527a5","kind":"boards","method":"GET","status":200}
+{"requestId":"e662238b-bf29-48c0-82cb-99fbccdf70e1","kind":"boards","method":"PATCH","status":200}
+{"requestId":"6dd2af02-c806-4e26-8cf6-8994532b0bb9","kind":"boards","method":"GET","status":200}
+{"requestId":"c1111779-e319-4143-b8be-4236046e0fb4","kind":"boards","method":"GET","status":200}
+{"requestId":"62717952-b308-4d6c-9ba8-a767f75238c6","kind":"boards","method":"GET","status":200}
+{"requestId":"04219a61-a0fa-42b1-b509-48a2aed46570","kind":"boards","method":"GET","status":200}
+{"requestId":"4fbafe9c-a035-460a-8ea6-3c4b921b085d","kind":"lists","method":"GET","status":200}
+{"requestId":"d4886ae0-ccb7-4c1e-ab86-b21a4d04b2ef","kind":"lists","method":"POST","status":201}
+{"requestId":"c4395630-59d4-4d6e-90bd-508a715c9a79","kind":"boards","method":"GET","status":200}
+{"requestId":"a924e4d4-516f-45c0-8651-61f538f0ca61","kind":"boards","method":"GET","status":200}
+{"requestId":"4bca8515-6340-4b62-8129-e140a13ca038","kind":"lists","method":"GET","status":200}
+{"requestId":"a94ace17-4220-40fb-b3f2-99fcb863c5aa","kind":"cards","method":"GET","status":200}
+{"requestId":"49aa803b-01c3-488c-9450-f18a8594a1d0","kind":"lists","method":"PATCH","status":200}
+{"requestId":"0db53afb-66b1-419b-ba61-15443b505bd1","kind":"boards","method":"GET","status":200}
+{"requestId":"620d456d-06d9-4548-9572-24cc443c31c3","kind":"boards","method":"GET","status":200}
+{"requestId":"238a9a69-72e7-43f8-8b96-4db424307f34","kind":"lists","method":"GET","status":200}
+{"requestId":"9fb8efc7-09c9-44fd-926a-44baa7816ce2","kind":"cards","method":"GET","status":200}
+{"requestId":"27e6abf8-9498-4328-880b-af48b1d49c27","kind":"cards","method":"POST","status":201}
+{"requestId":"857e6cd4-4ea2-4507-92e9-7e9b2780a1fd","kind":"boards","method":"GET","status":200}
+{"requestId":"0f2a06d2-4114-4b98-9e03-883f3a01620c","kind":"boards","method":"GET","status":200}
+{"requestId":"2845d08c-f8e6-4e12-8116-e3277f1b8456","kind":"lists","method":"GET","status":200}
+{"requestId":"d25bb605-87de-4f96-ba25-869867128665","kind":"cards","method":"GET","status":200}
+{"requestId":"52c41bfe-46e7-4f72-a8f1-db0f928380e0","kind":"cards","method":"PATCH","status":200}
+{"requestId":"61c07f27-eb4e-4486-b1df-0da67b2029b2","kind":"boards","method":"GET","status":200}
+{"requestId":"5ca35b1a-69e0-4260-a102-8354f034f89d","kind":"boards","method":"GET","status":200}
+{"requestId":"63641df1-fcf3-49f1-9b57-29368e842a37","kind":"lists","method":"GET","status":200}
+{"requestId":"ad846b03-7e3e-4cc6-bc7f-96d186dd7cb5","kind":"cards","method":"GET","status":200}
+{"requestId":"4fcfb683-ad31-4e5e-a659-f788dfa48950","kind":"cards","method":"DELETE","status":204}
+{"requestId":"0c62606d-0617-4474-a524-0738ff2fdcdd","kind":"boards","method":"GET","status":200}
+{"requestId":"2eb60ddc-29fb-4bd2-8b67-54d2f11b1f63","kind":"boards","method":"GET","status":200}
+{"requestId":"ae548bfe-d45b-45c4-be0f-1539a0bcc51c","kind":"lists","method":"GET","status":200}
+{"requestId":"06000b11-9e8a-45f8-94e7-bd4d18437ca1","kind":"cards","method":"GET","status":200}
+{"requestId":"eee9310b-a71f-4b07-8f63-c447465c69a0","kind":"lists","method":"DELETE","status":204}
+{"requestId":"849987f2-58ec-4cb8-9038-e2ebbf7b3fab","kind":"boards","method":"GET","status":200}
+{"requestId":"500ef092-cce1-4c0e-b492-a60805b5a360","kind":"boards","method":"GET","status":200}
+{"requestId":"fd6b6031-43c7-476b-b269-3bfbfd902661","kind":"lists","method":"GET","status":200}
+{"requestId":"eb0dbc18-e3a7-46e7-9b0f-bb58831cca07","kind":"boards","method":"GET","status":200}
+{"requestId":"b5c95d72-2b42-4234-bd20-90a3e9246946","kind":"boards","method":"GET","status":200}
+{"requestId":"be70389b-2d8d-41a0-aa87-0c1c536c59dd","kind":"boards","method":"DELETE","status":204}
+{"requestId":"21f87dc3-e620-4e7c-ab70-aa6f3bdeedf4","kind":"boards","method":"GET","status":200}

@@ -1,0 +1,32 @@
+// FR-COM-001: 親子関係を永続化する。
+generator client {
+ provider = "prisma-client"
+ output = "../generated/prisma"
+}
+datasource db {
+ provider = "sqlite"
+}
+model Board {
+ id String @id @default(cuid())
+ title String
+ createdAt DateTime @default(now())
+ lists List[]
+}
+model List {
+ id String @id @default(cuid())
+ title String
+ order Int
+ boardId String
+ createdAt DateTime @default(now())
+ board Board @relation(fields: [boardId], references: [id])
+ cards Card[]
+}
+model Card {
+ id String @id @default(cuid())
+ title String
+ description String?
+ order Int
+ listId String
+ createdAt DateTime @default(now())
+ list List @relation(fields: [listId], references: [id])
+}

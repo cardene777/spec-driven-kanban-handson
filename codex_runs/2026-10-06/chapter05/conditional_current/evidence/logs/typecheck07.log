@@ -1,0 +1,5 @@
+
+> simple-kanban@0.1.0 typecheck
+> tsc --noEmit
+
+tests/schemas/assignees.test.ts(16,72): error TS2737: BigInt literals are not available when targeting lower than ES2020.
