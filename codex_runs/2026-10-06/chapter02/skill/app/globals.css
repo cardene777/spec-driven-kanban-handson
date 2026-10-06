@@ -1,0 +1,6 @@
+/* FR-BOARD-001, FR-LIST-001, FR-CARD-001 */
+@import "tailwindcss";
+body { background: #f8fafc; color: #0f172a; font-family: sans-serif; }
+button { cursor: pointer; }
+.action { border-radius: .35rem; background: #1d4ed8; color: white; padding: .6rem 1rem; }
+.entry { display: block; width: 100%; border: 1px solid #94a3b8; border-radius: .25rem; padding: .4rem; background: white; }

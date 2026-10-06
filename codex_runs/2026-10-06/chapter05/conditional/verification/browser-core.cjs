@@ -1,0 +1,13 @@
+const { chromium } = require('@playwright/test');
+const fs = require('node:fs');
+(async()=>{
+ const browser=await chromium.launch({headless:true}); const page=await browser.newPage({viewport:{width:1400,height:1000}}); const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const checks=[];const check=(label,value)=>{if(!value)throw new Error(label);checks.push({label,pass:true});};
+ await page.goto('http://localhost:3105');await page.getByText('ボードはありません',{exact:true}).waitFor();check('empty board state',true);
+ await page.getByLabel('新規ボード名').fill('読者ボード'); await page.getByRole('button',{name:'作成',exact:true}).click();await page.getByRole('link',{name:'読者ボード',exact:true}).waitFor();
+ await page.screenshot({path:'evidence/core-board-list.png',fullPage:true});await page.getByRole('link',{name:'読者ボード',exact:true}).click();await page.getByText('リストはありません',{exact:true}).waitFor();check('board route includes id',/\/boards\/[^/]+$/.test(page.url()));
+ await page.getByLabel('新規リスト名').fill('未着手');await page.getByRole('button',{name:'作成',exact:true}).click();await page.getByLabel('新規カード名').fill('確認カード');await page.getByRole('button',{name:'作成',exact:true}).last().click();await page.getByRole('button',{name:'確認カード',exact:true}).waitFor();
+ await page.screenshot({path:'evidence/core-board-detail.png',fullPage:true});await page.getByRole('button',{name:'確認カード',exact:true}).click();await page.getByRole('dialog').waitFor();check('card dialog title',await page.getByLabel('題名',{exact:true}).inputValue()==='確認カード');
+ await page.getByLabel('題名',{exact:true}).fill('編集済カード');await page.locator('textarea[name="description"]').fill('読者が説明を保存');await page.screenshot({path:'evidence/core-card-dialog.png'});await page.getByRole('button',{name:'保存',exact:true}).click();await page.getByRole('dialog').waitFor({state:'hidden'});await page.getByRole('button',{name:'編集済カード',exact:true}).waitFor();await page.reload();await page.getByRole('button',{name:'編集済カード',exact:true}).click();await page.getByRole('dialog').waitFor();check('description persisted',await page.locator('textarea[name="description"]').inputValue()==='読者が説明を保存');await page.keyboard.press('Escape');check('escape closes',await page.getByRole('dialog').count()===0);check('focus restored',await page.getByRole('button',{name:'編集済カード',exact:true}).evaluate(el=>document.activeElement===el));
+ check('no runtime errors',errors.length===0);fs.writeFileSync('evidence/browser-core.json',JSON.stringify({checks,url:page.url(),errors},null,2));await browser.close();console.log(JSON.stringify(checks));
+})().catch(e=>{console.error(e);process.exit(1)});

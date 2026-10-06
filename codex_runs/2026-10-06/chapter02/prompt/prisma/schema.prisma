@@ -1,0 +1,31 @@
+generator client {
+ provider = "prisma-client"
+ output = "../generated/prisma"
+}
+datasource db {
+ provider = "sqlite"
+}
+model Board {
+ lists List[]
+ id String @id @default(cuid())
+ title String
+ createdAt DateTime @default(now())
+}
+model List {
+ cards Card[]
+ id String @id @default(cuid())
+ title String
+ order Int
+ boardId String
+ createdAt DateTime @default(now())
+ board Board @relation(fields: [boardId], references: [id])
+}
+model Card {
+ id String @id @default(cuid())
+ title String
+ description String?
+ order Int
+ listId String
+ createdAt DateTime @default(now())
+ list List @relation(fields: [listId], references: [id])
+}

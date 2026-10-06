@@ -1,0 +1,71 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+ExpectError: expect(page).toHaveURL(expected) failed
+
+Expected: "http://127.0.0.1:3215/"
+Received: "http://127.0.0.1:3215/boards/bfa6fac2-a376-4553-879b-d8134edd8bc0"
+Timeout:  5000ms
+
+Call log:
+  - Expect "toHaveURL" with timeout 5000ms
+    14 × locator resolved to <html lang="ja">…</html>
+       - unexpected value "http://127.0.0.1:3215/boards/bfa6fac2-a376-4553-879b-d8134edd8bc0"
+
+    at captureRawStack (<WORK>/node_modules/playwright-core/lib/coreBundle.js:8588:17)
+    at callMatcherAsStep (<WORK>/node_modules/playwright/lib/matchers/expect.js:13310:57)
+    at Object.toHaveURL (<WORK>/node_modules/playwright/lib/matchers/expect.js:13302:23)
+    at <WORK>/.verification/browser05.mjs:10:134 {
+  matcherResult: {
+    name: 'toHaveURL',
+    expected: 'http://127.0.0.1:3215/',
+    message: 'expect(page).toHaveURL(expected) failed\n' +
+      '\n' +
+      'Expected: "http://127.0.0.1:3215/"\n' +
+      'Received: "http://127.0.0.1:3215/boards/bfa6fac2-a376-4553-879b-d8134edd8bc0"\n' +
+      'Timeout:  5000ms\n' +
+      '\n' +
+      'Call log:\n' +
+      '  - Expect "toHaveURL" with timeout 5000ms\n' +
+      '    14 × locator resolved to <html lang="ja">…</html>\n' +
+      '       - unexpected value "http://127.0.0.1:3215/boards/bfa6fac2-a376-4553-879b-d8134edd8bc0"\n',
+    pass: false,
+    actual: 'http://127.0.0.1:3215/boards/bfa6fac2-a376-4553-879b-d8134edd8bc0',
+    log: [
+      '  - Expect "toHaveURL" with timeout 5000ms',
+      '    14 × locator resolved to <html lang="ja">…</html>',
+      '       - unexpected value "http://127.0.0.1:3215/boards/bfa6fac2-a376-4553-879b-d8134edd8bc0"'
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- alert\n' +
+      '- complementary:\n' +
+      '  - link "Simple Kanban":\n' +
+      '    - /url: /\n' +
+      '  - navigation "ナビゲーション":\n' +
+      '    - link "ボード一覧":\n' +
+      '      - /url: /\n' +
+      '  - heading "最近のボード" [level=2]\n' +
+      '  - navigation "最近のボード":\n' +
+      '    - link "編集ボード":\n' +
+      '      - /url: /boards/bfa6fac2-a376-4553-879b-d8134edd8bc0\n' +
+      '  - text: ロ ローカル利用者\n' +
+      '- banner:\n' +
+      '  - navigation "パンくず":\n' +
+      '    - link "ボード一覧":\n' +
+      '      - /url: /\n' +
+      '    - text: / 編集ボード\n' +
+      '  - button "通知" [disabled]\n' +
+      '  - text: ロ\n' +
+      '- main:\n' +
+      '  - heading "編集ボード" [level=1]\n' +
+      '  - link "ボード一覧":\n' +
+      '    - /url: /\n' +
+      '  - text: 新規リスト名\n' +
+      '  - textbox "新規リスト名"\n' +
+      '  - button "作成"\n' +
+      '  - paragraph: リストがありません'
+  }
+}
+
+Node.js v24.15.0

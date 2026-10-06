@@ -1,0 +1,7 @@
+book_commit=580719fe7ec6852cd620ae14a66e6fb1bb561ac2
+handson_base_commit=551f918a44eeeba57ad427176849f7775f1a0072
+chapter05_frozen_distribution_commit=9764131d98562e29a1c168e83fcbbbf412ff5740
+clean_start=empty application work directory; temporary HOME and CODEX_HOME; CODEX_HOME contained only auth.json; no AGENTS.md, SKILL.md, rules or config.toml in temporary root
+confirmed_author_answers=list and card deletion require member or higher; Card.description empty string allowed; empty-title and over-limit inputs return 422
+approval_policy=simulate reader approval for book-specified constraints and ordinary implementation details proposed by the Skill; record proposal, basis and choice
+flags=--ephemeral --ignore-user-config --ignore-rules --sandbox danger-full-access --skip-git-repo-check

@@ -1,0 +1,25 @@
+{
+  "exists": [
+    "constitution.md",
+    "spec/000_shared_rules.md",
+    "spec/001_boards.md",
+    "spec/002_lists.md",
+    "spec/003_cards.md",
+    "spec/004_card_movement_archive_restore.md",
+    "design/004_card_movement_archive_restore.md",
+    "design/005_008_ui_features_ui.md",
+    "review/004_card_movement_archive_restore_spec_review.md",
+    "spec/009_assignee.md",
+    "design/009_assignee.md",
+    "review/009_assignee_review.md"
+  ],
+  "not_created_by_prior_instructions": [
+    "spec/010_comment.md",
+    "design/010_comment.md",
+    "design/005_card_detail_ui.md",
+    "design/006_label_ui.md",
+    "design/007_due_date_ui.md",
+    "design/008_search_filter_ui.md"
+  ],
+  "section09_later_prompts_not_executed": true
+}

@@ -1,0 +1,12 @@
+**/node_modules/
+**/.next/
+**/coverage/
+**/generated/
+**/.env
+**/.env.*
+!**/.env.example
+**/*.db
+**/*.db-journal
+**/*.tsbuildinfo
+**/.verification/npm-cache/
+**/.verification/browser-cache/

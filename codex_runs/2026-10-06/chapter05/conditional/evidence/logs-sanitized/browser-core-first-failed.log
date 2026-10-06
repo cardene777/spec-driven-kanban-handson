@@ -1,0 +1,10 @@
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByText('ボードはありません', { exact: true }) to be visible[22m
+
+    at <WORK>/.verification/browser-check.cjs:6:90 {
+  log: [
+    "  - waiting for getByText('ボードはありません', { exact: true }) to be visible"
+  ],
+  name: 'TimeoutError'
+}

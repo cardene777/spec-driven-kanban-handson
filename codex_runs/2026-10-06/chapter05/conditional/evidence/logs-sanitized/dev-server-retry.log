@@ -1,0 +1,362 @@
+
+> simple-kanban@0.1.0 dev
+> next dev --webpack --port 3105
+
+▲ Next.js 16.3.8 (webpack)
+- Local:         http://localhost:3105
+- Network:       http://192.168.144.215:3105
+- Environments: .env
+✓ Ready in 1491ms
+✓ Running next.config.ts took 114ms
+
+○ Compiling / ...
+ GET / 200 in 16.7s (next.js: 16.4s, application-code: 300ms)
+○ Compiling /api/boards ...
+{"requestId":"d54d3e84-39ac-4e21-8de4-1d7b8c5d8508","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 5.0s (next.js: 4.8s, application-code: 206ms)
+{"requestId":"a316017f-2fe0-4dab-b747-14c742425453","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 4ms (next.js: 1.1ms, application-code: 3ms)
+ GET / 200 in 125ms (next.js: 42ms, application-code: 83ms)
+{"requestId":"10076bea-d4fb-4a6d-87ec-0ea03e9bdb68","method":"POST","kind":"board","status":201}
+ POST /api/boards 201 in 16ms (next.js: 5ms, application-code: 12ms)
+{"requestId":"e22cc375-049a-456c-a5a7-28380d647f35","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 4ms (next.js: 1.2ms, application-code: 2ms)
+○ Compiling /boards/[id] ...
+ GET /boards/cmuwdbzft0000ieseoxxouant 200 in 5.5s (next.js: 5.4s, application-code: 45ms)
+ GET /boards/cmuwdbzft0000ieseoxxouant 200 in 254ms (next.js: 12ms, application-code: 242ms)
+{"requestId":"91d7152a-a04c-404f-ac38-c5be2784ef73","method":"GET","kind":"board","id":"cmuwdbzft0000ieseoxxouant","status":200}
+ GET /api/boards/cmuwdbzft0000ieseoxxouant 200 in 1824ms (next.js: 1813ms, application-code: 11ms)
+{"requestId":"710b90fc-0005-41e1-b742-fe3af70b4899","method":"GET","kind":"board","id":"cmuwdbzft0000ieseoxxouant","status":200}
+ GET /api/boards/cmuwdbzft0000ieseoxxouant 200 in 7ms (next.js: 2ms, application-code: 5ms)
+{"requestId":"2198152b-fa15-4378-bdbf-9ca4f395682d","method":"GET","kind":"list","parent":"cmuwdbzft0000ieseoxxouant","status":200}
+ GET /api/boards/cmuwdbzft0000ieseoxxouant/lists 200 in 517ms (next.js: 504ms, application-code: 13ms)
+{"requestId":"7807f4eb-4379-4358-a8f9-2b6155ac36dc","method":"GET","kind":"list","parent":"cmuwdbzft0000ieseoxxouant","status":200}
+ GET /api/boards/cmuwdbzft0000ieseoxxouant/lists 200 in 11ms (next.js: 5ms, application-code: 6ms)
+{"requestId":"44d052c4-3d97-4475-b540-6f99f2bc74a0","method":"POST","kind":"list","parent":"cmuwdbzft0000ieseoxxouant","status":201}
+ POST /api/boards/cmuwdbzft0000ieseoxxouant/lists 201 in 8ms (next.js: 1.9ms, application-code: 7ms)
+{"requestId":"5f2785e1-1d80-45c8-9035-80d6b1d5c249","method":"GET","kind":"board","id":"cmuwdbzft0000ieseoxxouant","status":200}
+ GET /api/boards/cmuwdbzft0000ieseoxxouant 200 in 7ms (next.js: 3ms, application-code: 4ms)
+{"requestId":"293acc3e-6799-4175-950b-1614b7bcb4de","method":"GET","kind":"list","parent":"cmuwdbzft0000ieseoxxouant","status":200}
+ GET /api/boards/cmuwdbzft0000ieseoxxouant/lists 200 in 4ms (next.js: 1.1ms, application-code: 3ms)
+ GET /boards/cmuwdbzft0000ieseoxxouant 200 in 124ms (next.js: 13ms, application-code: 111ms)
+{"requestId":"680d6069-1739-4c46-bcb4-a859c4e328a9","method":"GET","kind":"card","parent":"cmuwdc5zv0001iesekrme4vya","status":200}
+ GET /api/lists/cmuwdc5zv0001iesekrme4vya/cards 200 in 1236ms (next.js: 1225ms, application-code: 10ms)
+{"requestId":"cd3197ba-6bbb-4e6b-802a-6aa5e45c9681","method":"POST","kind":"card","parent":"cmuwdc5zv0001iesekrme4vya","status":201}
+ POST /api/lists/cmuwdc5zv0001iesekrme4vya/cards 201 in 10ms (next.js: 5ms, application-code: 6ms)
+{"requestId":"bec02809-4a4b-4951-99c5-c01126a84bc0","method":"GET","kind":"board","id":"cmuwdbzft0000ieseoxxouant","status":200}
+ GET /api/boards/cmuwdbzft0000ieseoxxouant 200 in 8ms (next.js: 5ms, application-code: 4ms)
+{"requestId":"879a4b67-eb6f-4346-820a-a3f7e3d75ac0","method":"GET","kind":"list","parent":"cmuwdbzft0000ieseoxxouant","status":200}
+ GET /api/boards/cmuwdbzft0000ieseoxxouant/lists 200 in 8ms (next.js: 5ms, application-code: 3ms)
+{"requestId":"f87a71f9-2af9-4760-861e-24f5599a77ef","method":"GET","kind":"card","parent":"cmuwdc5zv0001iesekrme4vya","status":200}
+ GET /api/lists/cmuwdc5zv0001iesekrme4vya/cards 200 in 5ms (next.js: 1.5ms, application-code: 4ms)
+ GET /boards/cmuwdbzft0000ieseoxxouant 200 in 47ms (next.js: 29ms, application-code: 18ms)
+{"requestId":"e9a093d5-e05e-4b1a-8d09-ac96e33e13e1","method":"PATCH","kind":"card","id":"cmuwdc75g0002ieseifqojwhi","status":200}
+ PATCH /api/cards/cmuwdc75g0002ieseifqojwhi 200 in 1631ms (next.js: 1609ms, application-code: 22ms)
+{"requestId":"816204d8-d5e7-4287-9279-559581136f67","method":"GET","kind":"board","id":"cmuwdbzft0000ieseoxxouant","status":200}
+ GET /api/boards/cmuwdbzft0000ieseoxxouant 200 in 7ms (next.js: 3ms, application-code: 4ms)
+{"requestId":"ddfbde92-0491-4649-81b6-567f2321c76f","method":"GET","kind":"list","parent":"cmuwdbzft0000ieseoxxouant","status":200}
+ GET /api/boards/cmuwdbzft0000ieseoxxouant/lists 200 in 8ms (next.js: 4ms, application-code: 4ms)
+{"requestId":"9f085d23-f038-419c-8110-24b3f270033b","method":"GET","kind":"card","parent":"cmuwdc5zv0001iesekrme4vya","status":200}
+ GET /api/lists/cmuwdc5zv0001iesekrme4vya/cards 200 in 14ms (next.js: 5ms, application-code: 8ms)
+{"requestId":"b8ce3227-5513-443b-bb15-6a2db3046d8d","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 16ms (next.js: 8ms, application-code: 8ms)
+{"requestId":"339312de-094c-4794-978b-440e9c332ac8","method":"DELETE","kind":"board","id":"cmuwdbzft0000ieseoxxouant","status":204}
+ DELETE /api/boards/cmuwdbzft0000ieseoxxouant 204 in 14ms (next.js: 3ms, application-code: 12ms)
+ GET / 200 in 400ms (next.js: 4ms, application-code: 396ms)
+{"requestId":"e903a08d-05f3-4f0c-a6fc-5b4cf23e4efa","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 39ms (next.js: 7ms, application-code: 31ms)
+{"requestId":"4793cf42-78bb-452a-9eb0-843a7a29bff3","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 3ms (next.js: 0.9ms, application-code: 2ms)
+{"requestId":"ff34551f-aff2-4d9d-9a06-88e6e8681a0a","method":"POST","kind":"board","status":201}
+ POST /api/boards 201 in 38ms (next.js: 11ms, application-code: 28ms)
+{"requestId":"707bee07-309b-4e89-ae54-6220f55357ff","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 12ms (next.js: 1.5ms, application-code: 10ms)
+ GET /boards/cmuwddci90003iesep00ls1pf 200 in 777ms (next.js: 6ms, application-code: 772ms)
+ GET /boards/cmuwddci90003iesep00ls1pf 200 in 205ms (next.js: 2ms, application-code: 203ms)
+{"requestId":"cae7903a-94b7-4fae-94df-9bd7decf4543","method":"GET","kind":"board","id":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf 200 in 34ms (next.js: 3ms, application-code: 31ms)
+{"requestId":"d7d72b86-70f8-4394-adf8-f79efcff4321","method":"GET","kind":"board","id":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf 200 in 50ms (next.js: 1.5ms, application-code: 49ms)
+{"requestId":"6ee33a71-a049-4317-a20c-6ea495507997","method":"GET","kind":"list","parent":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf/lists 200 in 21ms (next.js: 4ms, application-code: 17ms)
+{"requestId":"1b71cee3-6e00-4ce9-ad88-22ff4c4412e6","method":"GET","kind":"list","parent":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf/lists 200 in 4ms (next.js: 0.8ms, application-code: 4ms)
+{"requestId":"5e32989d-b234-4386-86a3-977b32ea103c","method":"POST","kind":"list","parent":"cmuwddci90003iesep00ls1pf","status":201}
+ POST /api/boards/cmuwddci90003iesep00ls1pf/lists 201 in 6ms (next.js: 0.8ms, application-code: 5ms)
+{"requestId":"f720cbef-98f3-45ee-ac66-d5ac29115fbf","method":"GET","kind":"board","id":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf 200 in 6ms (next.js: 0.8ms, application-code: 6ms)
+{"requestId":"1128469b-bcc8-4bc5-a90c-c20cd19f1ea7","method":"GET","kind":"list","parent":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf/lists 200 in 4ms (next.js: 0.9ms, application-code: 3ms)
+{"requestId":"7e135dfa-534c-4fe3-8b87-c37986cafcfd","method":"GET","kind":"card","parent":"cmuwddemt0004iesev44289je","status":200}
+ GET /api/lists/cmuwddemt0004iesev44289je/cards 200 in 18ms (next.js: 8ms, application-code: 10ms)
+{"requestId":"3e96d8e3-6e66-40c7-9211-ba6971398480","method":"POST","kind":"card","parent":"cmuwddemt0004iesev44289je","status":201}
+ POST /api/lists/cmuwddemt0004iesev44289je/cards 201 in 129ms (next.js: 0.8ms, application-code: 128ms)
+{"requestId":"e0eafdff-c86e-4429-bb17-42ec80e5d3c4","method":"GET","kind":"board","id":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf 200 in 3ms (next.js: 0.7ms, application-code: 2ms)
+{"requestId":"8903b397-dccc-4626-8dab-729600308945","method":"GET","kind":"list","parent":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf/lists 200 in 4ms (next.js: 0.9ms, application-code: 3ms)
+{"requestId":"7d3fcfd5-41e9-483d-8eee-733a514504e3","method":"GET","kind":"card","parent":"cmuwddemt0004iesev44289je","status":200}
+ GET /api/lists/cmuwddemt0004iesev44289je/cards 200 in 3ms (next.js: 0.7ms, application-code: 3ms)
+{"requestId":"03b435e2-6d9e-4b94-84dc-794838de8119","method":"PATCH","kind":"card","id":"cmuwddexp0005iesedyt4pupd","status":200}
+ PATCH /api/cards/cmuwddexp0005iesedyt4pupd 200 in 104ms (next.js: 96ms, application-code: 8ms)
+{"requestId":"af3638c3-b97e-4d27-8307-9f384351f45b","method":"GET","kind":"board","id":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf 200 in 103ms (next.js: 36ms, application-code: 67ms)
+{"requestId":"f84a1cc4-d005-4bb4-aee9-dceaf1d9903f","method":"GET","kind":"list","parent":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf/lists 200 in 5ms (next.js: 3ms, application-code: 2ms)
+{"requestId":"2898dee9-6463-4b1f-a7ea-a0311b728cbc","method":"GET","kind":"card","parent":"cmuwddemt0004iesev44289je","status":200}
+ GET /api/lists/cmuwddemt0004iesev44289je/cards 200 in 22ms (next.js: 13ms, application-code: 9ms)
+ GET /boards/cmuwddci90003iesep00ls1pf 200 in 482ms (next.js: 23ms, application-code: 458ms)
+ GET /boards/cmuwddci90003iesep00ls1pf 200 in 320ms (next.js: 2ms, application-code: 318ms)
+ GET / 200 in 20ms (next.js: 3ms, application-code: 17ms)
+{"requestId":"aea926c1-eb44-40f6-a7ff-dd6cd555ab43","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 6ms (next.js: 2ms, application-code: 4ms)
+{"requestId":"3abd9596-e348-4624-8630-22dd4bc5c7fb","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 5ms (next.js: 2ms, application-code: 2ms)
+ GET /boards/cmuwddci90003iesep00ls1pf 200 in 141ms (next.js: 9ms, application-code: 132ms)
+{"requestId":"2a218998-fad7-48b7-b4ba-bf220e724af1","method":"GET","kind":"board","id":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf 200 in 41ms (next.js: 28ms, application-code: 14ms)
+{"requestId":"74bbcb45-d346-4eec-bc28-677005ce0b14","method":"GET","kind":"board","id":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf 200 in 7ms (next.js: 1.4ms, application-code: 5ms)
+{"requestId":"b6b7eba7-86cf-4a63-a342-e25d1f1061a8","method":"GET","kind":"list","parent":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf/lists 200 in 134ms (next.js: 18ms, application-code: 116ms)
+{"requestId":"53a24668-8bf8-4298-925c-ad3d553c1536","method":"GET","kind":"list","parent":"cmuwddci90003iesep00ls1pf","status":200}
+ GET /api/boards/cmuwddci90003iesep00ls1pf/lists 200 in 4ms (next.js: 1.6ms, application-code: 3ms)
+{"requestId":"083aa692-5b6d-422b-a70f-546655dee46f","method":"GET","kind":"card","parent":"cmuwddemt0004iesev44289je","status":200}
+ GET /api/lists/cmuwddemt0004iesev44289je/cards 200 in 12ms (next.js: 7ms, application-code: 5ms)
+{"requestId":"4fece184-4734-4b94-8451-1312b1a1ed70","method":"GET","kind":"card","parent":"cmuwddemt0004iesev44289je","status":200}
+ GET /api/lists/cmuwddemt0004iesev44289je/cards 200 in 11ms (next.js: 3ms, application-code: 8ms)
+{"requestId":"9a4d442f-407b-4cf1-a2fd-874ee3bbd25d","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 1981ms (next.js: 1964ms, application-code: 16ms)
+{"requestId":"3886154c-692b-486e-8594-ae9130610beb","method":"DELETE","kind":"board","id":"cmuwddci90003iesep00ls1pf","status":204}
+ DELETE /api/boards/cmuwddci90003iesep00ls1pf 204 in 13ms (next.js: 7ms, application-code: 6ms)
+ GET / 200 in 1409ms (next.js: 393ms, application-code: 1015ms)
+{"requestId":"d4bc0283-2939-40bd-abe6-731385758e61","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 15ms (next.js: 4ms, application-code: 11ms)
+{"requestId":"2302e274-8d70-4644-bbee-f888a6261c2f","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 7ms (next.js: 1.4ms, application-code: 5ms)
+{"requestId":"50f00c83-e502-422b-b9aa-624a91a08c24","method":"POST","kind":"board","status":201}
+ POST /api/boards 201 in 56ms (next.js: 0.6ms, application-code: 56ms)
+{"requestId":"ae370a79-103a-4550-9a0a-30350ca46185","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 8ms (next.js: 1.4ms, application-code: 7ms)
+ GET /boards/cmuwdfjml0006iesemd6v127i 200 in 411ms (next.js: 31ms, application-code: 380ms)
+ GET /boards/cmuwdfjml0006iesemd6v127i 200 in 711ms (next.js: 54ms, application-code: 657ms)
+{"requestId":"177eb6dd-5b68-4408-a233-54e63d71fdfb","method":"GET","kind":"board","id":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i 200 in 99ms (next.js: 92ms, application-code: 7ms)
+{"requestId":"0a7e7ec0-3f54-4acb-9308-af55d7a4d42a","method":"GET","kind":"board","id":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i 200 in 5ms (next.js: 1.0ms, application-code: 4ms)
+{"requestId":"8f606c48-d340-49de-8ba6-c5b1842aec7c","method":"GET","kind":"list","parent":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i/lists 200 in 294ms (next.js: 36ms, application-code: 258ms)
+{"requestId":"8cbcdeee-3ec5-40d3-adad-af5fae388d40","method":"GET","kind":"list","parent":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i/lists 200 in 5ms (next.js: 0.7ms, application-code: 4ms)
+{"requestId":"f6a521ca-18ed-47b5-a7b5-465bfb857a81","method":"POST","kind":"list","parent":"cmuwdfjml0006iesemd6v127i","status":201}
+ POST /api/boards/cmuwdfjml0006iesemd6v127i/lists 201 in 6ms (next.js: 1.2ms, application-code: 5ms)
+{"requestId":"e0c4b426-301f-4f8f-a594-c9a567740488","method":"GET","kind":"board","id":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i 200 in 3ms (next.js: 0.8ms, application-code: 3ms)
+{"requestId":"d75fec64-5145-4c28-8db0-057694c2d091","method":"GET","kind":"list","parent":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i/lists 200 in 6ms (next.js: 1.9ms, application-code: 4ms)
+{"requestId":"b8d73674-1ff7-4a07-b653-a0758e5c27b3","method":"GET","kind":"card","parent":"cmuwdfmau0007iesezt63t6fe","status":200}
+ GET /api/lists/cmuwdfmau0007iesezt63t6fe/cards 200 in 57ms (next.js: 52ms, application-code: 5ms)
+{"requestId":"0a6def80-5e28-4d2d-9968-bfd5a614d3f0","method":"POST","kind":"card","parent":"cmuwdfmau0007iesezt63t6fe","status":201}
+ POST /api/lists/cmuwdfmau0007iesezt63t6fe/cards 201 in 8ms (next.js: 2ms, application-code: 5ms)
+{"requestId":"99a5b309-274c-401b-be4d-23e8a65f9afa","method":"GET","kind":"board","id":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i 200 in 4ms (next.js: 1.4ms, application-code: 3ms)
+{"requestId":"ce5cb21e-ffd8-4d3d-bdbf-f36a431f8b2a","method":"GET","kind":"list","parent":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i/lists 200 in 4ms (next.js: 0.8ms, application-code: 3ms)
+{"requestId":"96ae7a4b-d019-4a08-a506-4885288dca32","method":"GET","kind":"card","parent":"cmuwdfmau0007iesezt63t6fe","status":200}
+ GET /api/lists/cmuwdfmau0007iesezt63t6fe/cards 200 in 7ms (next.js: 1.4ms, application-code: 5ms)
+{"requestId":"e66896ec-1747-4a35-a7a4-7f23ab0793a2","method":"PATCH","kind":"card","id":"cmuwdfmej0008iesefkpzxfu9","status":200}
+ PATCH /api/cards/cmuwdfmej0008iesefkpzxfu9 200 in 729ms (next.js: 707ms, application-code: 21ms)
+{"requestId":"b8cd96d9-f1cc-4301-84e1-479ac307edb8","method":"GET","kind":"board","id":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i 200 in 16ms (next.js: 7ms, application-code: 9ms)
+{"requestId":"70651fcd-59c1-482c-8110-f05fd6115151","method":"GET","kind":"list","parent":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i/lists 200 in 49ms (next.js: 43ms, application-code: 6ms)
+ GET /boards/cmuwdfjml0006iesemd6v127i 200 in 141ms (next.js: 65ms, application-code: 76ms)
+{"requestId":"9197cafb-785c-4c20-92cc-b447be1e9cce","method":"GET","kind":"card","parent":"cmuwdfmau0007iesezt63t6fe","status":200}
+ GET /api/lists/cmuwdfmau0007iesezt63t6fe/cards 200 in 15ms (next.js: 8ms, application-code: 7ms)
+ GET /boards/cmuwdfjml0006iesemd6v127i 200 in 194ms (next.js: 1.3ms, application-code: 193ms)
+{"requestId":"168a19b8-f703-4c43-b143-518df3f1f22b","method":"GET","kind":"board","id":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i 200 in 92ms (next.js: 62ms, application-code: 30ms)
+{"requestId":"3ce320a8-40f1-49e2-b3ca-dddb79b8665e","method":"GET","kind":"board","id":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i 200 in 20ms (next.js: 8ms, application-code: 13ms)
+{"requestId":"7d01a7e0-fd58-4f06-a046-8c464ac67e4f","method":"GET","kind":"list","parent":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i/lists 200 in 56ms (next.js: 52ms, application-code: 4ms)
+{"requestId":"83440e13-c5bd-41f6-b895-8996d6bfc44e","method":"GET","kind":"list","parent":"cmuwdfjml0006iesemd6v127i","status":200}
+ GET /api/boards/cmuwdfjml0006iesemd6v127i/lists 200 in 3ms (next.js: 0.8ms, application-code: 3ms)
+{"requestId":"d14f68f0-0de7-4b60-acb1-3955c9aff74c","method":"GET","kind":"card","parent":"cmuwdfmau0007iesezt63t6fe","status":200}
+ GET /api/lists/cmuwdfmau0007iesezt63t6fe/cards 200 in 98ms (next.js: 6ms, application-code: 93ms)
+{"requestId":"0f759c74-a084-4c3d-9484-97994acbbe90","method":"GET","kind":"card","parent":"cmuwdfmau0007iesezt63t6fe","status":200}
+ GET /api/lists/cmuwdfmau0007iesezt63t6fe/cards 200 in 25ms (next.js: 13ms, application-code: 13ms)
+{"requestId":"401582e8-3c5a-4e91-9214-7ea555a786ba","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 19ms (next.js: 10ms, application-code: 9ms)
+{"requestId":"73af4c8a-8912-42e6-a3b5-5004ea0bb8d9","method":"DELETE","kind":"board","id":"cmuwdfjml0006iesemd6v127i","status":204}
+ DELETE /api/boards/cmuwdfjml0006iesemd6v127i 204 in 50ms (next.js: 41ms, application-code: 9ms)
+ GET / 200 in 52ms (next.js: 9ms, application-code: 43ms)
+{"requestId":"e797dbaa-3ce1-4004-a686-ccb0d8ff716a","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 10ms (next.js: 3ms, application-code: 6ms)
+{"requestId":"e65ad223-0e6b-4ebe-897d-1bcbc25c726f","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 3ms (next.js: 0.6ms, application-code: 2ms)
+{"requestId":"b544e2cd-79af-4cdd-9a1f-65a6d777209e","method":"POST","kind":"board","status":201}
+ POST /api/boards 201 in 3ms (next.js: 0.5ms, application-code: 3ms)
+{"requestId":"104258fe-9b93-437b-bb9b-485837e8b792","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 2ms (next.js: 0.5ms, application-code: 2.0ms)
+ GET /boards/cmuwdgwze0009iese2tgf825h 200 in 1729ms (next.js: 1423ms, application-code: 306ms)
+ GET /boards/cmuwdgwze0009iese2tgf825h 200 in 16ms (next.js: 1.8ms, application-code: 14ms)
+{"requestId":"50bce2d8-a022-469b-9ab2-648ad80299cb","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 7ms (next.js: 3ms, application-code: 4ms)
+{"requestId":"03c93a1f-ae34-4775-aa40-103ea2c9a701","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 5ms (next.js: 0.6ms, application-code: 5ms)
+{"requestId":"08454509-a2b6-4de1-97d5-7ca34db36033","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 9ms (next.js: 4ms, application-code: 4ms)
+{"requestId":"7efaa798-0520-4467-841a-0102dc9ba96e","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 4ms (next.js: 1.1ms, application-code: 3ms)
+{"requestId":"a3c25810-71c3-4e3d-abe6-3e3ada549c6f","method":"POST","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":201}
+ POST /api/boards/cmuwdgwze0009iese2tgf825h/lists 201 in 6ms (next.js: 2.0ms, application-code: 4ms)
+{"requestId":"e120c900-0888-42e2-869b-a53fc8e649bd","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 4ms (next.js: 2ms, application-code: 2ms)
+{"requestId":"60e0b937-fc3b-457d-b963-2fc8b6483c09","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 3ms (next.js: 0.7ms, application-code: 2ms)
+{"requestId":"e43c98b2-4095-422b-bd0e-7db50e1ce02e","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 6ms (next.js: 3ms, application-code: 2ms)
+{"requestId":"f2d45cd3-a97d-45ae-bf35-812f93ce4d3c","method":"POST","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":201}
+ POST /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 201 in 201ms (next.js: 85ms, application-code: 116ms)
+{"requestId":"9eb5732d-d959-4beb-a03f-a33f3d40e0f6","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 4ms (next.js: 1.1ms, application-code: 3ms)
+{"requestId":"5af42d81-3ca3-4a23-bd88-7bb8dfc01d0a","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 4ms (next.js: 0.8ms, application-code: 3ms)
+{"requestId":"3dbb7e78-767d-48e0-a2ba-e6d1f5bc71dc","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 3ms (next.js: 0.7ms, application-code: 2ms)
+{"requestId":"46bb5884-19d8-41a7-956e-710d482a6635","method":"PATCH","kind":"card","id":"cmuwdgz8r000biese7t3dgf9w","status":200}
+ PATCH /api/cards/cmuwdgz8r000biese7t3dgf9w 200 in 19ms (next.js: 3ms, application-code: 16ms)
+{"requestId":"697ce437-e32a-4ec8-8f8d-a2a4a2af3f6b","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 18ms (next.js: 14ms, application-code: 4ms)
+{"requestId":"4df31f8a-5693-4db0-a342-af29ab57de55","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 5ms (next.js: 2ms, application-code: 3ms)
+{"requestId":"f2fd8c37-f4e3-4719-a5fa-dd724cac537c","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 6ms (next.js: 2ms, application-code: 4ms)
+ GET /boards/cmuwdgwze0009iese2tgf825h 200 in 287ms (next.js: 5ms, application-code: 282ms)
+ GET /boards/cmuwdgwze0009iese2tgf825h 200 in 43ms (next.js: 0.9ms, application-code: 42ms)
+{"requestId":"94c985e6-24d6-4dd9-aabd-3c695c0562cc","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 10ms (next.js: 5ms, application-code: 4ms)
+{"requestId":"0e8550b9-6800-48d4-b157-8bcfa412f653","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 4ms (next.js: 0.7ms, application-code: 4ms)
+{"requestId":"6175af37-00ae-4e94-a13b-6ded69a7c8eb","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 5ms (next.js: 2ms, application-code: 3ms)
+{"requestId":"ac57d396-30d9-4ed7-8bca-ee656b1932b8","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 4ms (next.js: 0.8ms, application-code: 3ms)
+{"requestId":"4689c1a2-b0db-438a-9bf0-91a46893e78b","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 4ms (next.js: 2ms, application-code: 2ms)
+{"requestId":"7226264f-0d13-4fbe-9b83-2a0c3ded98c5","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 3ms (next.js: 0.7ms, application-code: 2ms)
+ GET / 200 in 317ms (next.js: 8ms, application-code: 308ms)
+{"requestId":"d6faa775-e33b-41e8-824b-5441ff946c0e","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 9ms (next.js: 4ms, application-code: 5ms)
+{"requestId":"90d08e42-9821-4da0-8026-69e2509f65ae","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 5ms (next.js: 0.9ms, application-code: 4ms)
+{"requestId":"55a4d763-b3d0-4845-bade-f8bcdc968833","method":"PATCH","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ PATCH /api/boards/cmuwdgwze0009iese2tgf825h 200 in 134ms (next.js: 93ms, application-code: 40ms)
+ GET /boards/cmuwdgwze0009iese2tgf825h 200 in 197ms (next.js: 9ms, application-code: 188ms)
+{"requestId":"45733beb-7e95-44c7-bced-dc63763b67f7","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 3ms (next.js: 0.9ms, application-code: 2ms)
+{"requestId":"df493abb-cf6b-45fa-9d22-46058c649310","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 5ms (next.js: 1.4ms, application-code: 3ms)
+{"requestId":"b1c7979a-a255-48b5-81f8-4cf76bbaa8f6","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 4ms (next.js: 0.7ms, application-code: 3ms)
+{"requestId":"83591b74-bc1a-4b93-8ff7-272f27a9e480","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 88ms (next.js: 73ms, application-code: 15ms)
+{"requestId":"1ab7c2fe-f7bd-454b-8319-19759ef757b9","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 6ms (next.js: 1.5ms, application-code: 4ms)
+{"requestId":"385212f5-cc01-42b8-b170-f043f3c6bb45","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 20ms (next.js: 17ms, application-code: 3ms)
+{"requestId":"4050aa22-6100-423d-8e63-05471652bb09","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 4ms (next.js: 0.7ms, application-code: 4ms)
+ GET /boards/cmuwdgwze0009iese2tgf825h 200 in 790ms (next.js: 428ms, application-code: 361ms)
+{"requestId":"c4af1edb-107b-4ee1-bf4b-4c344487cb72","method":"PATCH","kind":"list","id":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ PATCH /api/lists/cmuwdgyz1000aiesehcg3hmud 200 in 4.5s (next.js: 4.5s, application-code: 18ms)
+{"requestId":"7ca9c55d-1990-483c-8e92-6ea07c09145e","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 126ms (next.js: 111ms, application-code: 15ms)
+{"requestId":"a33d4aca-c002-47e1-ae29-ce4936c0f6fb","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 68ms (next.js: 60ms, application-code: 7ms)
+{"requestId":"7e29ca99-5936-418e-b440-cb8e5925ebd6","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 279ms (next.js: 270ms, application-code: 9ms)
+{"requestId":"4665bdc5-088b-49d8-a171-d3d52a19562a","method":"POST","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":201}
+ POST /api/boards/cmuwdgwze0009iese2tgf825h/lists 201 in 96ms (next.js: 1.2ms, application-code: 95ms)
+{"requestId":"682fdc88-8aab-4ec7-9a8d-4d23a6fe0f1e","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 3ms (next.js: 0.9ms, application-code: 2ms)
+{"requestId":"efff1be3-bc86-4c05-8421-fe6ba05d6a51","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 6ms (next.js: 1.3ms, application-code: 4ms)
+{"requestId":"676b4cbf-c9e1-4f17-927e-3c2244ad8e91","method":"GET","kind":"card","parent":"cmuwdhj5i000ciesesf09q9il","status":200}
+ GET /api/lists/cmuwdhj5i000ciesesf09q9il/cards 200 in 4ms (next.js: 0.7ms, application-code: 3ms)
+{"requestId":"41831c1e-d4f6-408b-aace-1c0ce89099c3","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 3ms (next.js: 0.7ms, application-code: 2ms)
+{"requestId":"ab3cd452-e3c8-4920-a4df-42155f6515d9","method":"PATCH","kind":"list","id":"cmuwdhj5i000ciesesf09q9il","status":200}
+ PATCH /api/lists/cmuwdhj5i000ciesesf09q9il 200 in 26ms (next.js: 1.9ms, application-code: 24ms)
+{"requestId":"901c33ba-d758-4ff3-b7b6-b96d53680ca5","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 33ms (next.js: 24ms, application-code: 9ms)
+{"requestId":"64976a85-9969-4a63-b7c7-6452a800b6e3","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 7ms (next.js: 1.7ms, application-code: 5ms)
+{"requestId":"ac94e735-694a-4d32-8eb4-1dfe55b660cb","method":"GET","kind":"card","parent":"cmuwdhj5i000ciesesf09q9il","status":200}
+ GET /api/lists/cmuwdhj5i000ciesesf09q9il/cards 200 in 8ms (next.js: 4ms, application-code: 4ms)
+{"requestId":"49e84a23-5570-4035-8dcc-f0389afe31ba","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 7ms (next.js: 5ms, application-code: 2ms)
+{"requestId":"a57dd4ac-a4ee-4d4c-badd-e5695f3d1354","method":"POST","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":201}
+ POST /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 201 in 9ms (next.js: 1.9ms, application-code: 7ms)
+{"requestId":"68790393-e4a8-4480-ae2b-f6046f79a3fe","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 14ms (next.js: 1.9ms, application-code: 12ms)
+{"requestId":"345d1bf1-e7c5-4ab6-8d11-d728cd3e433a","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 3ms (next.js: 0.8ms, application-code: 3ms)
+{"requestId":"d02effea-723a-4cd7-af03-5aaf6211f190","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 3ms (next.js: 0.7ms, application-code: 3ms)
+{"requestId":"f6b869ca-240a-4136-83ee-3ce1069a0450","method":"GET","kind":"card","parent":"cmuwdhj5i000ciesesf09q9il","status":200}
+ GET /api/lists/cmuwdhj5i000ciesesf09q9il/cards 200 in 5ms (next.js: 1.2ms, application-code: 3ms)
+{"requestId":"a6d6dc1c-2b47-43c1-bc87-803a7eeb46a4","method":"PATCH","kind":"card","id":"cmuwdhjxw000diese0uy0rdk1","status":200}
+ PATCH /api/cards/cmuwdhjxw000diese0uy0rdk1 200 in 65ms (next.js: 11ms, application-code: 54ms)
+{"requestId":"5f5e93b2-1030-41ae-a401-72528a727c8f","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 5ms (next.js: 0.8ms, application-code: 4ms)
+{"requestId":"e8593528-0976-469c-9e3e-195ba7607688","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 5ms (next.js: 1.3ms, application-code: 4ms)
+{"requestId":"bcf03535-3491-4cb7-a607-1f7ec99b76c8","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 3ms (next.js: 0.7ms, application-code: 2ms)
+{"requestId":"ba33b06e-c3ec-4c9d-84b4-2156ce930a53","method":"GET","kind":"card","parent":"cmuwdhj5i000ciesesf09q9il","status":200}
+ GET /api/lists/cmuwdhj5i000ciesesf09q9il/cards 200 in 10ms (next.js: 4ms, application-code: 6ms)
+{"requestId":"c708c98a-561c-4534-8771-c84098bdbb8f","method":"DELETE","kind":"card","id":"cmuwdhjxw000diese0uy0rdk1","status":204}
+ DELETE /api/cards/cmuwdhjxw000diese0uy0rdk1 204 in 59ms (next.js: 50ms, application-code: 9ms)
+{"requestId":"259d9066-1938-4f49-9c5d-b3de513de816","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 4ms (next.js: 1.7ms, application-code: 3ms)
+{"requestId":"602eadd0-b56f-4e1c-a094-82db73a1ed5b","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 53ms (next.js: 48ms, application-code: 4ms)
+{"requestId":"5a84707e-d222-4b11-95a7-247e3ea73d4d","method":"GET","kind":"card","parent":"cmuwdhj5i000ciesesf09q9il","status":200}
+ GET /api/lists/cmuwdhj5i000ciesesf09q9il/cards 200 in 4ms (next.js: 1.0ms, application-code: 3ms)
+{"requestId":"b38114d3-ee00-4b29-85ad-e68e5871951c","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 9ms (next.js: 0.8ms, application-code: 8ms)
+{"requestId":"7c3c7bfa-96a4-4cdf-a51e-661ae84a8ee7","method":"DELETE","kind":"card","id":"cmuwdgz8r000biese7t3dgf9w","status":204}
+ DELETE /api/cards/cmuwdgz8r000biese7t3dgf9w 204 in 6ms (next.js: 1.3ms, application-code: 5ms)
+{"requestId":"ea709353-f953-4e15-8c5e-7af19a4fe53d","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 5ms (next.js: 1.1ms, application-code: 4ms)
+{"requestId":"86bfdb22-aaff-41e6-9414-6e8db669456f","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 3ms (next.js: 0.8ms, application-code: 2ms)
+{"requestId":"c7f9a426-3e39-4a61-b2e3-58300318f081","method":"GET","kind":"card","parent":"cmuwdhj5i000ciesesf09q9il","status":200}
+ GET /api/lists/cmuwdhj5i000ciesesf09q9il/cards 200 in 22ms (next.js: 4ms, application-code: 18ms)
+{"requestId":"19fbf2e1-fef1-46f4-9f7e-fa784050b092","method":"GET","kind":"card","parent":"cmuwdgyz1000aiesehcg3hmud","status":200}
+ GET /api/lists/cmuwdgyz1000aiesehcg3hmud/cards 200 in 49ms (next.js: 29ms, application-code: 20ms)
+{"requestId":"72d4203e-1bde-44f1-b9c9-c155637cab34","method":"DELETE","kind":"list","id":"cmuwdgyz1000aiesehcg3hmud","status":204}
+ DELETE /api/lists/cmuwdgyz1000aiesehcg3hmud 204 in 33ms (next.js: 13ms, application-code: 20ms)
+{"requestId":"7c4d94ef-331f-4146-b0e3-0aea4fe96607","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 5ms (next.js: 2ms, application-code: 2ms)
+{"requestId":"7a17bbe4-de50-4312-ae70-3f35c257d0de","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 3ms (next.js: 0.8ms, application-code: 3ms)
+{"requestId":"9fe88cec-42e5-42ae-ad99-b1d31b9318be","method":"GET","kind":"card","parent":"cmuwdhj5i000ciesesf09q9il","status":200}
+ GET /api/lists/cmuwdhj5i000ciesesf09q9il/cards 200 in 6ms (next.js: 1.4ms, application-code: 5ms)
+{"requestId":"5de7a7fb-1df0-451b-b02a-1aaf768b1329","method":"DELETE","kind":"list","id":"cmuwdhj5i000ciesesf09q9il","status":204}
+ DELETE /api/lists/cmuwdhj5i000ciesesf09q9il 204 in 88ms (next.js: 83ms, application-code: 5ms)
+{"requestId":"302ddf73-bac8-4eac-98b8-483622a00c20","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 200 in 6ms (next.js: 1.9ms, application-code: 4ms)
+{"requestId":"c919761b-969c-495d-b84c-14084fca9be6","method":"GET","kind":"list","parent":"cmuwdgwze0009iese2tgf825h","status":200}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h/lists 200 in 5ms (next.js: 1.3ms, application-code: 4ms)
+{"requestId":"5050d482-f871-452d-a1f4-7fc73f7688da","method":"DELETE","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":204}
+ DELETE /api/boards/cmuwdgwze0009iese2tgf825h 204 in 29ms (next.js: 15ms, application-code: 14ms)
+{"requestId":"4a839075-f16d-4d79-b165-81d747b74dbc","method":"GET","kind":"board","id":"cmuwdgwze0009iese2tgf825h","status":404}
+ GET /api/boards/cmuwdgwze0009iese2tgf825h 404 in 8ms (next.js: 3ms, application-code: 5ms)
+{"requestId":"d91c5a5d-5a39-4fbe-867d-abd8265e9ae3","method":"GET","kind":"board","status":200}
+ GET /api/boards 200 in 10ms (next.js: 3ms, application-code: 7ms)
+ GET / 200 in 235ms (next.js: 9ms, application-code: 226ms)
+[?25h

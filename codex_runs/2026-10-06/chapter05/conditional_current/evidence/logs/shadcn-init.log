@@ -1,0 +1,27 @@
+  - components/ui/button.tsx
+  - lib/utils.ts
+
+Project initialization completed.
+You may now add components.
+
+- Preflight checks.
+✔ Preflight checks.
+- Verifying framework.
+✔ Verifying framework. Found Next.js.
+- Validating Tailwind CSS. Found v4.
+✔ Validating Tailwind CSS. Found v4.
+- Validating import alias.
+✔ Validating import alias.
+- Writing components.json.
+✔ Writing components.json.
+- Checking registry.
+✔ Checking registry.
+- Installing dependencies.
+- Installing dependencies.
+✔ Installing dependencies.
+- Updating fonts.
+✔ Updating fonts.
+- Updating files.
+✔ Created 2 files:
+- Updating app/globals.css
+✔ Updating app/globals.css

@@ -1,0 +1,9 @@
+{
+  "candidate_file_count": 89,
+  "all_files_exist": true,
+  "hashes_verified": true,
+  "excluded_sensitive_and_runtime_files": true,
+  "personal_absolute_path_scan_passed": true,
+  "secret_pattern_scan_passed": true,
+  "source_book_and_inputs_unchanged": true
+}

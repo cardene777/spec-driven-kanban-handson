@@ -1,0 +1,111 @@
+[
+  {
+    "method": "POST",
+    "path": "/api/boards",
+    "status": 201,
+    "data": {
+      "id": "e1ff1e17-d3af-4cd0-b245-8b8bb6cea263",
+      "title": "HTTP",
+      "order": 0,
+      "createdAt": "2026-10-06T08:01:57.773Z",
+      "updatedAt": "2026-10-06T08:01:57.773Z"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/boards/e1ff1e17-d3af-4cd0-b245-8b8bb6cea263/lists",
+    "status": 201,
+    "data": {
+      "id": "feb3d537-852a-47f0-85f0-8e4c6cd5db94",
+      "boardId": "e1ff1e17-d3af-4cd0-b245-8b8bb6cea263",
+      "title": "L",
+      "order": 0,
+      "createdAt": "2026-10-06T08:01:58.410Z",
+      "updatedAt": "2026-10-06T08:01:58.410Z"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/lists/feb3d537-852a-47f0-85f0-8e4c6cd5db94/cards",
+    "status": 201,
+    "data": {
+      "id": "ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88",
+      "listId": "feb3d537-852a-47f0-85f0-8e4c6cd5db94",
+      "title": "C",
+      "description": "",
+      "order": 0,
+      "createdAt": "2026-10-06T08:01:58.896Z",
+      "updatedAt": "2026-10-06T08:01:58.896Z"
+    }
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88",
+    "status": 422,
+    "data": {
+      "error": "validation_error",
+      "fields": {
+        "description": "invalid"
+      }
+    }
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88",
+    "status": 200,
+    "data": {
+      "id": "ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88",
+      "listId": "feb3d537-852a-47f0-85f0-8e4c6cd5db94",
+      "title": "C",
+      "description": "",
+      "order": 0,
+      "createdAt": "2026-10-06T08:01:58.896Z",
+      "updatedAt": "2026-10-06T08:01:59.456Z"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/boards",
+    "status": 422,
+    "data": {
+      "error": "validation_error",
+      "fields": {
+        "title": "invalid"
+      }
+    }
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/cards/missing",
+    "status": 404,
+    "data": {
+      "error": "not_found"
+    }
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88",
+    "status": 204,
+    "data": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88",
+    "status": 404,
+    "data": {
+      "error": "not_found"
+    }
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/lists/feb3d537-852a-47f0-85f0-8e4c6cd5db94",
+    "status": 204,
+    "data": null
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/boards/e1ff1e17-d3af-4cd0-b245-8b8bb6cea263",
+    "status": 204,
+    "data": null
+  }
+]

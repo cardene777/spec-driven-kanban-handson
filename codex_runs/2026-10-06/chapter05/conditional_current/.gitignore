@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.verification/
+.env
+*.db
+*.db-*
+generated/
+*.tsbuildinfo
+evidence/logs/

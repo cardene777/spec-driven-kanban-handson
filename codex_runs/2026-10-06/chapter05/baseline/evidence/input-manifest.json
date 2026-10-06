@@ -1,0 +1,90 @@
+[
+  {
+    "path": ".claude/skills/constitution/SKILL.md",
+    "sha256": "e494090321cadb186adb2c09c3030c28a9cc5809a3352f5ab225e0d1da6357f8"
+  },
+  {
+    "path": ".claude/skills/design/SKILL.md",
+    "sha256": "c0d431ddc14708c8511e349b1d20b858e0edd73f01c6c2a25c383468b70301da"
+  },
+  {
+    "path": ".claude/skills/design-system/SKILL.md",
+    "sha256": "0668802ea904197cbfa23c88614e161d17c185c74bfe31520f52ef21704700a3"
+  },
+  {
+    "path": ".claude/skills/document/SKILL.md",
+    "sha256": "677521ea337ad8168be55c270c85e224c96cc068ccc538a5138b30535b4f7d8b"
+  },
+  {
+    "path": ".claude/skills/implement/SKILL.md",
+    "sha256": "cccf7b75b8fcb861e8f4b0632d42c924f553e976d3e390ec2b295897e58d52bb"
+  },
+  {
+    "path": ".claude/skills/review/SKILL.md",
+    "sha256": "8c4b6f2f13af620bf83e7b09acc6fb6a3da4951302af152fba6cc10b82e8b211"
+  },
+  {
+    "path": ".claude/skills/spec/SKILL.md",
+    "sha256": "43529a7c36dc5ca4945d2828ea7e5dde453f438ac8c6e9ae5f39406cb8dd3b0a"
+  },
+  {
+    "path": ".claude/skills/spec-review/SKILL.md",
+    "sha256": "66b107934249f02118eecff9cf16b1a0f2cb319aadd472875784c4730f797cdd"
+  },
+  {
+    "path": ".claude/skills/tdd/SKILL.md",
+    "sha256": "5bf9af65fdca0dd6061591d57dd7ac0e73276174ba84a5aa4eb8ecdfb595c566"
+  },
+  {
+    "path": ".claude/skills/test/SKILL.md",
+    "sha256": "52f0f14634f23d3546eeee7f5ed945af8cdb2d8f7def063c213bfa3c03c7e787"
+  },
+  {
+    "path": ".claude/skills/ui-design/SKILL.md",
+    "sha256": "f9fdd28de75df5cf6769fcb8bbe87ccc338da3af32d6eb589354222995870d83"
+  },
+  {
+    "path": "inputs/001_core_kanban_design_input.md",
+    "sha256": "4288ca5b68cdd2c88c1e683137796a0c6b8fd3944e10fbef617d7a0447d8507a"
+  },
+  {
+    "path": "inputs/001_core_kanban_spec_input.md",
+    "sha256": "56b3313c76c0eb196fc37c32df8472230ed63284ab80e5348224f2b57a6ff9c5"
+  },
+  {
+    "path": "inputs/004_card_movement_archive_restore_spec_input.md",
+    "sha256": "20713a4274b818d0e80a5823f09883d846882864eca6f6c279bb573eadd23115"
+  },
+  {
+    "path": "inputs/005_008_ui_features_design_input.md",
+    "sha256": "3eb3d2040de21a4fc3a452c858e563d97bfd998c721ab1401d6c81b28e8c6329"
+  },
+  {
+    "path": "inputs/005_008_ui_features_spec_input.md",
+    "sha256": "89fa5c620d321e91ae12e86af226947b8f20ac93e23faadb561f3456f61777f7"
+  },
+  {
+    "path": "inputs/009_assignee_design_input.md",
+    "sha256": "9699dd189b646a83d72fcf892c2a9f720cd00fe66591bbc307d5a13c5867b2c0"
+  },
+  {
+    "path": "inputs/009_assignee_spec_input.md",
+    "sha256": "e9dd190c7f79ed442aaa411cc859a046a6537c699a3a80b3cea2aaf3b1367a1c"
+  },
+  {
+    "path": "inputs/010_comment_design_input.md",
+    "sha256": "b8165bcfe388a8dc08ac908e5d2ffd0e8b9d4e436f7dd17989b1738123bcec4b"
+  },
+  {
+    "path": "inputs/010_comment_spec_input.md",
+    "sha256": "72e07816128ce9a98bef8e00c1ec13af67f63d0486855c46726bf12ba02532d8"
+  },
+  {
+    "path": "inputs/011_013_auth_invite_permissions_design_input.md",
+    "sha256": "67528073bc28d256dac8a7f6f95687489b7528b2c254c7391047187d808f0a73"
+  },
+  {
+    "path": "inputs/011_013_auth_invite_permissions_spec_input.md",
+    "sha256": "44adde82116e978758fac27fd4740f5fa8389feedcf81eb7951ee421e7e21c12"
+  }
+]

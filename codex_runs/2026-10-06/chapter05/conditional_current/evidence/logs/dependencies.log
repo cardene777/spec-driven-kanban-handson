@@ -1,0 +1,13 @@
+
+added 198 packages, and audited 564 packages in 1m
+
+184 packages are looking for funding
+  run `npm fund` for details
+
+9 high severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.

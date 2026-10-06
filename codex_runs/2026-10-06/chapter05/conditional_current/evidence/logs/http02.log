@@ -1,0 +1,45 @@
+[
+  { method: 'POST', path: '/api/boards', status: 201 },
+  {
+    method: 'POST',
+    path: '/api/boards/e1ff1e17-d3af-4cd0-b245-8b8bb6cea263/lists',
+    status: 201
+  },
+  {
+    method: 'POST',
+    path: '/api/lists/feb3d537-852a-47f0-85f0-8e4c6cd5db94/cards',
+    status: 201
+  },
+  {
+    method: 'PATCH',
+    path: '/api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88',
+    status: 422
+  },
+  {
+    method: 'PATCH',
+    path: '/api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88',
+    status: 200
+  },
+  { method: 'POST', path: '/api/boards', status: 422 },
+  { method: 'PATCH', path: '/api/cards/missing', status: 404 },
+  {
+    method: 'DELETE',
+    path: '/api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88',
+    status: 204
+  },
+  {
+    method: 'GET',
+    path: '/api/cards/ff9c2d42-45d5-4cb4-a1da-9e8d1e0f5d88',
+    status: 404
+  },
+  {
+    method: 'DELETE',
+    path: '/api/lists/feb3d537-852a-47f0-85f0-8e4c6cd5db94',
+    status: 204
+  },
+  {
+    method: 'DELETE',
+    path: '/api/boards/e1ff1e17-d3af-4cd0-b245-8b8bb6cea263',
+    status: 204
+  }
+]
