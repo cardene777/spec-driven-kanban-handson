@@ -1,5 +1,7 @@
+# 検証入力の記録
+
 出典: 04_step2_simple_skills.md:241
 
-```text
-/constitution プロジェクト名は「シンプルなカンバン」（Simple Kanban / タスクをカードで管理する最小構成のカンバンアプリ）。技術スタックは Next.js 16（App Router）+ TypeScript + Tailwind CSS + SQLite + Prisma 7 + Vitest 4 + npm。想定規模は個人開発で、認証は不要。
-```
+書籍掲載プロンプトの全文は公開版に収録しません。再実行時は書籍の該当箇所を入力してください。
+
+入力本文のSHA-256: `10562cb660a04658b8c43d0c81fafbc5988285ca3e599041ea1f0b32529cef2d`
