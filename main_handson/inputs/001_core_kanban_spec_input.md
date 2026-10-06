@@ -30,7 +30,7 @@
 - BoardとListのtitleは1〜100文字
 - Cardのtitleは1〜200文字
 - Cardのdescriptionは0〜2000文字
-- 空文字や上限超過は422
+- titleが空文字の場合と、titleまたはdescriptionが上限を超える場合は422。descriptionの空文字は許可する
 
 ## 画面
 

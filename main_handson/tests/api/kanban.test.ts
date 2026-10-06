@@ -351,6 +351,25 @@ describe("core boards/lists/cards", () => {
     );
     expect(okDesc.status).toBe(201);
   });
+
+  it("カード説明文は作成時と編集時に空文字を許可する", async () => {
+    const board = await createBoard();
+    const list = await createList(board.id);
+    const created = await cardsPOST(
+      jsonReq(`http://localhost/api/lists/${list.id}/cards`, { title: "C", description: "" }),
+      listCtx(list.id),
+    );
+    expect(created.status).toBe(201);
+    const card = await created.json();
+    expect(card.description).toBe("");
+
+    const updated = await cardPATCH(
+      jsonReq(`http://localhost/api/cards/${card.id}`, { description: "" }, "PATCH"),
+      cardCtx(card.id),
+    );
+    expect(updated.status).toBe(200);
+    expect((await updated.json()).description).toBe("");
+  });
 });
 
 // ---- spec/004: 移動 ----
