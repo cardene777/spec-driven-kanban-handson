@@ -15,23 +15,25 @@ model Board {
 }
 
 model List {
-  id      String @id @default(cuid())
-  title   String
-  order   Int
-  boardId String
-  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  cards   Card[]
+  id        String   @id @default(cuid())
+  title     String
+  order     Int
+  boardId   String
+  createdAt DateTime @default(now())
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards     Card[]
 
   @@index([boardId])
 }
 
 model Card {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
   description String?
   order       Int
   listId      String
-  list        List    @relation(fields: [listId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
 
   @@index([listId])
 }
