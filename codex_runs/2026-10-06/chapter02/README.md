@@ -7,4 +7,6 @@
 
 プロンプト版はVitest 9件、Skill版は18件に成功しました。両版でlint、型チェック、ビルド、ブラウザ操作とAPI・SQLiteの確認が成功しています。書籍に必須の修正は検出されませんでした。詳細は[結果](evidence/result.md)と[実行記録](evidence/session.md)を参照してください。
 
+`evidence/inputs/`には入力の出典とSHA-256だけを収録しています。書籍掲載プロンプトの全文は収録していません。再実行時は書籍の該当箇所を使用してください。
+
 実行時のNode.jsは24.15.0、npmは11.12.1でした。再実行する際は各アプリのディレクトリで`npm install`、`.env.example`からの`.env`作成、`npx prisma migrate dev`、`npx prisma generate`を行ってください。各アプリの`package.json`に検証用のnpm scriptsがあります。
